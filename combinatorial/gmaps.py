@@ -81,9 +81,9 @@ class nGmap(DualArray, Marks):
 
     def __init__ (self, array):
         super().__init__(8, self.shape[1]) # Create 8 marks for each (possible) dart
-        self.darts_dict = {}
+        self.darts_set = {}
         for i in range(self.shape[1]):
-            self.darts_dict[i] = Dart(i, {})
+            self.darts_set[i] = Dart(i, {})
 
     @classmethod
     def n_by_d (cls, n, n_darts):
@@ -128,6 +128,9 @@ class nGmap(DualArray, Marks):
         ### return (self[0] >= 0).sum()  # this would first create another big array of booleans
         return sum (1 for d in self.darts)
 
+    def get_dart_by_identifier(self, identifier: int) -> Dart:
+        return self.darts_set[identifier]
+
     @property
     def darts(self):
         """Generator to iterate thru all valid (non-negative alphas) darts"""
@@ -140,7 +143,7 @@ class nGmap(DualArray, Marks):
         """Generator to iterate thru all valid (non-negative alphas) darts"""
         for index in range (self.shape[1]):
             if self.a0(index) >= 0:
-                yield self.darts_dict[index]
+                yield self.darts_set[index]
 
     def all_dimensions_but_i (self, i=None):
         """Return a sorted sequence [0,...,n], without i, if 0 <= i <= n"""
@@ -156,6 +159,7 @@ class nGmap(DualArray, Marks):
         assert 0 <= i <= self.n
         self [i,dart] = new_dart
 
+    def alfa_i (self, i, indices): return self.darts_set[self[i, indices]]
     def ai (self, i, indices): return self[i,indices]  # TODO direct access
     def a0 (self,    indices): return self.ai(0,indices)
     def a1 (self,    indices): return self.ai(1,indices)

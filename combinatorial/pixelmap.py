@@ -45,9 +45,28 @@ class PixelMap (nGmap):
     text_HAs = 'center center right right center center left left'.split()
     text_VAs = 'top top center center bottom bottom center center'.split()
 
-    def _plot_dart_no (self, dart, rotate = False):
+
+    def _plot_dart_no_dt(self, dart_id, dt, rotate = False):
+        if dart_id >= 8*self.n_rows*self.n_cols:
+            return # TODO plot the boundary darts, too, if the maps is unbounded
+        vi0, vi1 = dart_id % 8, 1 + dart_id % 8
+        if vi1 == 8:
+            vi1 = 0
+        verts = PixelMap.vertices [[vi0,vi1]]
+        verts += [(dart_id // 8) % self.n_cols, (dart_id // 8) // self.n_cols]
+        mid = .5 * verts[0] + .5 * verts[1]
+        mid += 0.005 * PixelMap.text_offsets [vi0]
+        plt.text (mid[0], mid[1], dt,
+                  ha      = PixelMap.text_HAs  [dart_id % 8],
+                  va      = PixelMap.text_VAs   [dart_id % 8],
+                  rotation=PixelMap.text_angles[dart_id % 8] * rotate
+                  )
+
+
+    def _plot_dart_no(self, dart, rotate = False):
+        print(f"dart: {dart}")
         if dart >= 8*self.n_rows*self.n_cols:
-            return #  TODO plot the boundary darts, too, if the maps is unbounded
+            return # TODO plot the boundary darts, too, if the maps is unbounded
         vi0, vi1 = dart % 8, 1 + dart % 8
         if vi1 == 8:
             vi1 = 0
@@ -60,6 +79,34 @@ class PixelMap (nGmap):
             va      = PixelMap.text_VAs   [dart%8],
             rotation= PixelMap.text_angles[dart%8] * rotate
         )
+
+    def plot_faces_dt(self, number_darts = True):
+        vertices = PixelMap.vertices
+        # iterate over 2-cells
+        for some_dart in self.darts_of_i_cells (2):
+            x,y = [],[]
+            for dart in self.cell_2 (some_dart): # for 2D maps the orbiting darts of the face are 'sorted'
+                x.append (vertices [dart%8,0] + (dart // 8) %  self.n_cols)
+                y.append (vertices [dart%8,1] + (dart // 8) // self.n_cols)
+                if number_darts:
+                    distance = self.darts_set[dart].attributes["distance"]
+                    self._plot_dart_no_dt(dart, distance)
+            x.append (vertices [some_dart%8,0] + (some_dart // 8) %  self.n_cols)
+            y.append (vertices [some_dart%8,1] + (some_dart // 8) // self.n_cols)
+
+            plt.fill (x, y, alpha=.2)
+            plt.plot (x,y)
+            plt.scatter (x[1::2],y[1::2],marker='+',color='k')
+            plt.scatter (x[0::2],y[0::2],marker='o',color='k')
+
+        plt.gca().set_aspect (1)
+        plt.xticks ([])  # (np.arange (self.n_cols))
+        plt.yticks ([])  # (np.arange (self.n_rows)[::-1])
+        plt.ylim (self.n_rows-.5, -.5)
+        plt.axis ('off')
+        plt.title (self.__str__())
+        plt.show() # added by LordCatello. Without it does not work (it only works in a notebook)
+
 
     def plot_faces (self, number_darts = True):
         vertices = PixelMap.vertices
