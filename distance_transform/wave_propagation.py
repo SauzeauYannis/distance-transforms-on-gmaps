@@ -1,9 +1,74 @@
 import typing
 from combinatorial.gmaps import Dart
 from queue import Queue
+import numpy as np
+
+def wave_propagation_dt_binary_image(image: np.array) -> np.array:
+    """
+    4-neighborhood connection
+
+    :param image:
+    :return:
+    """
+
+    def get_next_neighbour(index: int, x: int, y: int, max_x: int, max_y: int) -> (int, int):
+        """
+        Preconditions:
+            x and y are valid values, i.e. x, y >= 0 and x <= max_x and y <= max_y
+
+        :param index:
+        :param x:
+        :param y:
+        :return:
+        """
+        if index == 0:  # left
+            if y - 1 < 0:
+                return None
+            else:
+                return x, y - 1
+        elif index == 1:  # up
+            if x - 1 < 0:
+                return None
+            else:
+                return x - 1, y
+        elif index == 2:  # right
+            if y + 1 > max_y:
+                return None
+            else:
+                return x, y + 1
+        elif index == 3:  # down
+            if x + 1 > max_x:
+                return None
+            else:
+                return x + 1, y
+        else:
+            raise Exception(f"Unexpected index {index}")
+
+    output_image = np.zeros(image.shape, image.dtype)
+    # initialize output_image to None
+    for i in range(output_image.shape[0]):
+        for j in range(output_image.shape[1]):
+            output_image[i][j] = None
+
+    # find seeds and add to queue
+    queue = Queue()
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            if image[i][j] == 0:
+                queue.put((i, j))
+                output_image[i][j] = 0
+
+    while not queue.empty():
+        pixel = queue.get()
+        # Visit all the neighbours
+        for i in range(4):
+            neighbour = get_next_neighbour(i, pixel[0], pixel[1], image.shape[0], image.shape[1])
+            if neighbour is not None and output_image[neighbour[0], neighbour[1]] is None:
+                output_image[neighbour[0], neighbour[1]] = output_image[pixel[0], pixel[1]] + 1
+                queue.put(neighbour)
 
 
-def wave_propagation_dt(gmap, seeds_identifiers: typing.List[int]) -> None:
+def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.List[int]) -> None:
     """
     It computes the dt for the gmap passed as parameter.
     The distance propagates through all the cells (using all the involutions).
