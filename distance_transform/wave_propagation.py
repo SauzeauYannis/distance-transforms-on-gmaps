@@ -48,7 +48,7 @@ def wave_propagation_dt_binary_image(image: np.array) -> np.array:
     # initialize output_image to None
     for i in range(output_image.shape[0]):
         for j in range(output_image.shape[1]):
-            output_image[i][j] = None
+            output_image[i][j] = -1
 
     # find seeds and add to queue
     queue = Queue()
@@ -62,10 +62,12 @@ def wave_propagation_dt_binary_image(image: np.array) -> np.array:
         pixel = queue.get()
         # Visit all the neighbours
         for i in range(4):
-            neighbour = get_next_neighbour(i, pixel[0], pixel[1], image.shape[0], image.shape[1])
-            if neighbour is not None and output_image[neighbour[0], neighbour[1]] is None:
+            neighbour = get_next_neighbour(i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
+            if neighbour is not None and output_image[neighbour[0], neighbour[1]] == -1:
                 output_image[neighbour[0], neighbour[1]] = output_image[pixel[0], pixel[1]] + 1
                 queue.put(neighbour)
+
+    return output_image
 
 
 def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.List[int]) -> None:

@@ -356,7 +356,7 @@ class dict_nGmap:
     def sewable(self, d1, d2, i):
         """
         algorithm 19
-        tests wether darts d1, d2 are sewable along i
+        test wether darts d1, d2 are sewable along i
         returns bool
         """
         if d1 == d2 or not self.is_i_free(i, d1) or not self.is_i_free(i, d2):
