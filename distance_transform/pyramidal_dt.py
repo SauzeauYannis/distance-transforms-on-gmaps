@@ -1,3 +1,5 @@
+import typing
+
 import numpy as np
 import math
 
@@ -95,22 +97,90 @@ def reduce_size_binary_image(image: np.array, stride: int) -> np.array:
 
 def interpolate_dt_binary_image(dt_reduced_image: np.array, stride: int) -> np.array:
     """
-    PRECONDITIONS:
-    1) An odd stride has to be used
+    The following algorithm is sequential but it should be parallelized in order to obtained
+    probably constant time performance.
+
+    Moreover the algorithm has been implemented giving priority to readability, sacrificing performance.
+    If the results will be good a more efficient version of the algorithm will be implemented.
 
     :param dt_reduced_image:
     :param stride:
     :return:
     """
 
-    if stride % 2 == 0:
-        raise Exception("The stride has to be odd")
+    def wave_propagation_interpolation(image: np.array, center_position: typing.Tuple[int, int], stride: int) -> None:
+        # Particular attention must be paid to the management of borders
+        # I have to consider a square of (stride - 1) radius
+
+        # It could be difficult to compute this programmatically
+        # Maybe it is better to use a different approach
+        # Like directly applying wave propagation
+        # Or I have just to study more the geometry problem and find
+        # a simple solution
+        for i in range(stride - 1):
+            # top row
+
+            # bottom row
+            # left col
+            # right col
+
+            # diagonals
+
 
     dt_original_image_shape = [dim * stride for dim in dt_reduced_image.shape]
     dt_original_image = np.zeros(dt_original_image_shape, dtype=dt_reduced_image.dtype)
 
-    # Not so easy. I should do it tomorrow morning, with fresh energies.
-    # 1) I can compute the average? But what does it mean? It doesn't have any sense
-    # 2) My idea is to increase or decrease by 1 the distance moving from the center of the interpolated cell
-    #    I have to compute the direction of growth in order to understand if I have to increase or decrease the distance
-    #    View photo saved on Telegram for details on that.
+    # Initialization
+    for i in range(dt_original_image.shape[0]):
+        for j in range(dt_original_image.shape[1]):
+            dt_original_image[i][j] = -1
+
+    # 1) Fill original image with values obtained from the reduced one multiplied by stride
+    #    The values will always be placed in the top left position
+    #    Example
+    """
+         0 1
+         1 2
+         
+         0 ? 2 ?
+         ? ? ? ?
+         2 ? 4 ?
+         ? ? ? ?
+    """
+    for i in range(dt_reduced_image.shape[0]):
+        for j in range(dt_reduced_image.shape[1]):
+            dt_original_image[i*stride][j*stride] = dt_reduced_image[i][j] * stride
+
+    # 2) Interpolate
+    """
+    Algorithm:
+        For each not -1 value in the original image apply wave propagation considering a square
+        centered in the value with radius/diagonal equals to (stride - 1)
+        
+        Square Example
+        stride = 3
+        
+        x x x x x
+        x x x x x
+        x x 4 x x
+        x x x x x
+        x x x x x
+        
+        The x values indicated the pixels where wave propagation has to be applied
+        
+        Apply wave propagation this way collision between different centers will happen.
+        This is the desired behaviour. In fact if for a pixel multiple values have been evaluated
+        from different centers the smallest one will be considered.
+        
+        This will ensure that a coherent dt image will be obtained, where coherent means that the distance between
+        each two neighbours pixels is never greater than 1 and the growth direction is coherent.
+        
+        A detailed explanations and more examples can be found in my notebook.
+    """
+
+    for i in range(dt_reduced_image.shape[0]):
+        for j in range(dt_reduced_image.shape[1]):
+            current_center_position = (i * stride, j * stride)
+            wave_propagation_interpolation(dt_original_image, current_center_position, stride)
+
+    return dt_original_image
