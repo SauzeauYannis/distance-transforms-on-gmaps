@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from distance_transform.pyramidal_dt import *
 from distance_transform.dt_utils import *
+from distance_transform.performance_evaluation import *
 import numpy as np
 
 
@@ -79,9 +80,20 @@ class TestPyramidalDt(TestCase):
         self.assertEqual(self.expected_interpolated_binary_image_1.tolist(), actual.tolist())
         plot_dt_image(actual, max_value=10)
 
+        # Performance
+        mae = mae_image(self.expected_binary_image_1_dt, actual)
+        print(f"mae: {mae}")
+
     def test_pyramidal_dt_binary_image_single_center(self):
         plot_binary_image(self.binary_image_2)
         plot_dt_image(self.expected_binary_image_2_dt, max_value=10)
         actual = pyramidal_dt_binary_image(self.binary_image_2, stride=2)
         plot_dt_image(actual, max_value=10)
+
+        # Performance
+        mae = mae_image(self.expected_binary_image_2_dt, actual)
+        print(f"mae: {mae}")
+
+        self.assertTrue(True)
+
 

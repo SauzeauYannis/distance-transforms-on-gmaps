@@ -3,6 +3,7 @@ from unittest import TestCase
 import numpy as np
 from distance_transform.wave_propagation import *
 
+
 class TestWavePropagation(TestCase):
     def setUp(self) -> None:
         self.binary_image_1 = np.array(
