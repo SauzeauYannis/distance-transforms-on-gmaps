@@ -24,9 +24,6 @@ def pyramidal_dt_binary_image(image: np.array, stride: int) -> np.array:
     :param stride:
     :return:
     """
-
-    dt_image = np.zeros(image.shape, dtype=image.dtype)
-
     # reduce image
     reduced_image = reduce_size_binary_image(image, stride)
 
@@ -34,7 +31,7 @@ def pyramidal_dt_binary_image(image: np.array, stride: int) -> np.array:
     dt_image = wave_propagation_dt_image(reduced_image)
 
     # interpolate
-
+    dt_image = interpolate_dt_binary_image(dt_image, stride)
 
     return dt_image
 
@@ -190,7 +187,5 @@ def interpolate_dt_binary_image(dt_reduced_image: np.array, stride: int) -> np.a
         for j in range(dt_reduced_image.shape[1]):
             original_image_center_position = (i * stride, j * stride)
             wave_propagation_interpolation(dt_original_image, original_image_center_position, stride)
-
-    print(dt_original_image)
 
     return dt_original_image
