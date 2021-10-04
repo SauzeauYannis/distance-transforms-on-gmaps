@@ -4,7 +4,7 @@ import numpy as np
 import math
 
 
-from wave_propagation import wave_propagation_dt_binary_image
+from distance_transform.wave_propagation import wave_propagation_dt_image
 
 
 def pyramidal_dt_binary_image(image: np.array, stride: int) -> np.array:
@@ -31,7 +31,7 @@ def pyramidal_dt_binary_image(image: np.array, stride: int) -> np.array:
     reduced_image = reduce_size_binary_image(image, stride)
 
     # compute dt
-    dt_image = wave_propagation_dt_binary_image(reduced_image)
+    dt_image = wave_propagation_dt_image(reduced_image)
 
     # interpolate
 
@@ -97,8 +97,7 @@ def reduce_size_binary_image(image: np.array, stride: int) -> np.array:
 
 def interpolate_dt_binary_image(dt_reduced_image: np.array, stride: int) -> np.array:
     """
-    The following algorithm is sequential but it should be parallelized in order to obtained
-    probably constant time performance.
+    The algorithm is sequential but it can be parallelized to obtain (hopefully) O(1) time complexity.
 
     Moreover the algorithm has been implemented giving priority to readability, sacrificing performance.
     If the results will be good a more efficient version of the algorithm will be implemented.
@@ -109,23 +108,32 @@ def interpolate_dt_binary_image(dt_reduced_image: np.array, stride: int) -> np.a
     """
 
     def wave_propagation_interpolation(image: np.array, center_position: typing.Tuple[int, int], stride: int) -> None:
-        # Particular attention must be paid to the management of borders
-        # I have to consider a square of (stride - 1) radius
+        # Get sub-image centered in center_position and call wave propagation algorithm
+        center_x = center_position[0]
+        center_y = center_position[1]
+        radius = stride - 1
 
-        # It could be difficult to compute this programmatically
-        # Maybe it is better to use a different approach
-        # Like directly applying wave propagation
-        # Or I have just to study more the geometry problem and find
-        # a simple solution
-        for i in range(stride - 1):
-            # top row
+        left_x = max(center_x - radius, 0)
+        left_y = max(center_y - radius, 0)
 
-            # bottom row
-            # left col
-            # right col
+        right_x = center_x + radius + 1  # +1 is necessary because right_x and right_y are included
+        right_y = center_y + radius + 1
 
-            # diagonals
+        sub_image_center_x = center_x - left_x
+        sub_image_center_y = center_y - left_y
 
+        output_image = wave_propagation_dt_image(image[left_x:right_x, left_y:right_y],
+                                                 seeds=[(sub_image_center_x, sub_image_center_y)])
+
+        # Update the input image saving the minimum between the current value and the new one for each pixel
+        for i in range(output_image.shape[0]):
+            for j in range(output_image.shape[1]):
+                original_x = i + left_x
+                original_y = j + left_y
+                if image[original_x][original_y] == -1:
+                    image[original_x][original_y] = output_image[i][j]
+                else:
+                    image[original_x][original_y] = min(image[original_x][original_y], output_image[i][j])
 
     dt_original_image_shape = [dim * stride for dim in dt_reduced_image.shape]
     dt_original_image = np.zeros(dt_original_image_shape, dtype=dt_reduced_image.dtype)
@@ -170,8 +178,8 @@ def interpolate_dt_binary_image(dt_reduced_image: np.array, stride: int) -> np.a
         
         Apply wave propagation this way collision between different centers will happen.
         This is the desired behaviour. In fact if for a pixel multiple values have been evaluated
-        from different centers the smallest one will be considered.
-        
+        from different centers only the smallest one will be kept.
+    
         This will ensure that a coherent dt image will be obtained, where coherent means that the distance between
         each two neighbours pixels is never greater than 1 and the growth direction is coherent.
         
@@ -180,7 +188,9 @@ def interpolate_dt_binary_image(dt_reduced_image: np.array, stride: int) -> np.a
 
     for i in range(dt_reduced_image.shape[0]):
         for j in range(dt_reduced_image.shape[1]):
-            current_center_position = (i * stride, j * stride)
-            wave_propagation_interpolation(dt_original_image, current_center_position, stride)
+            original_image_center_position = (i * stride, j * stride)
+            wave_propagation_interpolation(dt_original_image, original_image_center_position, stride)
+
+    print(dt_original_image)
 
     return dt_original_image

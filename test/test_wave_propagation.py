@@ -19,5 +19,5 @@ class TestWavePropagation(TestCase):
             [2, 3, 4, 3, 4]])
 
     def test_wave_propagation_dt_binary_image(self):
-        actual = wave_propagation_dt_binary_image(self.binary_image_1)
+        actual = wave_propagation_dt_image(self.binary_image_1)
         self.assertEqual(self.expected_binary_image_1_dt.tolist(), actual.tolist())

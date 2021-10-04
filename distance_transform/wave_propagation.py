@@ -3,11 +3,13 @@ from combinatorial.gmaps import Dart
 from queue import Queue
 import numpy as np
 
-def wave_propagation_dt_binary_image(image: np.array) -> np.array:
+
+def wave_propagation_dt_image(image: np.array, seeds: typing.List[typing.Tuple[int, int]] = None) -> np.array:
     """
     4-neighborhood connection
 
     :param image:
+    :param seeds: A list of seeds (x, y). If None, all values equal to 0 in the image will be used as seeds
     :return:
     """
 
@@ -45,18 +47,23 @@ def wave_propagation_dt_binary_image(image: np.array) -> np.array:
             raise Exception(f"Unexpected index {index}")
 
     output_image = np.zeros(image.shape, image.dtype)
-    # initialize output_image to None
+    # initialize output_image
     for i in range(output_image.shape[0]):
         for j in range(output_image.shape[1]):
             output_image[i][j] = -1
 
-    # find seeds and add to queue
     queue = Queue()
-    for i in range(image.shape[0]):
-        for j in range(image.shape[1]):
-            if image[i][j] == 0:
-                queue.put((i, j))
-                output_image[i][j] = 0
+    if seeds is None:
+        # find seeds and add to queue
+        for i in range(image.shape[0]):
+            for j in range(image.shape[1]):
+                if image[i][j] == 0:
+                    queue.put((i, j))
+                    output_image[i][j] = 0
+    else:
+        for seed in seeds:
+            output_image[seed[0]][seed[1]] = image[seed[0]][seed[1]]
+            queue.put(seed)
 
     while not queue.empty():
         pixel = queue.get()
