@@ -1,7 +1,6 @@
 import typing
 from unittest import TestCase
 
-import random
 import math
 
 from distance_transform.wave_propagation import wave_propagation_dt_image
@@ -13,17 +12,6 @@ from distance_transform.dt_utils import *
 class EvaluatePerformancePyramidalDt(TestCase):
     def setUp(self) -> None:
         random.seed(42)
-
-    def generate_random_image(self, image_size: int, background_pixel_probability: float) -> np.array:
-        image = np.ones((image_size, image_size), dtype=int)
-
-        for i in range(image.shape[0]):
-            for j in range(image.shape[1]):
-                random_float = random.random()
-                if random_float < background_pixel_probability:
-                    image[i][j] = 0
-
-        return image
 
     def evaluate_mae_with_multiple_strides(self, image, strides: typing.List[int]) -> None:
         plot_binary_image(image)
@@ -49,7 +37,7 @@ class EvaluatePerformancePyramidalDt(TestCase):
         self.assertTrue(True)
 
     def test_mae_random_images(self):
-        image = self.generate_random_image(128, 0.01)
+        image = generate_random_binary_image(128, 0.01)
         # evaluate the performance on the same image with different strides (from 2 to 64)
         self.evaluate_mae_with_multiple_strides(image, [2, 4, 8, 16, 64])
         self.assertTrue(True)
