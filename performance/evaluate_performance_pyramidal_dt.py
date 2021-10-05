@@ -21,7 +21,7 @@ class EvaluatePerformancePyramidalDt(TestCase):
             approximate_dt_image = pyramidal_dt_binary_image(image, stride)
 
             mae = mae_image(dt_image, approximate_dt_image)
-            print(f"mae with image_size {image.shape[0]} is {mae} and stride {stride}")
+            print(f"mae: {mae} - stride: {stride} - image_compression_percentage: {(1 - 1/stride) * 100}%")
 
             # Show images
             plot_dt_image(approximate_dt_image)
@@ -37,7 +37,15 @@ class EvaluatePerformancePyramidalDt(TestCase):
         self.assertTrue(True)
 
     def test_mae_random_images(self):
-        image = generate_random_binary_image(128, 0.01)
-        # evaluate the performance on the same image with different strides (from 2 to 64)
-        self.evaluate_mae_with_multiple_strides(image, [2, 4, 8, 16, 64])
+        image_size = 128
+        background_prob = 0.01
+        strides = [2, 4, 8, 16, 64]
+        print(f"background probability: {background_prob} - image size: {image_size}")
+        image = generate_random_binary_image(image_size, background_prob)
+        self.evaluate_mae_with_multiple_strides(image, strides)
+
+        background_prob = 0.001
+        print(f"background probability: {background_prob} - image size: {image_size}")
+        image = generate_random_binary_image(image_size, background_prob)
+        self.evaluate_mae_with_multiple_strides(image, strides)
         self.assertTrue(True)
