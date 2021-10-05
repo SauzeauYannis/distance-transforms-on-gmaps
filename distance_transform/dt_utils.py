@@ -41,3 +41,24 @@ def generate_random_binary_image(image_size: int, background_pixel_probability: 
                 image[i][j] = 0
 
     return image
+
+
+def gmap_dt_equal(gmap_1, gmap_2) -> bool:
+    """
+    It returns True if each dart in the two gmap passed as parameters has the same distance value.
+
+    PRECONDITIONS:
+    The two gmaps need to have the same structure.
+    """
+
+    for dart_1, dart_2 in zip(gmap_1.darts_with_attributes, gmap_2.darts_with_attributes):
+        if dart_1.identifier != dart_2.identifier:
+            raise Exception(f"The identifiers don't match. id 1: {dart_1.identifier} - id 2: {dart_2.identifier}")
+
+        distance_1 = dart_1.attributes["distance"]
+        distance_2 = dart_2.attributes["distance"]
+        if distance_1 != distance_2:
+            print(f"dart id: {dart_1.identifier} - dart 1 distance: {distance_1} - dart 2 distance: {distance_2}")
+            return False
+
+    return True

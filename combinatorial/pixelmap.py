@@ -64,7 +64,7 @@ class PixelMap (nGmap):
 
 
     def _plot_dart_no(self, dart, rotate = False):
-        print(f"dart: {dart}")
+        # print(f"dart: {dart}")
         if dart >= 8*self.n_rows*self.n_cols:
             return # TODO plot the boundary darts, too, if the maps is unbounded
         vi0, vi1 = dart % 8, 1 + dart % 8

@@ -131,6 +131,9 @@ class nGmap(DualArray, Marks):
     def get_dart_by_identifier(self, identifier: int) -> Dart:
         return self.darts_set[identifier]
 
+    def set_dart_distance(self, identifier: int, distance: int) -> None:
+        self.darts_set[identifier].attributes["distance"] = distance
+
     @property
     def darts(self):
         """Generator to iterate thru all valid (non-negative alphas) darts"""
