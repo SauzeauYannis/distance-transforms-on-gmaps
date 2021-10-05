@@ -36,6 +36,19 @@ def pyramidal_dt_binary_image(image: np.array, stride: int) -> np.array:
     return dt_image
 
 
+def improved_pyramidal_dt_binary_image(image: np.array, stride: int) -> np.array:
+    # reduce image
+    reduced_image = reduce_size_binary_image(image, stride)
+
+    # compute dt
+    dt_image = wave_propagation_dt_image(reduced_image)
+
+    # interpolate
+    dt_image = improved_interpolate_dt_binary_image(image, dt_image)
+
+    return dt_image
+
+
 def reduce_size_binary_image(image: np.array, stride: int) -> np.array:
     """
     How to compress the image?
@@ -121,11 +134,16 @@ def _wave_propagation_interpolation(image: np.array, center_position: typing.Tup
     sub_image_center_x = center_x - left_x
     sub_image_center_y = center_y - left_y
 
-    # get seeds
-    The
+    sub_image = image[left_x:right_x, left_y:right_y]
+    # Get seeds
+    seeds = []
+    if sub_image[sub_image_center_x, sub_image_center_y] > 0:
+        seeds.append((sub_image_center_x, sub_image_center_y))
+    else:
+        # If None the wave propagation algorithm will use all zeroes found in the image as seeds
+        seeds = None
 
-    output_image = wave_propagation_dt_image(image[left_x:right_x, left_y:right_y],
-                                             seeds=[(sub_image_center_x, sub_image_center_y)])
+    output_image = wave_propagation_dt_image(sub_image, seeds=seeds)
 
     # Update the input image saving the minimum between the current value and the new one for each pixel
     for i in range(output_image.shape[0]):
@@ -223,9 +241,9 @@ def improved_interpolate_dt_binary_image(original_image: np.array, dt_reduced_im
     """
 
     # Compute stride
-    stride = original_image.shape[0] / dt_reduced_image.shape[0]
-    if type(stride) is not int:
-        raise Exception(f"stride is not int - stride: {stride}")
+    if original_image.shape[0] % dt_reduced_image.shape[0] != 0:
+        raise Exception(f"stride is not int")
+    stride = int(original_image.shape[0] / dt_reduced_image.shape[0])
 
     # Initialize to -1 except for background pixels
     dt_interpolated_image = np.zeros(original_image.shape, dtype=dt_reduced_image.dtype)
@@ -249,3 +267,4 @@ def improved_interpolate_dt_binary_image(original_image: np.array, dt_reduced_im
             interpolated_image_center_position = (i * stride, j * stride)
             _wave_propagation_interpolation(dt_interpolated_image, interpolated_image_center_position, stride)
 
+    return dt_interpolated_image
