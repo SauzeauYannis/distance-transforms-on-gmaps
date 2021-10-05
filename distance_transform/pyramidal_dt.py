@@ -189,3 +189,19 @@ def interpolate_dt_binary_image(dt_reduced_image: np.array, stride: int) -> np.a
             wave_propagation_interpolation(dt_original_image, original_image_center_position, stride)
 
     return dt_original_image
+
+
+def improved_interpolate_dt_binary_image(original_image: np.array, dt_reduced_image: np.array) -> np.array:
+    """
+    IMPROVEMENTS:
+    All the pixels equal to 0 isn the original image (background/seeds)
+    will be equal to 0 also in the interpolated image.
+    Wave propagation will be executed also from all of this seeds.
+    The algorithm should remain parallelizable as the naive one.
+
+    MINOR CHANGES:
+    The stride parameter is no longer required because can be automatically computed from the shape
+    of the images passed as parameters.
+    """
+
+
