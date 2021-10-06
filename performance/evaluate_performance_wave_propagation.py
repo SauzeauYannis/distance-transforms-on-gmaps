@@ -50,7 +50,7 @@ class EvaluatePerformanceWavePropagation(TestCase):
         self.assertTrue(True)
 
     def test_time_wave_propagation_dt_binary_image(self):
-        image_sizes = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+        image_sizes = [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]
         elapsed_times = []
         background_probability = 0.01
 

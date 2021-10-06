@@ -80,7 +80,7 @@ class nGmap(DualArray, Marks):
     """g-map based on indices"""
 
     def __init__ (self, array):
-        super().__init__(8, self.shape[1]) # Create 8 marks for each (possible) dart
+        super().__init__(8, self.shape[1])  # Create 8 marks for each (possible) dart
         self.darts_set = {}
         for i in range(self.shape[1]):
             self.darts_set[i] = Dart(i, {})

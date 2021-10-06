@@ -75,7 +75,9 @@ class TestPyramidalDt(TestCase):
              [6, 5, 4, 3, 4, 5, 6, 7]])
 
     def test_reduce_size_binary_image(self):
+        plot_binary_image(self.binary_image_1)
         actual = reduce_size_binary_image(self.binary_image_1, stride=2)
+        plot_binary_image(actual)
         self.assertEqual(self.expected_reduced_binary_image_1.tolist(), actual.tolist())
 
     def test_interpolate_dt_binary_image(self):
