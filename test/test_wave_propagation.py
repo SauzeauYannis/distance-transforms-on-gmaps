@@ -73,3 +73,13 @@ class TestWavePropagation(TestCase):
         actual_gmap.plot_faces_dt()
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
+
+    def test_wave_propagation_dt_gmap_corner(self):
+        seeds = [7]
+
+        actual_gmap = PixelMap.from_shape(2, 2)
+
+        wave_propagation_dt_gmap(actual_gmap, seeds)
+
+        # plot
+        actual_gmap.plot_faces_dt()
