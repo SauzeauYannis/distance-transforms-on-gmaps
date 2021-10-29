@@ -80,8 +80,8 @@ def dt_on_label_map_example():
 
 def dt_cell_10():
     image = str2labels(CELL_5)
-    plt.imshow(image)
-    plt.show()
+    #plt.imshow(image)
+    #plt.show()
 
     # Now I need a function to set seeds on an image
     # Then I need a function to convert the image with the seeds
@@ -90,11 +90,17 @@ def dt_cell_10():
     # vertices
 
     gmap = LabelMap.from_labels(image)
-    gmap.plot(number_darts=True)
+    #gmap.plot(number_darts=False)
 
     seeds = [6, 5, 40, 47, 148, 185, 157, 192]
 
     wave_propagation_dt_gmap(gmap, seeds)
-    gmap.plot_faces_dt()
+    gmap.plot_dt()
+
+    gmap.remove_edges()
+    gmap.remove_vertices()
+    #gmap.plot(number_darts=True)
+    gmap.plot_dt()
+
 
 dt_cell_10()

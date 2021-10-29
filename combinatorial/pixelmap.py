@@ -6,6 +6,7 @@ __all__ = ['PixelMap', 'LabelMap']
 
 import logging
 import numpy as np
+from combinatorial.utils import *
 from .gmaps import nGmap
 from .zoo import G2_SQUARE_BOUNDED, G2_SQUARE_UNBOUNDED
 
@@ -83,7 +84,7 @@ class PixelMap (nGmap):
     def plot_faces_dt(self, number_darts = True):
         vertices = PixelMap.vertices
         # iterate over 2-cells
-        for some_dart in self.darts_of_i_cells (2):
+        for some_dart in self.darts_of_i_cells(2):
             x,y = [],[]
             for dart in self.cell_2 (some_dart): # for 2D maps the orbiting darts of the face are 'sorted'
                 x.append (vertices [dart%8,0] + (dart // 8) %  self.n_cols)
@@ -94,8 +95,8 @@ class PixelMap (nGmap):
             x.append (vertices [some_dart%8,0] + (some_dart // 8) %  self.n_cols)
             y.append (vertices [some_dart%8,1] + (some_dart // 8) // self.n_cols)
 
-            plt.fill (x, y, alpha=.2)
-            plt.plot (x,y)
+            plt.fill(x, y, alpha=.2, color='w')
+            plt.plot(x, y, color='k')
             plt.scatter (x[1::2],y[1::2],marker='+',color='k')
             plt.scatter (x[0::2],y[0::2],marker='o',color='k')
 
@@ -257,8 +258,8 @@ class LabelMap (PixelMap):
         """
         for d in self.darts:
             e = self.a0(d)
-            plt.plot   (self._dart_polyline[d][ :,0], self._dart_polyline[d][: ,1],'k-')
-            plt.plot ([self._dart_polyline[d][-1,0],self._dart_polyline[e][-1,0]],[self._dart_polyline[d][-1,1],self._dart_polyline[e][-1,1]], 'k-')
+            plt.plot(self._dart_polyline[d][ :,0], self._dart_polyline[d][: ,1],'k-')
+            plt.plot([self._dart_polyline[d][-1,0],self._dart_polyline[e][-1,0]],[self._dart_polyline[d][-1,1],self._dart_polyline[e][-1,1]], 'k-')
             # f = self.a1(d)
             # plt.plot ([self._dart_polyline[d][ 0,0],self._dart_polyline[f][ 0,0]],[self._dart_polyline[d][ 0,1],self._dart_polyline[f][ 0,1]], 'b-')
             if number_darts:
@@ -267,15 +268,70 @@ class LabelMap (PixelMap):
 #             plt.scatter(self._dart_polyline[d][-1,0], self._dart_polyline[d][-1,1], marker='+')
 
         if image_palette:
-            plt.imshow (self.labels, alpha=0.5, cmap=image_palette)
+            plt.imshow(self.labels, alpha=0.5, cmap=image_palette)
 
         plt.gca().set_aspect (1)
-        plt.xticks ([])  # (np.arange (self.n_cols))
-        plt.yticks ([])  # (np.arange (self.n_rows)[::-1])
+        plt.xticks([])  # (np.arange (self.n_cols))
+        plt.yticks([])  # (np.arange (self.n_rows)[::-1])
         plt.ylim (self.n_rows-.5, -.5)
         plt.axis ('off')
         plt.title (self.__str__())
         plt.show() # added by LordCatello. Without it does not work (it only works in a notebook)
+
+    def _evaluate_max_dt_value(self) -> float:
+        max_distance = 0
+        for d in self.darts:
+            distance = self.darts_set[d].attributes["distance"]
+            if distance > max_distance:
+                max_distance = distance
+
+        return max_distance
+
+    def plot_dt(self, show_values=True, fill_cell='face'):
+        # The coloring of the faces doesn't work super well after
+        # the reduction
+        # I have to take darts of the same 2-cell
+
+        # evaluate max distance
+        max_distance = self._evaluate_max_dt_value()
+
+        for representative_dart in self.darts_of_i_cells(2):
+            # The distance of the cell is evaluated as the min distance among all his darts
+            x_values_face = []
+            y_values_face = []
+            min_distance = float('inf')
+            for d in self.cell_2(representative_dart):
+                distance = self.darts_set[d].attributes["distance"]
+                if distance < min_distance:
+                    min_distance = distance
+
+                e = self.a0(d)
+                x = list(self._dart_polyline[d][ :,0]) + [self._dart_polyline[d][-1,0],self._dart_polyline[e][-1,0]]
+                y = list(self._dart_polyline[d][: ,1]) + [self._dart_polyline[d][-1,1],self._dart_polyline[e][-1,1]]
+
+                plt.plot(x, y, 'k-')
+
+                if show_values:
+                    self._plot_dart_no_dt(d, distance)
+
+                plt.scatter(self._dart_polyline[d][0, 0], self._dart_polyline[d][0, 1], c='k')
+                x_values_face.append(x)
+                y_values_face.append(y)
+
+            if fill_cell:
+                x_values_face_ordered, y_values_face_ordered = build_polygon_from_segments((x_values_face, y_values_face))
+                color_value = min_distance / (max_distance * 2) + 0.5
+                if color_value > 1.0:
+                    raise Exception("Color value is greater than 1.0")
+                plt.fill(x_values_face_ordered, y_values_face_ordered, f"{color_value}")
+
+        plt.gca().set_aspect (1)
+        plt.xticks([])
+        plt.yticks([])
+        plt.ylim (self.n_rows-.5, -.5)
+        plt.axis ('off')
+        plt.title (self.__str__())
+        plt.show()
 
     @property
     def labels(self):
