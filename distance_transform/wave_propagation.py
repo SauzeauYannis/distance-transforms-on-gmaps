@@ -123,3 +123,31 @@ def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.List[int], accumula
                 else:
                     neighbour.attributes["distance"] = dart.attributes["distance"]
                 queue.put(neighbour)
+
+
+def generate_accumulation_directions_vertex(gmap_size: int) -> typing.List[int]:
+    accumulation_directions = []
+
+    accumulation_directions.append(True)
+    for i in range(gmap_size):
+        accumulation_directions.append(False)
+
+    return accumulation_directions
+
+
+def generate_accumulation_directions_cell(gmap_size: int) -> typing.List[int]:
+    """
+    Generates the accumulation directions array for the cell of the max dimension.
+    For a 2gmap is the face (2cell) for a 3gmap is the volume (3cell).
+    Note that the face in a 2gmap corresponds to a pixel in the corresponding image.
+    and the volume in a 3gmap corresponds to a voxel in the corresponding 3d image.
+
+    """
+    accumulation_directions = []
+
+    for i in range(gmap_size):
+        accumulation_directions.append(False)
+    accumulation_directions.append(True)
+
+    return accumulation_directions
+

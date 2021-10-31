@@ -74,7 +74,7 @@ class TestWavePropagation(TestCase):
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
-    def test_wave_propagation_dt_gmap_vertices(self):
+    def test_wave_propagation_dt_gmap_vertex(self):
         """
         Test if distance propagates correctly only through vertices
         """
@@ -117,7 +117,61 @@ class TestWavePropagation(TestCase):
         expected_gmap.set_dart_distance(30, 3)
         expected_gmap.set_dart_distance(31, 2)
 
-        wave_propagation_dt_gmap(actual_gmap, seeds, [True, False, False])
+        accumulation_directions = generate_accumulation_directions_vertex(2)
+        wave_propagation_dt_gmap(actual_gmap, seeds, accumulation_directions)
+
+        # plot
+        expected_gmap.plot_faces()
+        expected_gmap.plot_faces_dt()
+        actual_gmap.plot_faces_dt()
+
+        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
+
+    def test_wave_propagation_dt_gmap_face(self):
+        """
+        Test if distance propagates correctly only through vertices
+        """
+        seeds = [0, 1, 2, 3, 4, 5, 6, 7]
+
+        actual_gmap = PixelMap.from_shape(2, 2)
+        expected_gmap = PixelMap.from_shape(2, 2)
+
+        # set distances on expected gmap
+        expected_gmap.set_dart_distance(0, 0)
+        expected_gmap.set_dart_distance(1, 0)
+        expected_gmap.set_dart_distance(2, 0)
+        expected_gmap.set_dart_distance(3, 0)
+        expected_gmap.set_dart_distance(4, 0)
+        expected_gmap.set_dart_distance(5, 0)
+        expected_gmap.set_dart_distance(6, 0)
+        expected_gmap.set_dart_distance(7, 0)
+        expected_gmap.set_dart_distance(8, 1)
+        expected_gmap.set_dart_distance(9, 1)
+        expected_gmap.set_dart_distance(10, 1)
+        expected_gmap.set_dart_distance(11, 1)
+        expected_gmap.set_dart_distance(12, 1)
+        expected_gmap.set_dart_distance(13, 1)
+        expected_gmap.set_dart_distance(14, 1)
+        expected_gmap.set_dart_distance(15, 1)
+        expected_gmap.set_dart_distance(16, 1)
+        expected_gmap.set_dart_distance(17, 1)
+        expected_gmap.set_dart_distance(18, 1)
+        expected_gmap.set_dart_distance(19, 1)
+        expected_gmap.set_dart_distance(20, 1)
+        expected_gmap.set_dart_distance(21, 1)
+        expected_gmap.set_dart_distance(22, 1)
+        expected_gmap.set_dart_distance(23, 1)
+        expected_gmap.set_dart_distance(24, 2)
+        expected_gmap.set_dart_distance(25, 2)
+        expected_gmap.set_dart_distance(26, 2)
+        expected_gmap.set_dart_distance(27, 2)
+        expected_gmap.set_dart_distance(28, 2)
+        expected_gmap.set_dart_distance(29, 2)
+        expected_gmap.set_dart_distance(30, 2)
+        expected_gmap.set_dart_distance(31, 2)
+
+        accumulation_directions = generate_accumulation_directions_cell(2)
+        wave_propagation_dt_gmap(actual_gmap, seeds, accumulation_directions)
 
         # plot
         expected_gmap.plot_faces()
