@@ -77,21 +77,34 @@ def wave_propagation_dt_image(image: np.array, seeds: typing.List[typing.Tuple[i
     return output_image
 
 
-def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.List[int]) -> None:
+def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.List[int], accumulation_directions: typing.List[bool] = None) -> None:
     """
     It computes the dt for the gmap passed as parameter.
     The distance propagates through all the cells (using all the involutions).
 
-    A parameter can be added in order to consider only a subset of involutions.
-
-    :param gmap:
-    :param seeds_identifiers:
-    :return:
+    Despite the fact that distance propagates through all the directions, a distance unit is not necessarily added
+    for all the directions.
+    The accumulation_directions parameter can be used to specify to which directions increase the distance.
+    accumulation_directions has to be a list of n+1 elements, where n is the level of the gmap.
+    Each element can be True, if the distance has to be increased, or False otherwise.
+    Passing None as parameter has the same result of passing an array of False.
+    The default behaviour is to increase the distance for all the directions, but a different combination can be used
+    to increase distances in a different way.
+    For example if the distance has to be increased only passing from a vertex to another, the combination of
+    alfa0 = True and alfai = False for all the remaining i
+    So the array should be: [True False False] for a 2-gmap
+    can be used.
     """
 
     # Initialization
     for dart in gmap.darts_with_attributes:
         dart.attributes["distance"] = None
+
+    # Initialize accumulation directions if None
+    if accumulation_directions is None:
+        accumulation_directions = []
+        for i in range(gmap.n + 1):
+            accumulation_directions.append(True)
 
     queue = Queue()
     for seed_identifier in seeds_identifiers:
@@ -105,5 +118,8 @@ def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.List[int]) -> None:
         for i in range(gmap.n + 1):
             neighbour = gmap.alfa_i(i, dart.identifier)
             if neighbour.attributes["distance"] is None:
-                neighbour.attributes["distance"] = dart.attributes["distance"] + 1
+                if accumulation_directions[i]:
+                    neighbour.attributes["distance"] = dart.attributes["distance"] + 1
+                else:
+                    neighbour.attributes["distance"] = dart.attributes["distance"]
                 queue.put(neighbour)

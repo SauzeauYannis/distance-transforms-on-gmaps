@@ -74,6 +74,58 @@ class TestWavePropagation(TestCase):
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
+    def test_wave_propagation_dt_gmap_vertices(self):
+        """
+        Test if distance propagates correctly only through vertices
+        """
+        seeds = [0, 7]
+
+        actual_gmap = PixelMap.from_shape(2, 2)
+        expected_gmap = PixelMap.from_shape(2, 2)
+
+        # set distances on expected gmap
+        expected_gmap.set_dart_distance(0, 0)
+        expected_gmap.set_dart_distance(1, 1)
+        expected_gmap.set_dart_distance(2, 1)
+        expected_gmap.set_dart_distance(3, 2)
+        expected_gmap.set_dart_distance(4, 2)
+        expected_gmap.set_dart_distance(5, 1)
+        expected_gmap.set_dart_distance(6, 1)
+        expected_gmap.set_dart_distance(7, 0)
+        expected_gmap.set_dart_distance(8, 1)
+        expected_gmap.set_dart_distance(9, 2)
+        expected_gmap.set_dart_distance(10, 2)
+        expected_gmap.set_dart_distance(11, 3)
+        expected_gmap.set_dart_distance(12, 3)
+        expected_gmap.set_dart_distance(13, 2)
+        expected_gmap.set_dart_distance(14, 2)
+        expected_gmap.set_dart_distance(15, 1)
+        expected_gmap.set_dart_distance(16, 1)
+        expected_gmap.set_dart_distance(17, 2)
+        expected_gmap.set_dart_distance(18, 2)
+        expected_gmap.set_dart_distance(19, 3)
+        expected_gmap.set_dart_distance(20, 3)
+        expected_gmap.set_dart_distance(21, 2)
+        expected_gmap.set_dart_distance(22, 2)
+        expected_gmap.set_dart_distance(23, 1)
+        expected_gmap.set_dart_distance(24, 2)
+        expected_gmap.set_dart_distance(25, 3)
+        expected_gmap.set_dart_distance(26, 3)
+        expected_gmap.set_dart_distance(27, 4)
+        expected_gmap.set_dart_distance(28, 4)
+        expected_gmap.set_dart_distance(29, 3)
+        expected_gmap.set_dart_distance(30, 3)
+        expected_gmap.set_dart_distance(31, 2)
+
+        wave_propagation_dt_gmap(actual_gmap, seeds, [True, False, False])
+
+        # plot
+        expected_gmap.plot_faces()
+        expected_gmap.plot_faces_dt()
+        actual_gmap.plot_faces_dt()
+
+        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
+
     def test_wave_propagation_dt_gmap_corner(self):
         seeds = [7]
 

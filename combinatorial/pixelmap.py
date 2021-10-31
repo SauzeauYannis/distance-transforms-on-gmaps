@@ -287,7 +287,7 @@ class LabelMap (PixelMap):
 
         return max_distance
 
-    def plot_dt(self, show_values=True, fill_cell='face'):
+    def plot_dt(self, show_values=True, fill_cell=None):
         # The coloring of the faces doesn't work super well after
         # the reduction
         # I have to take darts of the same 2-cell
@@ -318,7 +318,7 @@ class LabelMap (PixelMap):
                 x_values_face.append(x)
                 y_values_face.append(y)
 
-            if fill_cell:
+            if fill_cell == 'face':
                 x_values_face_ordered, y_values_face_ordered = build_polygon_from_segments((x_values_face, y_values_face))
                 color_value = min_distance / (max_distance * 2) + 0.5
                 if color_value > 1.0:
