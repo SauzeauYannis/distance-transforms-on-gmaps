@@ -3,6 +3,7 @@ from combinatorial.pixelmap import LabelMap
 from combinatorial.zoo_labels import *
 from distance_transform.sample_data import *
 import matplotlib.pyplot as plt
+import cv2
 
 
 def dt_gmap_example():
@@ -103,4 +104,25 @@ def dt_cell_10():
     gmap.plot_dt()
 
 
-dt_cell_10()
+def read_leaf_image():
+    # Use 0 to read image in grayscale mode
+    # I have for sure grayscale images because the image is labeled, so it is not useful to have more that 3 channels
+    img = cv2.imread('data/5_5_reduced_portion_leaf.png', 0)
+    #cv2.imshow('image', img)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
+
+    print(img.shape)
+    print(img[4][1])
+
+    return img
+
+
+def build_gmap_from_leaf_image():
+    img = read_leaf_image()
+    gmap = LabelMap.from_labels(img)
+    print("gmap created successfully")
+    gmap.plot()
+
+
+build_gmap_from_leaf_image()
