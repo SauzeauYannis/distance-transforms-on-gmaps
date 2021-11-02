@@ -4,6 +4,8 @@ import numpy as np
 from distance_transform.wave_propagation import *
 from combinatorial.pixelmap import PixelMap
 from distance_transform.dt_utils import *
+from combinatorial.pixelmap import LabelMap
+import cv2
 
 
 class TestWavePropagation(TestCase):
@@ -129,7 +131,7 @@ class TestWavePropagation(TestCase):
 
     def test_wave_propagation_dt_gmap_face(self):
         """
-        Test if distance propagates correctly only through vertices
+        Test if distance propagates correctly only through faces
         """
         seeds = [0, 1, 2, 3, 4, 5, 6, 7]
 
@@ -179,6 +181,58 @@ class TestWavePropagation(TestCase):
         actual_gmap.plot_faces_dt()
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
+
+    def test_wave_propagation_inside(self):
+        """
+        Test if distance propagates correctly only through faces
+        """
+
+        image = cv2.imread('../data/5_5_boundary.png', 0)
+        actual_gmap = LabelMap.from_labels(image)
+        expected_gmap = LabelMap.from_labels(image)
+
+        # set distances on expected gmap
+        for i in range(56):
+            expected_gmap.set_dart_distance(i, None)
+        for i in range(56, 80):
+            expected_gmap.set_dart_distance(i, 0)
+        for i in range(80, 88):
+            expected_gmap.set_dart_distance(i, None)
+        for i in range(88, 96):
+            expected_gmap.set_dart_distance(i, 0)
+        for i in range(96, 112):
+            expected_gmap.set_dart_distance(i, 1)
+        for i in range(112, 120):
+            expected_gmap.set_dart_distance(i, 0)
+        for i in range(120, 128):
+            expected_gmap.set_dart_distance(i, None)
+        for i in range(128, 136):
+            expected_gmap.set_dart_distance(i, 0)
+        for i in range(136, 144):
+            expected_gmap.set_dart_distance(i, 1)
+        for i in range(144, 152):
+            expected_gmap.set_dart_distance(i, 2)
+        for i in range(152, 160):
+            expected_gmap.set_dart_distance(i, 1)
+        for i in range(160, 168):
+            expected_gmap.set_dart_distance(i, None)
+        for i in range(168, 176):
+            expected_gmap.set_dart_distance(i, 0)
+        for i in range(176, 184):
+            expected_gmap.set_dart_distance(i, 1)
+        for i in range(184, 200):
+            expected_gmap.set_dart_distance(i, 2)
+
+        accumulation_directions = generate_accumulation_directions_cell(2)
+        wave_propagation_dt_gmap(actual_gmap, None, accumulation_directions)
+
+        # plot
+        expected_gmap.plot()
+        expected_gmap.plot_dt(fill_cell='face')
+        actual_gmap.plot_dt(fill_cell='face')
+
+        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
+
 
     def test_wave_propagation_dt_gmap_corner(self):
         seeds = [7]

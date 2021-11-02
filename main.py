@@ -136,4 +136,4 @@ cv2.imshow('image', new_img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()#
 """
-save_labels('data/5_5_reduced_portion_leaf.png')
+save_labels('data/5_5_boundary.png')

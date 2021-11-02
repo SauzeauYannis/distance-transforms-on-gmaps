@@ -295,7 +295,7 @@ class LabelMap (PixelMap):
         max_distance = 0
         for d in self.darts:
             distance = self.darts_set[d].attributes["distance"]
-            if distance > max_distance:
+            if distance and distance > max_distance:
                 max_distance = distance
 
         return max_distance
@@ -315,7 +315,7 @@ class LabelMap (PixelMap):
             min_distance = float('inf')
             for d in self.cell_2(representative_dart):
                 distance = self.darts_set[d].attributes["distance"]
-                if distance < min_distance:
+                if distance and distance < min_distance:
                     min_distance = distance
 
                 e = self.a0(d)
@@ -333,7 +333,10 @@ class LabelMap (PixelMap):
 
             if fill_cell == 'face':
                 x_values_face_ordered, y_values_face_ordered = build_polygon_from_segments((x_values_face, y_values_face))
-                color_value = min_distance / (max_distance * 2) + 0.5
+                if min_distance == float('inf'): # all darts are None
+                    color_value = 1.0
+                else:
+                    color_value = min_distance / (max_distance * 2) + 0.5
                 if color_value > 1.0:
                     raise Exception("Color value is greater than 1.0")
                 plt.fill(x_values_face_ordered, y_values_face_ordered, f"{color_value}")
