@@ -1,4 +1,5 @@
 from distance_transform.wave_propagation import wave_propagation_dt_gmap
+from distance_transform.preprocessing import *
 from combinatorial.pixelmap import LabelMap
 from combinatorial.zoo_labels import *
 from distance_transform.sample_data import *
@@ -104,25 +105,27 @@ def dt_cell_10():
     gmap.plot_dt()
 
 
-def read_leaf_image():
+def read_leaf_image(path):
     # Use 0 to read image in grayscale mode
     # I have for sure grayscale images because the image is labeled, so it is not useful to have more that 3 channels
-    img = cv2.imread('data/5_5_reduced_portion_leaf.png', 0)
-    #cv2.imshow('image', img)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
-
-    print(img.shape)
-    print(img[4][1])
+    img = cv2.imread(path, 0)
+    cv2.imshow('image', img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    print(img[50][50])
 
     return img
 
 
-def build_gmap_from_leaf_image():
-    img = read_leaf_image()
+def build_gmap_from_leaf_image(path):
+    img = read_leaf_image(path)
     gmap = LabelMap.from_labels(img)
     print("gmap created successfully")
     gmap.plot()
 
 
-build_gmap_from_leaf_image()
+img = read_leaf_image('data/DEHYDRATION_small_leaf_4_time_1_ax0para_0049_Label_1119x1350_uint8.png')
+new_img = find_borders(img, 152)
+cv2.imshow('image', new_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
