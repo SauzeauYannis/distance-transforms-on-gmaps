@@ -349,6 +349,28 @@ class LabelMap (PixelMap):
         plt.title (self.__str__())
         plt.show()
 
+    def from_dt_gmap_to_gray_image(self):
+        image = np.zeros((self.n_rows, self.n_cols))
+
+        # the method has to be modified because it not works
+        # when the gmap is simplified.
+
+        max_distance = self._evaluate_max_dt_value()
+
+        for i in range(image.shape[0]):
+            for j in range(image.shape[1]):
+                # get dart associated to each cell
+                dart = (i * image.shape[1] * 8) + j * 8
+                distance = self.get_dart_by_identifier(dart).attributes["distance"]
+                if distance is None:
+                    image[i][j] = 255
+                else:
+                    # normalize in 0:200 (not 255 because it is associated with pixels with no distance values)
+                    norm_distance = distance / max_distance * 200
+                    print(f"norm_distance: {norm_distance}")
+                    image[i][j] = norm_distance
+        return image
+
     def plot_labels(self):
         for representative_dart in self.darts_of_i_cells(2):
             self._plot_dart_no_dt(representative_dart, self.darts_set[representative_dart].attributes["label"])

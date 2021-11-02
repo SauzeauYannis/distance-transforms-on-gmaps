@@ -77,7 +77,7 @@ def wave_propagation_dt_image(image: np.array, seeds: typing.List[typing.Tuple[i
     return output_image
 
 
-def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.List[int], accumulation_directions: typing.List[bool] = None) -> None:
+def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.List[int]], accumulation_directions: typing.List[bool] = None) -> None:
     """
     It computes the dt for the gmap passed as parameter.
     The distance propagates through all the cells (using all the involutions).
@@ -158,7 +158,7 @@ def generate_accumulation_directions_vertex(gmap_size: int) -> typing.List[int]:
     return accumulation_directions
 
 
-def generate_accumulation_directions_cell(gmap_size: int) -> typing.List[int]:
+def generate_accumulation_directions_cell(gmap_size: int) -> typing.List[bool]:
     """
     Generates the accumulation directions array for the cell of the max dimension.
     For a 2gmap is the face (2cell) for a 3gmap is the volume (3cell).

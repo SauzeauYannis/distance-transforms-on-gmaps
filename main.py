@@ -1,8 +1,9 @@
-from distance_transform.wave_propagation import wave_propagation_dt_gmap
+from distance_transform.wave_propagation import *
 from distance_transform.preprocessing import *
 from combinatorial.pixelmap import LabelMap
 from combinatorial.zoo_labels import *
 from distance_transform.sample_data import *
+from distance_transform.dt_utils import *
 import matplotlib.pyplot as plt
 import cv2
 
@@ -122,12 +123,34 @@ def build_gmap_from_leaf_image(path):
     img = read_leaf_image(path)
     gmap = LabelMap.from_labels(img)
     print("gmap created successfully")
-    gmap.plot()
+    #gmap.plot()
     return gmap
 
 def save_labels(path):
     gmap = build_gmap_from_leaf_image(path)
     gmap.plot_labels()
+
+def test_norm_image(path):
+    # read gray level image
+    image = cv2.imread(path, 0)
+    show_image(image)
+    # find borders
+    image_borders = find_borders(image, 152)
+    show_image(image_borders)
+    # build gmap
+    gmap = LabelMap.from_labels(image_borders)
+    # wave propagation
+    accumulation_directions = generate_accumulation_directions_cell(2)
+    wave_propagation_dt_gmap(gmap, None, accumulation_directions)
+    # get image and show results
+    dt_image = gmap.from_dt_gmap_to_gray_image()
+    plot_dt_image(dt_image, None)
+
+
+def show_image(image):
+    cv2.imshow('image', image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 """
 img = read_leaf_image('data/DEHYDRATION_small_leaf_4_time_1_ax0para_0049_Label_1119x1350_uint8.png')
@@ -136,4 +159,4 @@ cv2.imshow('image', new_img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()#
 """
-save_labels('data/5_5_boundary.png')
+test_norm_image('data/100_100_portion_leaf.png')
