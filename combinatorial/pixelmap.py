@@ -239,7 +239,7 @@ class LabelMap (PixelMap):
         if type(labels) == str:
             n_lines = len (labels.splitlines())
             labels = np.fromstring (labels, sep=' ', dtype=np.uint8).reshape (n_lines, -1)
-        c = cls.from_shape (labels.shape[0], labels.shape[1])
+        c = cls.from_shape(labels.shape[0], labels.shape[1])
         cls._labels = labels
 
         # add drawable polyline for each dart
@@ -249,7 +249,20 @@ class LabelMap (PixelMap):
             c._dart_polyline [d][..., 0] += (d // 8)  % c.n_cols
             c._dart_polyline [d][..., 1] += (d // 8) // c.n_cols
 
+        # save labels
+        cls._save_labels(c, labels)
+
         return c
+
+    def _save_labels(gmap, labels: np.array) -> None:
+        for i in range(labels.shape[0]):
+            for j in range(labels.shape[1]):
+                # Get the first dart associated to each pixel
+                start_identifier = (i * labels.shape[1]) * 8 + j * 8
+                # Save label to all the darts of the cells
+                for k in range(8):
+                    gmap.darts_set[start_identifier + k].attributes["label"] = labels[i][j]
+
 
     def plot(self, number_darts=True, image_palette='gray'):
         """Plots the label map.
@@ -324,6 +337,26 @@ class LabelMap (PixelMap):
                 if color_value > 1.0:
                     raise Exception("Color value is greater than 1.0")
                 plt.fill(x_values_face_ordered, y_values_face_ordered, f"{color_value}")
+
+        plt.gca().set_aspect (1)
+        plt.xticks([])
+        plt.yticks([])
+        plt.ylim (self.n_rows-.5, -.5)
+        plt.axis ('off')
+        plt.title (self.__str__())
+        plt.show()
+
+    def plot_labels(self):
+        for representative_dart in self.darts_of_i_cells(2):
+            self._plot_dart_no_dt(representative_dart, self.darts_set[representative_dart].attributes["label"])
+            for d in self.cell_2(representative_dart):
+                e = self.a0(d)
+                x = list(self._dart_polyline[d][ :,0]) + [self._dart_polyline[d][-1,0],self._dart_polyline[e][-1,0]]
+                y = list(self._dart_polyline[d][: ,1]) + [self._dart_polyline[d][-1,1],self._dart_polyline[e][-1,1]]
+
+                plt.plot(x, y, 'k-')
+
+                plt.scatter(self._dart_polyline[d][0, 0], self._dart_polyline[d][0, 1], c='k')
 
         plt.gca().set_aspect (1)
         plt.xticks([])

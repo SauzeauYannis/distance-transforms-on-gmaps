@@ -92,7 +92,8 @@ def dt_cell_10():
     # vertices
 
     gmap = LabelMap.from_labels(image)
-    #gmap.plot(number_darts=False)
+    gmap.plot(number_darts=True)
+    gmap.plot_labels()
 
     seeds = [6, 5, 40, 47, 148, 185, 157, 192]
 
@@ -112,7 +113,7 @@ def read_leaf_image(path):
     cv2.imshow('image', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    print(img[50][50])
+    #print(img[50][50])
 
     return img
 
@@ -122,10 +123,17 @@ def build_gmap_from_leaf_image(path):
     gmap = LabelMap.from_labels(img)
     print("gmap created successfully")
     gmap.plot()
+    return gmap
 
+def save_labels(path):
+    gmap = build_gmap_from_leaf_image(path)
+    gmap.plot_labels()
 
+"""
 img = read_leaf_image('data/DEHYDRATION_small_leaf_4_time_1_ax0para_0049_Label_1119x1350_uint8.png')
 new_img = find_borders(img, 152)
 cv2.imshow('image', new_img)
 cv2.waitKey(0)
-cv2.destroyAllWindows()
+cv2.destroyAllWindows()#
+"""
+save_labels('data/5_5_reduced_portion_leaf.png')
