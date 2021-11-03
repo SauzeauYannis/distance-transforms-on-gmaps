@@ -333,10 +333,10 @@ class LabelMap (PixelMap):
 
             if fill_cell == 'face':
                 x_values_face_ordered, y_values_face_ordered = build_polygon_from_segments((x_values_face, y_values_face))
-                if min_distance == float('inf'): # all darts are None
+                if min_distance == float('inf'):  # all darts are None
                     color_value = 1.0
                 else:
-                    color_value = min_distance / (max_distance * 2) + 0.5
+                    color_value = min_distance / (max_distance * 2) + 0.4
                 if color_value > 1.0:
                     raise Exception("Color value is greater than 1.0")
                 plt.fill(x_values_face_ordered, y_values_face_ordered, f"{color_value}")
@@ -361,13 +361,18 @@ class LabelMap (PixelMap):
             for j in range(image.shape[1]):
                 # get dart associated to each cell
                 dart = (i * image.shape[1] * 8) + j * 8
+                # check if dart has been removed
+                while self.ai(0, dart) == -1:
+                    dart = self.get_dart_by_identifier(dart).attributes["face_identifier"]
+
                 distance = self.get_dart_by_identifier(dart).attributes["distance"]
                 if distance is None:
+                    # the distance is None if the corresponding cell has not been used
+                    # for propagating the distance
                     image[i][j] = 255
                 else:
                     # normalize in 0:200 (not 255 because it is associated with pixels with no distance values)
                     norm_distance = distance / max_distance * 200
-                    print(f"norm_distance: {norm_distance}")
                     image[i][j] = norm_distance
         return image
 

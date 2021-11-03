@@ -5,6 +5,7 @@ from distance_transform.wave_propagation import *
 from combinatorial.pixelmap import PixelMap
 from distance_transform.dt_utils import *
 from combinatorial.pixelmap import LabelMap
+from distance_transform.preprocessing import *
 import cv2
 
 
@@ -232,6 +233,84 @@ class TestWavePropagation(TestCase):
         actual_gmap.plot_dt(fill_cell='face')
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
+
+
+    def test_dt_after_reduction(self):
+        """
+        Test if distance propagates correctly only through faces
+        """
+
+        image = cv2.imread('../data/5_5_boundary.png', 0)
+        actual_gmap = LabelMap.from_labels(image)
+        expected_gmap = LabelMap.from_labels(image)
+
+        # simplify gmap
+        actual_gmap.remove_edges()
+        actual_gmap.remove_vertices()
+        expected_gmap.remove_edges()
+        expected_gmap.remove_vertices()
+
+        expected_gmap.plot()
+
+        # set distances on expected gmap
+        expected_gmap.set_dart_distance(35, None)
+        expected_gmap.set_dart_distance(36, None)
+        expected_gmap.set_dart_distance(51, None)
+        expected_gmap.set_dart_distance(52, None)
+        expected_gmap.set_dart_distance(163, None)
+        expected_gmap.set_dart_distance(164, None)
+
+        expected_gmap.set_dart_distance(73, 0)
+        expected_gmap.set_dart_distance(74, 0)
+        expected_gmap.set_dart_distance(61, 0)
+        expected_gmap.set_dart_distance(62, 0)
+        expected_gmap.set_dart_distance(89, 0)
+        expected_gmap.set_dart_distance(90, 0)
+        expected_gmap.set_dart_distance(173, 0)
+        expected_gmap.set_dart_distance(174, 0)
+        expected_gmap.set_dart_distance(173, 0)
+        expected_gmap.set_dart_distance(171, 0)
+        expected_gmap.set_dart_distance(172, 0)
+        expected_gmap.set_dart_distance(115, 0)
+        expected_gmap.set_dart_distance(116, 0)
+
+        expected_gmap.set_dart_distance(96, 1)
+        expected_gmap.set_dart_distance(103, 1)
+        expected_gmap.set_dart_distance(181, 1)
+        expected_gmap.set_dart_distance(182, 1)
+        expected_gmap.set_dart_distance(153, 1)
+        expected_gmap.set_dart_distance(154, 1)
+
+        accumulation_directions = generate_accumulation_directions_cell(2)
+        wave_propagation_dt_gmap(actual_gmap, None, accumulation_directions)
+
+        # plot
+        expected_gmap.plot_dt(fill_cell='face')
+        actual_gmap.plot_dt(fill_cell='face')
+
+        dt_image = actual_gmap.from_dt_gmap_to_gray_image()
+        plot_dt_image(dt_image, None)
+
+        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
+
+    def test_dt_after_reductio_big_image(self):
+        image = cv2.imread('../data/100_100_portion_leaf.png', 0)
+        #image_borders = find_borders(image, 152)
+        gmap = LabelMap.from_labels(image)
+        gmap.remove_edges()
+        gmap.remove_vertices()
+        gmap.plot()
+
+        wave_propagation_dt_gmap(gmap, [69593])
+
+        gmap.plot_dt(fill_cell='face')
+        gmap.plot_faces_dt()
+
+        dt_image = gmap.from_dt_gmap_to_gray_image()
+        plot_dt_image(dt_image, None)
+
+        self.assertTrue(True)
+
 
 
     def test_wave_propagation_dt_gmap_corner(self):

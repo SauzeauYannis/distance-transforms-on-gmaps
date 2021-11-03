@@ -430,6 +430,20 @@ class nGmap(DualArray, Marks):
                 logging.debug (f'Modifying alpha_{i} of dart {d1} from {self.ai (i,d1)} to {d2}')
 
                 self.set_ai(i,d1,d2) # d1.Alphas[i] ← d2;
+                # Update the face identifier value of the removed dart
+                # I choose d1 but I can also choose d2.
+                # I have to memorize to which face is now associated d when it is removed
+                # I identify the face by one of his darts
+                self.get_dart_by_identifier(d).attributes["face_identifier"] = d1
+            else:
+                # I need to find a value to wich associate d.
+                # d1 is not suitable because is in the i-cell
+                # I can find a dart in the i+1 cell to associate the value that is not in the i-cell to remove
+                for d1 in self.cell_i(i + 1, d):
+                    if d1 not in i_cell:
+                        self.get_dart_by_identifier(d).attributes["face_identifier"] = d1
+                        break
+
         for d in i_cell:  # foreach dart d' ∈ ci(d) do
             self._remove_dart (d)  # remove d' from gm.Darts;
 
