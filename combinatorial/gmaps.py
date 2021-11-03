@@ -439,10 +439,22 @@ class nGmap(DualArray, Marks):
                 # I need to find a value to wich associate d.
                 # d1 is not suitable because is in the i-cell
                 # I can find a dart in the i+1 cell to associate the value that is not in the i-cell to remove
+                found = False
                 for d1 in self.cell_i(i + 1, d):
                     if d1 not in i_cell:
                         self.get_dart_by_identifier(d).attributes["face_identifier"] = d1
+                        found = True
                         break
+                if not found:
+                    # try with the other cell
+                    d_other_cell = self.ai(i+1, d) # d1 ← d.Alphas[i];
+                    for d1 in self.cell_i(i + 1, d_other_cell):
+                        if d1 not in i_cell:
+                            self.get_dart_by_identifier(d).attributes["face_identifier"] = d1
+                            found = True
+                            break
+                if not found:
+                    print(f"Not found a suitable dart for dart: {d}")
 
         for d in i_cell:  # foreach dart d' ∈ ci(d) do
             self._remove_dart (d)  # remove d' from gm.Darts;

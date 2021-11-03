@@ -323,19 +323,26 @@ class TestWavePropagation(TestCase):
         gmap.remove_edges(0.5)
         gmap.plot()
 
-    def _compute_dt_reduction(self, image, reduction_factor: float):
+    def _compute_dt_reduction(self, image, reduction_factor: float, show_gmap: bool = True):
         gmap = LabelMap.from_labels(image)
+        print("gmap successfully created")
         gmap.remove_edges(reduction_factor)
+        print("edges successfully removed")
         gmap.remove_vertices()
-        gmap.plot()
+        print("vertices successfully removed")
+        if show_gmap:
+            gmap.plot()
 
         accumulation_directions = generate_accumulation_directions_cell(2)
         wave_propagation_dt_gmap(gmap, None, accumulation_directions)
+        print("dt successfully computed")
 
         # plot
-        gmap.plot_dt(fill_cell='face')
+        if show_gmap:
+            gmap.plot_dt(fill_cell='face')
 
         dt_image = gmap.from_dt_gmap_to_gray_image()
+        print("image successfully retrieved")
         plot_dt_image(dt_image, None)
 
     def test_dt_reduction_05(self):
@@ -345,6 +352,18 @@ class TestWavePropagation(TestCase):
     def test_dt_reduction_0(self):
         image = cv2.imread('../data/5_5_boundary.png', 0)
         self._compute_dt_reduction(image, 0)
+
+    def test_dt_reduction_05_big_image(self):
+        image = cv2.imread('../data/100_100_portion_leaf.png', 0)
+        image_borders = find_borders(image, 152)
+        self._compute_dt_reduction(image_borders, 0.5, False)
+
+    def test_dt_reduction_05_1000_image(self):
+        image = cv2.imread('../data/300_300_portion_leaf.png', 0)
+        print("image read successfully")
+        image_borders = find_borders(image, 152)
+        print("image borders successfully computed")
+        self._compute_dt_reduction(image_borders, 0.5, False)
 
     def test_reduction_factor_pyramid(self):
         image = cv2.imread('../data/5_5_boundary.png', 0)

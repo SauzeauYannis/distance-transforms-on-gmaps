@@ -157,6 +157,7 @@ img = read_leaf_image('data/DEHYDRATION_small_leaf_4_time_1_ax0para_0049_Label_1
 new_img = find_borders(img, 152)
 cv2.imshow('image', new_img)
 cv2.waitKey(0)
-cv2.destroyAllWindows()#
+cv2.destroyAllWindows()
 """
+
 test_norm_image('data/100_100_portion_leaf.png')
