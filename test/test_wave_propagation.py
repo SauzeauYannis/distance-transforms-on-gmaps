@@ -311,7 +311,52 @@ class TestWavePropagation(TestCase):
 
         self.assertTrue(True)
 
+    def test_reduction_factor_0(self):
+        image = cv2.imread('../data/5_5_boundary.png', 0)
+        gmap = LabelMap.from_labels(image)
+        gmap.remove_edges(0.0)
+        gmap.plot()
 
+    def test_reduction_factor_05(self):
+        image = cv2.imread('../data/5_5_boundary.png', 0)
+        gmap = LabelMap.from_labels(image)
+        gmap.remove_edges(0.5)
+        gmap.plot()
+
+    def _compute_dt_reduction(self, image, reduction_factor: float):
+        gmap = LabelMap.from_labels(image)
+        gmap.remove_edges(reduction_factor)
+        gmap.remove_vertices()
+        gmap.plot()
+
+        accumulation_directions = generate_accumulation_directions_cell(2)
+        wave_propagation_dt_gmap(gmap, None, accumulation_directions)
+
+        # plot
+        gmap.plot_dt(fill_cell='face')
+
+        dt_image = gmap.from_dt_gmap_to_gray_image()
+        plot_dt_image(dt_image, None)
+
+    def test_dt_reduction_05(self):
+        image = cv2.imread('../data/5_5_boundary.png', 0)
+        self._compute_dt_reduction(image, 0.5)
+
+    def test_dt_reduction_0(self):
+        image = cv2.imread('../data/5_5_boundary.png', 0)
+        self._compute_dt_reduction(image, 0)
+
+    def test_reduction_factor_pyramid(self):
+        image = cv2.imread('../data/5_5_boundary.png', 0)
+        gmap = LabelMap.from_labels(image)
+        gmap.remove_edges(0.5)
+        gmap.plot()
+        gmap.remove_edges(0.5)
+        gmap.plot()
+        gmap.remove_edges(0.5)
+        gmap.plot()
+        gmap.remove_edges(0.5)
+        gmap.plot()
 
     def test_wave_propagation_dt_gmap_corner(self):
         seeds = [7]

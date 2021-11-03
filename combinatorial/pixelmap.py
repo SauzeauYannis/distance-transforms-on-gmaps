@@ -9,6 +9,10 @@ import numpy as np
 from combinatorial.utils import *
 from .gmaps import nGmap
 from .zoo import G2_SQUARE_BOUNDED, G2_SQUARE_UNBOUNDED
+import random
+
+# set seed
+random.seed(42)
 
 import matplotlib.pyplot as plt
 
@@ -405,7 +409,14 @@ class LabelMap (PixelMap):
         p = d // 8
         return self.labels [p // self.n_cols, p % self.n_cols]
 
-    def remove_edges (self):
+    def remove_edges(self, reduction_factor: float = 1.0):
+        """
+
+        :param reduction_factor: Specify how many edges to remove. If 1.0 all the removable edges will be removed
+                                 If < 1.0 a removable edge will be removed only with the specified reduction_factor
+                                 probability
+        :return:
+        """
         # TODO edge removal causes skips in the outer loop if used w/i list() ???
         for d in list (self.darts_of_i_cells (1)):          # d ... some dart while iterating over all edges
             e = self.a2(d)                           # e ... dart of the oposit face
@@ -416,12 +427,14 @@ class LabelMap (PixelMap):
             if d == self.a1(e):                      # dangling dart
                 logging.debug (f'{d} : pending')
 #                 logging.info (d)
-                self.remove_edge(d)
+                if random.random() < reduction_factor:
+                    self.remove_edge(d)
                 continue
             if d == self.a0 (self.a1 (self.a0 (e))): # dangling edge
                 logging.debug (f'{d} : pending')
 #                 logging.info (d)
-                self.remove_edge(d)
+                if random.random() < reduction_factor:
+                    self.remove_edge(d)
                 continue
             if d in self.cell_2 (e):                 # bridge (self-touching face)
                 logging.debug (f'Skipping bridge at {d}')
@@ -429,7 +442,8 @@ class LabelMap (PixelMap):
             if (self.value(d) == self.value(e)).all():       # identical colour in CCL
                 logging.debug  (f'{d} : low-contrast')
 #                 logging.info (d)
-                self.remove_edge(d)
+                if random.random() < reduction_factor:
+                    self.remove_edge(d)
                 continue
             logging.debug (f'Skipping: contrast edge at {d}')
 
