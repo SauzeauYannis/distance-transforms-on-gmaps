@@ -75,7 +75,6 @@ class nGmap(DualArray, Marks):
 
     def __init__ (self, array):
         super().__init__(8, self.shape[1])  # Create 8 marks for each (possible) dart
-        pass
 
     @classmethod
     def _init_structures(cls, number_of_darts: int):

@@ -240,7 +240,7 @@ class LabelMap (PixelMap):
     _initial_dart_polylines_00 -= .5
 
     @classmethod
-    def from_labels (cls, labels, add_polyline: True):
+    def from_labels (cls, labels, add_polyline: bool = True):
         if type(labels) == str:
             n_lines = len (labels.splitlines())
             labels = np.fromstring (labels, sep=' ', dtype=np.uint8).reshape (n_lines, -1)

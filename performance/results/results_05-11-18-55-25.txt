@@ -1,0 +1,20 @@
+INFO     Reading image from ../data/100_100_portion_leaf.png
+INFO     Image shape: (100, 100)
+INFO     gmap successfully builded in 0.7189981937408447 seconds
+INFO     Memory: current: 2.402194 MB peak: 2.404686 MB
+INFO     Memory required for each dart is: 30.027425 B
+INFO     Reading image from ../data/200_200_portion_leaf.png
+INFO     Image shape: (200, 200)
+INFO     gmap successfully builded in 2.990999937057495 seconds
+INFO     Memory: current: 9.601946 MB peak: 9.604439 MB
+INFO     Memory required for each dart is: 30.00608125 B
+INFO     Reading image from ../data/300_300_portion_leaf.png
+INFO     Image shape: (300, 300)
+INFO     gmap successfully builded in 6.540996074676514 seconds
+INFO     Memory: current: 21.602002 MB peak: 21.604551 MB
+INFO     Memory required for each dart is: 30.002780555555557 B
+INFO     Reading image from ../data/1000_1000_portion_leaf.png
+INFO     Image shape: (1119, 1000)
+INFO     gmap successfully builded in 81.83799958229065 seconds
+INFO     Memory: current: 268.561906 MB peak: 268.564552 MB
+INFO     Memory required for each dart is: 30.000212913315462 B

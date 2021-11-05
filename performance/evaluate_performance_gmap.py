@@ -59,7 +59,7 @@ def main():
     evaluate_performance_build_gmap('../data/200_200_portion_leaf.png')
     evaluate_performance_build_gmap('../data/300_300_portion_leaf.png')
 
-    evaluate_performance_build_gmap('../data/300_300_portion_leaf.png')
+    evaluate_performance_build_gmap('../data/1000_1000_portion_leaf.png')
 
 if __name__ == "__main__":
     main()
