@@ -39,3 +39,21 @@ def find_borders(labeled_image: np.array, label_value: int) -> np.array:
                 image[i][j] = 0 # border
 
     return image
+
+
+def find_borders_on_gmap(gmap, label_value: int, face_value, neighboring: ):
+    """
+
+    It modifies the gmap passed as parameter.
+
+    0: border
+    255: foreground
+    100: inside
+
+    :param gmap:
+    :param label_value:
+    :return:
+    """
+
+    pass
+
