@@ -182,7 +182,7 @@ class PixelMap (nGmap):
         cls._nC = C
 
         n_all_darts = 8*R*C + (not bounded)*4*(R+C)
-        alphas_all   = np.full ((3, n_all_darts), fill_value=-1, dtype=np.int64)   #  TODO dtype can be smaller for small images
+        alphas_all = np.full ((3, n_all_darts), fill_value=-1, dtype=np.int32)
         alphas_block = alphas_all [:, :8*R*C ] # view at the block part
         alphas_bound = alphas_all [:,  8*R*C:] # view at the outer boundary part
 
@@ -220,7 +220,7 @@ class PixelMap (nGmap):
                 alphas_block [2, d_block] = d_bound + 8*R*C
                 alphas_bound [2, d_bound] = d_block
 
-        return cls.from_alpha_array (alphas_all)
+        return cls.from_alpha_array(alphas_all)
 
 # Cell
 

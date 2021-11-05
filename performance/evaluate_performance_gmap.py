@@ -10,6 +10,9 @@ import cv2
 from combinatorial.pixelmap import LabelMap
 import tracemalloc
 
+# temp
+# from combinatorial_original.pixelmap import LabelMap
+
 # get logger
 logger = logging.getLogger("evaluate_performance_gmap_logger")
 logging_configuration.set_logging("results")

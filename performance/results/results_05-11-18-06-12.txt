@@ -1,0 +1,19 @@
+Memory occupied by combinatorial original
+For each dart is just 10 bytes less, because in the other one I have (4 + 4 + 2) bytes for each dart
+So I have to improve this structure, that is too huge for some reason.
+
+INFO     Reading image from ../data/100_100_portion_leaf.png
+INFO     Image shape: (100, 100)
+INFO     gmap successfully builded in 1.2789981365203857 seconds
+INFO     Memory: current: 18.295276 MB peak: 18.295748 MB
+INFO     Memory required for each dart is: 228.69095 B
+INFO     Reading image from ../data/200_200_portion_leaf.png
+INFO     Image shape: (200, 200)
+INFO     gmap successfully builded in 5.326002359390259 seconds
+INFO     Memory: current: 73.199596 MB peak: 73.200068 MB
+INFO     Memory required for each dart is: 228.7487375 B
+INFO     Reading image from ../data/300_300_portion_leaf.png
+INFO     Image shape: (300, 300)
+INFO     gmap successfully builded in 11.49600100517273 seconds
+INFO     Memory: current: 183.056932 MB peak: 200.593048 MB
+INFO     Memory required for each dart is: 254.2457388888889 B
