@@ -73,29 +73,32 @@ class DualArray(np.ndarray):
 class nGmap(DualArray, Marks):
     """g-map based on indices"""
 
-    def __init__ (self, array):
-        super().__init__(8, self.shape[1])  # Create 8 marks for each (possible) dart
+    @classmethod
+    def _init_structures(cls, number_of_darts: int):
+        logger.debug(f"The number of darts is: {number_of_darts}")
         # uint32 is sufficient for 1000x1000 images.
-        number_of_darts = self.shape[0] * self.shape[1] * 8
         dtype = np.int32 # I use a signed dtype for using negative values as markers (example, None type)
         if number_of_darts > (np.iinfo(dtype).max + 1):
             raise Exception(f"{dtype} is not sufficient to represent {number_of_darts} darts")
 
         # allocate distances array
-        self.distances = np.zeros(number_of_darts, dtype=dtype)
-        logger.debug(f"distances array successfully initialized with shape {self.distances.shape}"
-                     f" and dtype {self.distances.dtype}")
+        cls.distances = np.zeros(number_of_darts, dtype=dtype)
+        logger.debug(f"distances array successfully initialized with shape {cls.distances.shape}"
+                     f" and dtype {cls.distances.dtype}")
 
         # allocate labels array
         # int16 is sufficient to represent a label
-        self.image_labels = np.zeros(number_of_darts, dtype=np.int16)
-        logger.debug(f"labels array successfully initialized with shape {self.image_labels.shape}"
-                     f" and dtype {self.image_labels.dtype}")
+        cls.image_labels = np.zeros(number_of_darts, dtype=np.int16)
+        logger.debug(f"labels array successfully initialized with shape {cls.image_labels.shape}"
+                     f" and dtype {cls.image_labels.dtype}")
 
         # allocate face identifiers array
-        self.face_identifiers = np.zeros(number_of_darts, dtype=dtype)
-        logger.debug(f"face_identifiers array successfully initialized with shape {self.face_identifiers.shape}"
-                     f" and dtype {self.face_identifiers.dtype}")
+        cls.face_identifiers = np.zeros(number_of_darts, dtype=dtype)
+        logger.debug(f"face_identifiers array successfully initialized with shape {cls.face_identifiers.shape}"
+                     f" and dtype {cls.face_identifiers.dtype}")
+
+    def __init__ (self, array):
+        super().__init__(8, self.shape[1])  # Create 8 marks for each (possible) dart
 
     @classmethod
     def n_by_d (cls, n, n_darts):
@@ -117,6 +120,9 @@ class nGmap(DualArray, Marks):
         if not result.is_valid:
             logging.critical('Have you passed an invalid involution array?')
             raise ValueError
+
+        cls._init_structures(a.shape[1])
+
         return result
 
     @classmethod
