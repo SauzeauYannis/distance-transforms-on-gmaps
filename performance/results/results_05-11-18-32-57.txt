@@ -1,0 +1,22 @@
+Memory profiler
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+    39     58.9 MiB     58.9 MiB           1   @profile
+    40                                         def measure_memory_build_gmap_memory_profiler(image) -> None:
+    41     58.9 MiB      0.0 MiB           1       shape = image.shape
+    42     78.1 MiB     19.2 MiB           1       gmap = LabelMap.from_labels(image)
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+    39     59.0 MiB     59.0 MiB           1   @profile
+    40                                         def measure_memory_build_gmap_memory_profiler(image) -> None:
+    41     59.0 MiB      0.0 MiB           1       shape = image.shape
+    42    136.5 MiB     77.4 MiB           1       gmap = LabelMap.from_labels(image)
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+    39     59.7 MiB     59.7 MiB           1   @profile
+    40                                         def measure_memory_build_gmap_memory_profiler(image) -> None:
+    41     59.7 MiB      0.0 MiB           1       shape = image.shape
+    42    252.1 MiB    192.5 MiB           1       gmap = LabelMap.from_labels(image)

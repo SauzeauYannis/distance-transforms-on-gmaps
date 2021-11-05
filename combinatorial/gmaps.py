@@ -73,6 +73,10 @@ class DualArray(np.ndarray):
 class nGmap(DualArray, Marks):
     """g-map based on indices"""
 
+    def __init__ (self, array):
+        super().__init__(8, self.shape[1])  # Create 8 marks for each (possible) dart
+        pass
+
     @classmethod
     def _init_structures(cls, number_of_darts: int):
         logger.debug(f"The number of darts is: {number_of_darts}")
@@ -96,9 +100,6 @@ class nGmap(DualArray, Marks):
         cls.face_identifiers = np.zeros(number_of_darts, dtype=dtype)
         logger.debug(f"face_identifiers array successfully initialized with shape {cls.face_identifiers.shape}"
                      f" and dtype {cls.face_identifiers.dtype}")
-
-    def __init__ (self, array):
-        super().__init__(8, self.shape[1])  # Create 8 marks for each (possible) dart
 
     @classmethod
     def n_by_d (cls, n, n_darts):

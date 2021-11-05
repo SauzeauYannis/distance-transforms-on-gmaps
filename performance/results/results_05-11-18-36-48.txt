@@ -1,0 +1,99 @@
+The problem is the graphical representation
+
+C:\Documenti\UNISA\II_Magistrale\erasmus\thesis_work\distance-transforms-on-gmaps\venv\Scripts\python.exe C:/Documenti/UNISA/II_Magistrale/erasmus/thesis_work/distance-transforms-on-gmaps/performance/evaluate_performance_gmap.py
+INFO     Reading image from ../data/100_100_portion_leaf.png
+INFO     Image shape: (100, 100)
+INFO:evaluate_performance_gmap_logger:gmap successfully builded in 23.684998750686646 seconds
+INFO:evaluate_performance_gmap_logger:Reading image from ../data/200_200_portion_leaf.png
+Filename: C:\Documenti\UNISA\II_Magistrale\erasmus\thesis_work\distance-transforms-on-gmaps\combinatorial\pixelmap.py
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+   242     58.2 MiB     58.2 MiB           1       @classmethod
+   243                                             @profile
+   244                                             def from_labels (cls, labels):
+   245     58.2 MiB      0.0 MiB           1           if type(labels) == str:
+   246                                                     n_lines = len (labels.splitlines())
+   247                                                     labels = np.fromstring (labels, sep=' ', dtype=np.uint8).reshape (n_lines, -1)
+   248     60.4 MiB      2.2 MiB           1           c = cls.from_shape(labels.shape[0], labels.shape[1])
+   249     60.4 MiB      0.0 MiB           1           cls._labels = labels
+   250
+   251                                                 # add drawable polyline for each dart
+   252     60.4 MiB      0.0 MiB           1           c._dart_polyline = {}
+   253     78.6 MiB    -11.5 MiB       80001           for d in c.darts:
+   254     78.6 MiB     -0.2 MiB       80000               c._dart_polyline [d] = LabelMap._initial_dart_polylines_00[d % 8].copy()
+   255     78.6 MiB     -4.7 MiB       80000               c._dart_polyline [d][..., 0] += (d // 8)  % c.n_cols
+   256     78.6 MiB    -11.5 MiB       80000               c._dart_polyline [d][..., 1] += (d // 8) // c.n_cols
+   257
+   258                                                 # save labels
+   259     78.6 MiB      0.0 MiB           1           cls._save_labels(c, labels)
+   260
+   261     78.6 MiB      0.0 MiB           1           return c
+
+
+INFO     gmap successfully builded in 23.684998750686646 seconds
+INFO     Reading image from ../data/200_200_portion_leaf.png
+INFO:evaluate_performance_gmap_logger:Image shape: (200, 200)
+INFO     Image shape: (200, 200)
+INFO:evaluate_performance_gmap_logger:gmap successfully builded in 97.81200003623962 seconds
+Filename: C:\Documenti\UNISA\II_Magistrale\erasmus\thesis_work\distance-transforms-on-gmaps\combinatorial\pixelmap.py
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+   242     59.0 MiB     59.0 MiB           1       @classmethod
+   243                                             @profile
+   244                                             def from_labels (cls, labels):
+   245     59.0 MiB      0.0 MiB           1           if type(labels) == str:
+   246                                                     n_lines = len (labels.splitlines())
+   247                                                     labels = np.fromstring (labels, sep=' ', dtype=np.uint8).reshape (n_lines, -1)
+   248     62.7 MiB      3.8 MiB           1           c = cls.from_shape(labels.shape[0], labels.shape[1])
+   249     62.7 MiB      0.0 MiB           1           cls._labels = labels
+   250
+   251                                                 # add drawable polyline for each dart
+   252     62.7 MiB      0.0 MiB           1           c._dart_polyline = {}
+   253    136.5 MiB    -20.6 MiB      320001           for d in c.darts:
+   254    136.5 MiB     -6.9 MiB      320000               c._dart_polyline [d] = LabelMap._initial_dart_polylines_00[d % 8].copy()
+   255    136.5 MiB     39.4 MiB      320000               c._dart_polyline [d][..., 0] += (d // 8)  % c.n_cols
+   256    136.5 MiB    -20.6 MiB      320000               c._dart_polyline [d][..., 1] += (d // 8) // c.n_cols
+   257
+   258                                                 # save labels
+   259    136.5 MiB      0.0 MiB           1           cls._save_labels(c, labels)
+   260
+   261    136.5 MiB      0.0 MiB           1           return c
+
+
+INFO     gmap successfully builded in 97.81200003623962 seconds
+INFO     Reading image from ../data/300_300_portion_leaf.png
+INFO     Image shape: (300, 300)
+INFO:evaluate_performance_gmap_logger:Reading image from ../data/300_300_portion_leaf.png
+INFO:evaluate_performance_gmap_logger:Image shape: (300, 300)
+Filename: C:\Documenti\UNISA\II_Magistrale\erasmus\thesis_work\distance-transforms-on-gmaps\combinatorial\pixelmap.py
+
+Line #    Mem usage    Increment  Occurences   Line Contents
+============================================================
+   242     59.4 MiB     59.4 MiB           1       @classmethod
+   243                                             @profile
+   244                                             def from_labels (cls, labels):
+   245     59.4 MiB      0.0 MiB           1           if type(labels) == str:
+   246                                                     n_lines = len (labels.splitlines())
+   247                                                     labels = np.fromstring (labels, sep=' ', dtype=np.uint8).reshape (n_lines, -1)
+   248     66.7 MiB      7.4 MiB           1           c = cls.from_shape(labels.shape[0], labels.shape[1])
+   249     66.7 MiB      0.0 MiB           1           cls._labels = labels
+   250
+   251                                                 # add drawable polyline for each dart
+   252     66.7 MiB      0.0 MiB           1           c._dart_polyline = {}
+   253    250.4 MiB   -682.8 MiB      720001           for d in c.darts:
+   254    250.4 MiB   -635.4 MiB      720000               c._dart_polyline [d] = LabelMap._initial_dart_polylines_00[d % 8].copy()
+   255    250.4 MiB   -546.2 MiB      720000               c._dart_polyline [d][..., 0] += (d // 8)  % c.n_cols
+   256    250.4 MiB   -682.7 MiB      720000               c._dart_polyline [d][..., 1] += (d // 8) // c.n_cols
+   257
+   258                                                 # save labels
+   259    251.8 MiB      1.4 MiB           1           cls._save_labels(c, labels)
+   260
+   261    251.8 MiB      0.0 MiB           1           return c
+
+
+INFO     gmap successfully builded in 216.86400246620178 seconds
+INFO:evaluate_performance_gmap_logger:gmap successfully builded in 216.86400246620178 seconds
+
+Process finished with exit code 0

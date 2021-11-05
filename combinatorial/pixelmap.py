@@ -11,6 +11,8 @@ from .gmaps import nGmap
 from .zoo import G2_SQUARE_BOUNDED, G2_SQUARE_UNBOUNDED
 import random
 
+from memory_profiler import profile
+
 # set seed
 random.seed(42)
 
@@ -238,7 +240,7 @@ class LabelMap (PixelMap):
     _initial_dart_polylines_00 -= .5
 
     @classmethod
-    def from_labels (cls, labels):
+    def from_labels (cls, labels, add_polyline: True):
         if type(labels) == str:
             n_lines = len (labels.splitlines())
             labels = np.fromstring (labels, sep=' ', dtype=np.uint8).reshape (n_lines, -1)
@@ -246,11 +248,12 @@ class LabelMap (PixelMap):
         cls._labels = labels
 
         # add drawable polyline for each dart
-        c._dart_polyline = {}
-        for d in c.darts:
-            c._dart_polyline [d] = LabelMap._initial_dart_polylines_00[d % 8].copy()
-            c._dart_polyline [d][..., 0] += (d // 8)  % c.n_cols
-            c._dart_polyline [d][..., 1] += (d // 8) // c.n_cols
+        if add_polyline:
+            c._dart_polyline = {}
+            for d in c.darts:
+                c._dart_polyline [d] = LabelMap._initial_dart_polylines_00[d % 8].copy()
+                c._dart_polyline [d][..., 0] += (d // 8)  % c.n_cols
+                c._dart_polyline [d][..., 1] += (d // 8) // c.n_cols
 
         # save labels
         cls._save_labels(c, labels)

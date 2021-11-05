@@ -1,0 +1,17 @@
+Memory of gmap with reduced (alpha elements size)
+
+INFO     Reading image from ../data/100_100_portion_leaf.png
+INFO     Image shape: (100, 100)
+INFO     gmap successfully builded in 1.3379969596862793 seconds
+INFO     Memory: current: 18.135982 MB peak: 18.136454 MB
+INFO     Memory required for each dart is: 226.699775 B
+INFO     Reading image from ../data/200_200_portion_leaf.png
+INFO     Image shape: (200, 200)
+INFO     gmap successfully builded in 5.277999639511108 seconds
+INFO     Memory: current: 72.560238 MB peak: 72.56071 MB
+INFO     Memory required for each dart is: 226.75074375 B
+INFO     Reading image from ../data/300_300_portion_leaf.png
+INFO     Image shape: (300, 300)
+INFO     gmap successfully builded in 12.21899938583374 seconds
+INFO     Memory: current: 181.617574 MB peak: 199.15369 MB
+INFO     Memory required for each dart is: 252.24663055555556 B

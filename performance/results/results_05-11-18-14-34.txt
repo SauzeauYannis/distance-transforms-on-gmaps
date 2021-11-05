@@ -1,0 +1,18 @@
+Gmap without marks. 8 bytes for each dart less (because of 8 marks for each dart)
+Where is the 218 B memory?
+
+INFO     Reading image from ../data/100_100_portion_leaf.png
+INFO     Image shape: (100, 100)
+INFO     gmap successfully builded in 1.3000319004058838 seconds
+INFO     Memory: current: 17.495134 MB peak: 17.495606 MB
+INFO     Memory required for each dart is: 218.689175 B
+INFO     Reading image from ../data/200_200_portion_leaf.png
+INFO     Image shape: (200, 200)
+INFO     gmap successfully builded in 5.164470434188843 seconds
+INFO     Memory: current: 69.99939 MB peak: 69.999862 MB
+INFO     Memory required for each dart is: 218.74809375 B
+INFO     Reading image from ../data/300_300_portion_leaf.png
+INFO     Image shape: (300, 300)
+INFO     gmap successfully builded in 12.647001504898071 seconds
+INFO     Memory: current: 175.856726 MB peak: 193.392842 MB
+INFO     Memory required for each dart is: 244.24545277777779 B
