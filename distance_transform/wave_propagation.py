@@ -1,5 +1,4 @@
 import typing
-from combinatorial.gmaps import Dart
 from queue import Queue
 import numpy as np
 
@@ -100,8 +99,8 @@ def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.Lis
     """
 
     # Initialization
-    for dart in gmap.darts_with_attributes:
-        dart.attributes["distance"] = None
+    for dart in gmap.darts:
+        gmap.distances[dart] = -1
 
     # Initialize accumulation directions if None
     if accumulation_directions is None:
@@ -112,38 +111,37 @@ def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.Lis
     curr_queue = Queue()
     next_queue = Queue()
     if seeds_identifiers is None:
-        for dart in gmap.darts_with_attributes:
-            if dart.attributes["label"] == 0:
+        for dart in gmap.darts:
+            if gmap.image_labels[dart] == 0:
                 curr_queue.put(dart)
-                dart.attributes["distance"] = 0
+                gmap.distances[dart] = 0
     else:
         for seed_identifier in seeds_identifiers:
-            dart = gmap.get_dart_by_identifier(seed_identifier)
-            curr_queue.put(dart)
-            dart.attributes["distance"] = 0
+            curr_queue.put(seed_identifier)
+            gmap.distances[seed_identifier] = 0
 
     while not curr_queue.empty():
         while not curr_queue.empty():
             dart = curr_queue.get()
             # Visit all the neighbours
             for i in range(gmap.n + 1):
-                neighbour = gmap.alfa_i(i, dart.identifier)
-                if seeds_identifiers is None and neighbour.attributes["label"] == 255:
+                neighbour = gmap.ai(i, dart)
+                if seeds_identifiers is None and gmap.image_labels[neighbour] == 255:
                     continue
                 # due to the accumulation policies, it happens that the first distance value associated to a neighbours
-                # cannot be the right ones. All the values have to been checked. View example on joplin (01/11/2021)
+                # could not be the right one. All the values have to be checked. View example on joplin (01/11/2021)
                 if accumulation_directions[i]:
-                    if neighbour.attributes["distance"] is None:
+                    if gmap.distances[neighbour] == -1:
                         next_queue.put(neighbour)
-                    if neighbour.attributes["distance"] is None\
-                            or dart.attributes["distance"] + 1 < neighbour.attributes["distance"]:
-                        neighbour.attributes["distance"] = dart.attributes["distance"] + 1
+                    if gmap.distances[neighbour] == -1\
+                            or gmap.distances[dart] + 1 < gmap.distances[neighbour]:
+                        gmap.distances[neighbour] = gmap.distances[dart] + 1
                 else:
-                    if neighbour.attributes["distance"] is None:
+                    if gmap.distances[neighbour] == -1:
                         curr_queue.put(neighbour)
-                    if neighbour.attributes["distance"] is None \
-                                or dart.attributes["distance"] < neighbour.attributes["distance"]:
-                        neighbour.attributes["distance"] = dart.attributes["distance"]
+                    if gmap.distances[neighbour] == -1 \
+                                or gmap.distances[dart] < gmap.distances[neighbour]:
+                        gmap.distances[neighbour] = gmap.distances[dart]
         curr_queue = next_queue
         next_queue = Queue()
 

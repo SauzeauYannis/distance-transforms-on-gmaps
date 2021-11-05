@@ -50,8 +50,7 @@ class PixelMap (nGmap):
     text_HAs = 'center center right right center center left left'.split()
     text_VAs = 'top top center center bottom bottom center center'.split()
 
-
-    def _plot_dart_no_dt(self, dart_id, dt, rotate = False):
+    def _plot_dart_no_dt(self, dart_id, dt: np.uint32, rotate = False):
         if dart_id >= 8*self.n_rows*self.n_cols:
             return # TODO plot the boundary darts, too, if the maps is unbounded
         vi0, vi1 = dart_id % 8, 1 + dart_id % 8
@@ -94,7 +93,7 @@ class PixelMap (nGmap):
                 x.append (vertices [dart%8,0] + (dart // 8) %  self.n_cols)
                 y.append (vertices [dart%8,1] + (dart // 8) // self.n_cols)
                 if number_darts:
-                    distance = self.darts_set[dart].attributes["distance"]
+                    distance = self.distances[dart]
                     self._plot_dart_no_dt(dart, distance)
             x.append (vertices [some_dart%8,0] + (some_dart // 8) %  self.n_cols)
             y.append (vertices [some_dart%8,1] + (some_dart // 8) // self.n_cols)
@@ -265,7 +264,7 @@ class LabelMap (PixelMap):
                 start_identifier = (i * labels.shape[1]) * 8 + j * 8
                 # Save label to all the darts of the cells
                 for k in range(8):
-                    gmap.darts_set[start_identifier + k].attributes["label"] = labels[i][j]
+                    gmap.image_labels[start_identifier + k] = labels[i][j]
 
 
     def plot(self, number_darts=True, image_palette='gray'):
@@ -298,8 +297,8 @@ class LabelMap (PixelMap):
     def _evaluate_max_dt_value(self) -> float:
         max_distance = 0
         for d in self.darts:
-            distance = self.darts_set[d].attributes["distance"]
-            if distance and distance > max_distance:
+            distance = self.distances[d]
+            if distance >= 0 and distance > max_distance:
                 max_distance = distance
 
         return max_distance
@@ -318,8 +317,8 @@ class LabelMap (PixelMap):
             y_values_face = []
             min_distance = float('inf')
             for d in self.cell_2(representative_dart):
-                distance = self.darts_set[d].attributes["distance"]
-                if distance and distance < min_distance:
+                distance = self.distances[d]
+                if distance >= 0 and distance < min_distance:
                     min_distance = distance
 
                 e = self.a0(d)
@@ -367,10 +366,10 @@ class LabelMap (PixelMap):
                 dart = (i * image.shape[1] * 8) + j * 8
                 # check if dart has been removed
                 while self.ai(0, dart) == -1:
-                    dart = self.get_dart_by_identifier(dart).attributes["face_identifier"]
+                    dart = self.face_identifiers[dart]
 
-                distance = self.get_dart_by_identifier(dart).attributes["distance"]
-                if distance is None:
+                distance = self.distances[dart]
+                if distance == -1:
                     # the distance is None if the corresponding cell has not been used
                     # for propagating the distance
                     image[i][j] = 255
@@ -382,7 +381,7 @@ class LabelMap (PixelMap):
 
     def plot_labels(self):
         for representative_dart in self.darts_of_i_cells(2):
-            self._plot_dart_no_dt(representative_dart, self.darts_set[representative_dart].attributes["label"])
+            self._plot_dart_no_dt(representative_dart, self.labels[representative_dart])
             for d in self.cell_2(representative_dart):
                 e = self.a0(d)
                 x = list(self._dart_polyline[d][ :,0]) + [self._dart_polyline[d][-1,0],self._dart_polyline[e][-1,0]]

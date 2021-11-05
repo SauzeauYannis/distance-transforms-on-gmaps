@@ -7,18 +7,12 @@ __all__ = ['Marks', 'DualArray', 'nGmap']
 import numpy as np
 import itertools
 import logging
-import itertools
-
-# import more_itertools
-
-# Cell
+import logging_configuration
 
 
-# I need a dart class to add attributes to darts
-class Dart:
-    def __init__(self, identifier: int, attributes: dict):
-        self.identifier = identifier
-        self.attributes = attributes
+# get logger
+logger = logging.getLogger("gmap_logger")
+logging_configuration.set_logging()
 
 
 class Marks:
@@ -81,9 +75,27 @@ class nGmap(DualArray, Marks):
 
     def __init__ (self, array):
         super().__init__(8, self.shape[1])  # Create 8 marks for each (possible) dart
-        self.darts_set = {}
-        for i in range(self.shape[1]):
-            self.darts_set[i] = Dart(i, {})
+        # uint32 is sufficient for 1000x1000 images.
+        number_of_darts = self.shape[0] * self.shape[1] * 8
+        dtype = np.int32 # I use a signed dtype for using negative values as markers (example, None type)
+        if number_of_darts > (np.iinfo(dtype).max + 1):
+            raise Exception(f"{dtype} is not sufficient to represent {number_of_darts} darts")
+
+        # allocate distances array
+        self.distances = np.zeros(number_of_darts, dtype=dtype)
+        logger.debug(f"distances array successfully initialized with shape {self.distances.shape}"
+                     f" and dtype {self.distances.dtype}")
+
+        # allocate labels array
+        # int16 is sufficient to represent a label
+        self.image_labels = np.zeros(number_of_darts, dtype=np.int16)
+        logger.debug(f"labels array successfully initialized with shape {self.image_labels.shape}"
+                     f" and dtype {self.image_labels.dtype}")
+
+        # allocate face identifiers array
+        self.face_identifiers = np.zeros(number_of_darts, dtype=dtype)
+        logger.debug(f"face_identifiers array successfully initialized with shape {self.face_identifiers.shape}"
+                     f" and dtype {self.face_identifiers.dtype}")
 
     @classmethod
     def n_by_d (cls, n, n_darts):
@@ -128,11 +140,8 @@ class nGmap(DualArray, Marks):
         ### return (self[0] >= 0).sum()  # this would first create another big array of booleans
         return sum (1 for d in self.darts)
 
-    def get_dart_by_identifier(self, identifier: int) -> Dart:
-        return self.darts_set[identifier]
-
-    def set_dart_distance(self, identifier: int, distance: int) -> None:
-        self.darts_set[identifier].attributes["distance"] = distance
+    def set_dart_distance(self, identifier: np.uint32, distance: np.uint32) -> None:
+        self.distances[identifier] = distance
 
     @property
     def darts(self):
@@ -140,13 +149,6 @@ class nGmap(DualArray, Marks):
         for index in range (self.shape[1]):
             if self.a0(index) >= 0:
                 yield index
-
-    @property
-    def darts_with_attributes(self):
-        """Generator to iterate thru all valid (non-negative alphas) darts"""
-        for index in range (self.shape[1]):
-            if self.a0(index) >= 0:
-                yield self.darts_set[index]
 
     def all_dimensions_but_i (self, i=None):
         """Return a sorted sequence [0,...,n], without i, if 0 <= i <= n"""
@@ -162,7 +164,6 @@ class nGmap(DualArray, Marks):
         assert 0 <= i <= self.n
         self [i,dart] = new_dart
 
-    def alfa_i (self, i, indices): return self.darts_set[self[i, indices]]
     def ai (self, i, indices): return self[i,indices]  # TODO direct access
     def a0 (self,    indices): return self.ai(0,indices)
     def a1 (self,    indices): return self.ai(1,indices)
@@ -434,7 +435,7 @@ class nGmap(DualArray, Marks):
                 # I choose d1 but I can also choose d2.
                 # I have to memorize to which face is now associated d when it is removed
                 # I identify the face by one of his darts
-                self.get_dart_by_identifier(d).attributes["face_identifier"] = d1
+                self.face_identifiers[d] = d1
             else:
                 # I need to find a value to wich associate d.
                 # d1 is not suitable because is in the i-cell
@@ -442,7 +443,7 @@ class nGmap(DualArray, Marks):
                 found = False
                 for d1 in self.cell_i(i + 1, d):
                     if d1 not in i_cell:
-                        self.get_dart_by_identifier(d).attributes["face_identifier"] = d1
+                        self.face_identifiers[d] = d1
                         found = True
                         break
                 if not found:
@@ -450,14 +451,14 @@ class nGmap(DualArray, Marks):
                     d_other_cell = self.ai(i+1, d) # d1 ← d.Alphas[i];
                     for d1 in self.cell_i(i + 1, d_other_cell):
                         if d1 not in i_cell:
-                            self.get_dart_by_identifier(d).attributes["face_identifier"] = d1
+                            self.face_identifiers[d] = d1
                             found = True
                             break
                 if not found:
-                    print(f"Not found a suitable dart for dart: {d}")
+                    logger.debug(f"Not found a suitable dart for dart: {d}")
 
         for d in i_cell:  # foreach dart d' ∈ ci(d) do
-            self._remove_dart (d)  # remove d' from gm.Darts;
+            self._remove_dart(d)  # remove d' from gm.Darts;
 
     def _remove(self, i, dart, skip_check=False):
         """Remove i-cell of dart"""

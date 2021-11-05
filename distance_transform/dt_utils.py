@@ -51,14 +51,14 @@ def gmap_dt_equal(gmap_1, gmap_2) -> bool:
     The two gmaps need to have the same structure.
     """
 
-    for dart_1, dart_2 in zip(gmap_1.darts_with_attributes, gmap_2.darts_with_attributes):
-        if dart_1.identifier != dart_2.identifier:
-            raise Exception(f"The identifiers don't match. id 1: {dart_1.identifier} - id 2: {dart_2.identifier}")
+    for dart_1, dart_2 in zip(gmap_1.darts, gmap_2.darts):
+        if dart_1 != dart_2:
+            raise Exception(f"The identifiers don't match. id 1: {dart_1} - id 2: {dart_2}")
 
-        distance_1 = dart_1.attributes["distance"]
-        distance_2 = dart_2.attributes["distance"]
+        distance_1 = gmap_1.distances[dart_1]
+        distance_2 = gmap_2.distances[dart_2]
         if distance_1 != distance_2:
-            print(f"dart id: {dart_1.identifier} - dart 1 distance: {distance_1} - dart 2 distance: {distance_2}")
+            print(f"dart id: {dart_1} - dart 1 distance: {distance_1} - dart 2 distance: {distance_2}")
             return False
 
     return True

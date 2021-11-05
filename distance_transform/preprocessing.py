@@ -40,8 +40,7 @@ def find_borders(labeled_image: np.array, label_value: int) -> np.array:
 
     return image
 
-
-def find_borders_on_gmap(gmap, label_value: int, face_value, neighboring: ):
+def find_borders_on_gmap(gmap, label_value: int, face_value):
     """
 
     It modifies the gmap passed as parameter.

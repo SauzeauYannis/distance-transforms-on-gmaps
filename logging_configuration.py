@@ -5,8 +5,8 @@ from pathlib import Path
 import datetime
 
 
-def set_logging():
-    results_dir = Path('results')
+def set_logging(result_dir_path: str = "results"):
+    results_dir = Path(result_dir_path)
     results_dir.mkdir(exist_ok=True)
 
     logging.config.dictConfig({
@@ -32,6 +32,10 @@ def set_logging():
             "evaluate_performance_gmap_logger": {
                 "level": "DEBUG",
                 "handlers": ["console-named", "file-named"]
+            },
+            "gmap_logger": {
+                "level": "INFO",
+                "handlers": ["console-named"]
             }
         },
     })

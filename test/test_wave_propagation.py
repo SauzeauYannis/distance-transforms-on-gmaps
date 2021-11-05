@@ -194,11 +194,11 @@ class TestWavePropagation(TestCase):
 
         # set distances on expected gmap
         for i in range(56):
-            expected_gmap.set_dart_distance(i, None)
+            expected_gmap.set_dart_distance(i, -1)
         for i in range(56, 80):
             expected_gmap.set_dart_distance(i, 0)
         for i in range(80, 88):
-            expected_gmap.set_dart_distance(i, None)
+            expected_gmap.set_dart_distance(i, -1)
         for i in range(88, 96):
             expected_gmap.set_dart_distance(i, 0)
         for i in range(96, 112):
@@ -206,7 +206,7 @@ class TestWavePropagation(TestCase):
         for i in range(112, 120):
             expected_gmap.set_dart_distance(i, 0)
         for i in range(120, 128):
-            expected_gmap.set_dart_distance(i, None)
+            expected_gmap.set_dart_distance(i, -1)
         for i in range(128, 136):
             expected_gmap.set_dart_distance(i, 0)
         for i in range(136, 144):
@@ -216,7 +216,7 @@ class TestWavePropagation(TestCase):
         for i in range(152, 160):
             expected_gmap.set_dart_distance(i, 1)
         for i in range(160, 168):
-            expected_gmap.set_dart_distance(i, None)
+            expected_gmap.set_dart_distance(i, -1)
         for i in range(168, 176):
             expected_gmap.set_dart_distance(i, 0)
         for i in range(176, 184):
@@ -253,12 +253,12 @@ class TestWavePropagation(TestCase):
         expected_gmap.plot()
 
         # set distances on expected gmap
-        expected_gmap.set_dart_distance(35, None)
-        expected_gmap.set_dart_distance(36, None)
-        expected_gmap.set_dart_distance(51, None)
-        expected_gmap.set_dart_distance(52, None)
-        expected_gmap.set_dart_distance(163, None)
-        expected_gmap.set_dart_distance(164, None)
+        expected_gmap.set_dart_distance(35, -1)
+        expected_gmap.set_dart_distance(36, -1)
+        expected_gmap.set_dart_distance(51, -1)
+        expected_gmap.set_dart_distance(52, -1)
+        expected_gmap.set_dart_distance(163, -1)
+        expected_gmap.set_dart_distance(164, -1)
 
         expected_gmap.set_dart_distance(73, 0)
         expected_gmap.set_dart_distance(74, 0)
@@ -358,7 +358,7 @@ class TestWavePropagation(TestCase):
         image_borders = find_borders(image, 152)
         self._compute_dt_reduction(image_borders, 0.5, False)
 
-    def test_dt_reduction_05_1000_image(self):
+    def test_dt_reduction_05_300_image(self):
         image = cv2.imread('../data/300_300_portion_leaf.png', 0)
         print("image read successfully")
         image_borders = find_borders(image, 152)

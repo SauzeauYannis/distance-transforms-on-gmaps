@@ -8,14 +8,11 @@ import time
 import logging_configuration
 import cv2
 from combinatorial.pixelmap import LabelMap
-import typing
 import tracemalloc
-import numpy as np
 
-
-# set logger
+# get logger
 logger = logging.getLogger("evaluate_performance_gmap_logger")
-logging_configuration.set_logging()
+logging_configuration.set_logging("results")
 
 
 def measure_time_build_gmap(image) -> None:
