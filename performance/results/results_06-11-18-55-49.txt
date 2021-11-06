@@ -1,0 +1,10 @@
+INFO     Reading image from ../data/5_5_reduced_portion_leaf.png
+INFO     Image shape: (5, 5)
+INFO     gmap successfully builded in 0.0019989013671875 seconds
+INFO     edges removed in 0.008999824523925781 seconds
+INFO     vertices removed in 0.0049991607666015625 seconds
+INFO     Reading image from ../data/20_20_reduced_portion_leaf.png
+INFO     Image shape: (20, 20)
+INFO     gmap successfully builded in 0.028997421264648438 seconds
+INFO     edges removed in 2.0750017166137695 seconds
+INFO     vertices removed in 0.40199923515319824 seconds

@@ -1,0 +1,17 @@
+Con la versione originale della classe marker è molto più veloce
+
+INFO     Reading image from ../data/5_5_reduced_portion_leaf.png
+INFO     Image shape: (5, 5)
+INFO     gmap successfully builded in 0.0019996166229248047 seconds
+INFO     edges removed in 0.0019998550415039062 seconds
+INFO     vertices removed in 0.0010006427764892578 seconds
+INFO     Reading image from ../data/20_20_reduced_portion_leaf.png
+INFO     Image shape: (20, 20)
+INFO     gmap successfully builded in 0.028998613357543945 seconds
+INFO     edges removed in 0.06600069999694824 seconds
+INFO     vertices removed in 0.007999897003173828 seconds
+INFO     Reading image from ../data/100_100_portion_leaf.png
+INFO     Image shape: (100, 100)
+INFO     gmap successfully builded in 0.7549991607666016 seconds
+INFO     edges removed in 2.1510000228881836 seconds
+INFO     vertices removed in 0.060999393463134766 seconds

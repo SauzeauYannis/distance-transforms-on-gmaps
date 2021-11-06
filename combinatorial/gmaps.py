@@ -15,6 +15,55 @@ logger = logging.getLogger("gmap_logger")
 logging_configuration.set_logging()
 
 
+"""
+# I can improve this class
+# Using only one byte for all the marks.
+class Marks:
+    @property
+    def m (self):
+        return self._marks.shape[0]
+
+    @property
+    def free_marks(self):
+        return self._free_marks
+
+    def __init__ (self, m, d):
+        if m != 8:
+            raise Exception(f"The number of marks is {f} but it have to be equal to 8")
+        self._marks = np.zeros(d, dtype=np.uint8)
+        self._free_marks = {i for i in range (m)}
+
+    def reserve_mark (self):
+        return self._free_marks.pop()
+
+    def free_mark (self,m):
+        self._free_marks |= {m}  # why. Just use add() function
+
+    def marked (self,m,d):
+        mask = np.uint8(1 << m)
+        return bool(self._marks[d] & mask)
+
+    def mark (self,m,d):
+        mask = np.uint8(1 << m)
+        self._marks[d] = self._marks[d] | mask
+
+    def unmark (self,m,d):
+        mask = np.uint8(~(1 << m))
+        self._marks[d] = self._marks[d] & mask
+
+    def mark_all(self, m):
+        mask = np.uint8(1 << m)
+        self._marks = np.bitwise_or(self._marks, mask)
+        for i in range(self._marks.shape[0]):
+            self._marks[i] = self._marks[i] | mask
+
+    def unmark_all(self, m):
+        mask = np.uint8(~(1 << m))
+        for i in range(self._marks.shape[0]):
+            self._marks[i] = self._marks[i] & mask
+"""
+
+
 class Marks:
     @property
     def m (self):
@@ -50,6 +99,7 @@ class Marks:
 
     def unmark_all (self,m):
         self._marks [m,:] = False
+
 
 # Cell
 
