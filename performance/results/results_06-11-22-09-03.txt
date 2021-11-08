@@ -1,0 +1,27 @@
+INFO     Reading image from ../data/100_100_portion_leaf.png
+INFO     Image shape: (100, 100)
+INFO     gmap with 80000 darts successfully builded in 0.7509987354278564 seconds
+INFO     wave propagation successfully executed in 0.2330024242401123 seconds
+INFO     edges successfully removed in 2.120309591293335 seconds. Reduction factor: 1
+INFO     vertices successfully removed in 0.059001922607421875 seconds.
+INFO     image successfully created in 0.40599989891052246 seconds.
+INFO     Memory: current: 2.402194 MB peak: 2.404686 MB
+INFO     Memory required for each dart is: 30.027425 B
+INFO     Reading image from ../data/200_200_portion_leaf.png
+INFO     Image shape: (200, 200)
+INFO     gmap with 320000 darts successfully builded in 3.0289974212646484 seconds
+INFO     wave propagation successfully executed in 0.9419996738433838 seconds
+INFO     edges successfully removed in 10.867003202438354 seconds. Reduction factor: 1
+INFO     vertices successfully removed in 0.22499871253967285 seconds.
+INFO     image successfully created in 3.437998056411743 seconds.
+INFO     Memory: current: 9.601946 MB peak: 9.604439 MB
+INFO     Memory required for each dart is: 30.00608125 B
+INFO     Reading image from ../data/300_300_portion_leaf.png
+INFO     Image shape: (300, 300)
+INFO     gmap with 720000 darts successfully builded in 6.869999885559082 seconds
+INFO     wave propagation successfully executed in 2.151998519897461 seconds
+INFO     edges successfully removed in 35.621002197265625 seconds. Reduction factor: 1
+INFO     vertices successfully removed in 0.6189990043640137 seconds.
+INFO     image successfully created in 7.5149986743927 seconds.
+INFO     Memory: current: 21.602002 MB peak: 21.604551 MB
+INFO     Memory required for each dart is: 30.002780555555557 B

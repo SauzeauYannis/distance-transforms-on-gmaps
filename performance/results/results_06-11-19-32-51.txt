@@ -1,0 +1,34 @@
+A lot of time is needed to reduce the gmap.
+
+INFO     Reading image from ../data/100_100_portion_leaf.png
+INFO     Image shape: (100, 100)
+INFO     gmap with 80000 darts successfully builded in 0.783001184463501 seconds
+INFO     wave propagation successfully executed in 0.25299644470214844 seconds
+INFO     edges successfully removed in 2.1800038814544678 seconds. Reduction factor: 1
+INFO     vertices successfully removed in 0.07199597358703613 seconds.
+INFO     Memory: current: 2.402194 MB peak: 2.404686 MB
+INFO     Memory required for each dart is: 30.027425 B
+INFO     Reading image from ../data/200_200_portion_leaf.png
+INFO     Image shape: (200, 200)
+INFO     gmap with 320000 darts successfully builded in 3.041008710861206 seconds
+INFO     wave propagation successfully executed in 0.9489974975585938 seconds
+INFO     edges successfully removed in 10.646002054214478 seconds. Reduction factor: 1
+INFO     vertices successfully removed in 0.253997802734375 seconds.
+INFO     Memory: current: 9.601946 MB peak: 9.604439 MB
+INFO     Memory required for each dart is: 30.00608125 B
+INFO     Reading image from ../data/300_300_portion_leaf.png
+INFO     Image shape: (300, 300)
+INFO     gmap with 720000 darts successfully builded in 6.992998123168945 seconds
+INFO     wave propagation successfully executed in 2.1649959087371826 seconds
+INFO     edges successfully removed in 37.872000217437744 seconds. Reduction factor: 1
+INFO     vertices successfully removed in 0.6610026359558105 seconds.
+INFO     Memory: current: 21.602002 MB peak: 21.604551 MB
+INFO     Memory required for each dart is: 30.002780555555557 B
+INFO     Reading image from ../data/1000_1000_portion_leaf.png
+INFO     Image shape: (1000, 1000)
+INFO     gmap with 8000000 darts successfully builded in 80.09599947929382 seconds
+INFO     wave propagation successfully executed in 24.51399850845337 seconds
+INFO     edges successfully removed in 3619.2282180786133 seconds. Reduction factor: 1
+INFO     vertices successfully removed in 18.182940244674683 seconds.
+INFO     Memory: current: 240.001906 MB peak: 240.004552 MB
+INFO     Memory required for each dart is: 30.00023825 B

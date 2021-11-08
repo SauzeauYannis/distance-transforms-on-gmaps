@@ -458,6 +458,7 @@ class nGmap(DualArray, Marks):
         """True if i-cell of dart can be contracted"""
         return self._is_i_removable_or_contractible(i, dart, rc=-1)
 
+    # Constant time
     def _i_remove_contract(self, i, dart, rc, skip_check=False):
         """
         Remove / contract an i-cell of dart
@@ -465,13 +466,19 @@ class nGmap(DualArray, Marks):
         i  ... i-cell
         rc ... +1 => remove, -1 => contract
         skip_check ... set to True if you are sure you can remove / contract the i-cell
+
+        Complexity
+
         """
+
         logging.debug (f'{"Remove" if rc == 1 else "Contract"} {i}-Cell of dart {dart}')
 
+        # Complexity
         if not skip_check:
             assert self._is_i_removable_or_contractible(i, dart, rc),\
                 f'{i}-cell of dart {dart} is not {"removable" if rc == 1 else "contractible"}!'
 
+        # Complexity
         i_cell = set(self.cell_i(i, dart))  # mark all the darts in ci(d)
         logging.debug (f'\n{i}-cell to be removed {i_cell}')
         for d in i_cell:
@@ -480,6 +487,7 @@ class nGmap(DualArray, Marks):
                 # d2 ← d.Alphas[i + 1].Alphas[i];
                 d2 = self.ai (i+rc,d)
                 d2 = self.ai (i   ,d2)
+                # It should costant time
                 while d2 in i_cell: # while isMarkedNself(d2,ma) do
                     # d2 ← d.Alphas[i + 1].Alphas[i];
                     d2 = self.ai (i+rc,d2)
