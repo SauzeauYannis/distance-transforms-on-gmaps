@@ -1,9 +1,12 @@
+import numpy as np
+
 from distance_transform.wave_propagation import *
 from distance_transform.preprocessing import *
 from combinatorial.pixelmap import LabelMap
 from combinatorial.zoo_labels import *
 from distance_transform.sample_data import *
 from distance_transform.dt_utils import *
+import imageio
 import matplotlib.pyplot as plt
 import cv2
 
@@ -107,14 +110,15 @@ def dt_cell_10():
     gmap.plot_dt()
 
 
-def read_leaf_image(path):
+def read_leaf_image(path, show: bool = False):
     # Use 0 to read image in grayscale mode
     # I have for sure grayscale images because the image is labeled, so it is not useful to have more that 3 channels
-    img = cv2.imread(path, 0)
-    cv2.imshow('image', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    #print(img[50][50])
+    img = imageio.imread(path)
+    #img = cv2.imread(path, 0)
+    if show:
+        cv2.imshow('image', img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     return img
 
@@ -152,12 +156,27 @@ def show_image(image):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-"""
-img = read_leaf_image('data/DEHYDRATION_small_leaf_4_time_1_ax0para_0049_Label_1119x1350_uint8.png')
-new_img = find_borders(img, 152)
-cv2.imshow('image', new_img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-"""
 
-test_norm_image('data/100_100_portion_leaf.png')
+def print_different_values_image(image: np.array) -> None:
+    values = set()
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+                values.add(image[i][j])
+
+    print(values)
+
+def main():
+
+    img = read_leaf_image('data/cross_section_leaf.png')
+    """
+    # new_img = find_borders(img, 152)
+    print(img.shape)  # the shape is inverted, it should be 1024 x 874, not 874 x 1024
+    print(img[746][272])
+    
+    # test_norm_image('data/100_100_portion_leaf.png')
+    """
+    print_different_values_image(img)
+
+if __name__ == "__main__":
+    main()
+

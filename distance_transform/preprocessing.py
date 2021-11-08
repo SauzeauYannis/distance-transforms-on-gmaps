@@ -3,10 +3,12 @@ import typing
 import numpy as np
 
 
+# Modify the function (maybe change also the name) in order to pass 2 array of labels
+# seeds_labels, propagation_labels
 def find_borders(labeled_image: np.array, label_value: int) -> np.array:
     """
     A pixel of a labeled component of interest is considered part of the border
-    if the label at least one of his neighbours is different from his label.
+    if the label of at least one of his neighbours is different from his label.
     4-neighbourhood is considered.
 
     I can consider a different rule to find the borders.
