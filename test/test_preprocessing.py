@@ -24,3 +24,10 @@ class TestPreprocessing(TestCase):
         image = cv2.imread('results/cleaned_cross_section_leaf.png', 0)
         cleaned_image = clean_borders(image, 9)
         cv2.imwrite('results/cleaned_borders_cross_section_leaf.png', cleaned_image)
+
+    def test_generalized_find_borders(self):
+        image = cv2.imread('../data/cleaned_borders_cross_section_leaf.png', 0)
+        new_image = generalized_find_borders(image, 0, 50)
+        cv2.imwrite('results/borders_image_test.png', new_image)
+
+

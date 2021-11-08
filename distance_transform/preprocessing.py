@@ -3,6 +3,39 @@ import typing
 import numpy as np
 
 
+def generalized_find_borders(image: np.array, region_label_value: int, border_label_value: int) -> np.array:
+    """
+    It finds the borders of the regions with label_value and creates a new image identical with
+    the image passed parameters but with the borders of the interested regions modified with
+    border_label_value
+
+    :param image:
+    :param label_value:
+    :param border_label_value:
+    :return:
+    """
+
+    new_image = np.copy(image)
+
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            if image[i][j] == region_label_value and not is_equal_to_neighbours(image, (i, j)):
+                new_image[i][j] = border_label_value
+
+    return new_image
+
+
+def is_equal_to_neighbours(image: np.array, value_position: typing.Tuple[int, int]) -> True:
+    value_x = value_position[0]
+    value_y = value_position[1]
+    x_values = [value_x, value_x - 1, value_x, value_x + 1]
+    y_values = [value_y -1, value_y, value_y + 1, value_y]
+    for x, y in zip(x_values, y_values):
+            if 0 < x < image.shape[0] and 0 < y < image.shape[1] and image[x][y] != image[value_x][value_y]:
+                return False
+    return True
+
+
 # Modify the function (maybe change also the name) in order to pass 2 array of labels
 # seeds_labels, propagation_labels
 def find_borders(labeled_image: np.array, label_value: int) -> np.array:
@@ -17,16 +50,6 @@ def find_borders(labeled_image: np.array, label_value: int) -> np.array:
     255: foreground
     100: inside
     """
-
-    def is_equal_to_neighbours(image: np.array, value_position: typing.Tuple[int, int]) -> True:
-        value_x = value_position[0]
-        value_y = value_position[1]
-        x_values = [value_x, value_x - 1, value_x, value_x + 1]
-        y_values = [value_y -1, value_y, value_y + 1, value_y]
-        for x, y in zip(x_values, y_values):
-            if 0 < x < image.shape[0] and 0 < y < image.shape[1] and image[x][y] != image[value_x][value_y]:
-                return False
-        return True
 
     image = np.copy(labeled_image)
 
