@@ -12,7 +12,18 @@ def compute_diffusion_distance(image_path: str, save_gmap_image: bool = True) ->
     # Read image
     image = cv2.imred(image_path, 0)  # the second parameter with value 0 is needed to read the greyscale image
 
-    # Find borders
-    find
+    # Compress image
+
+    # Find borders of cells to compute dt and modify the image adding this borders
+
+    # Compute dt from stomata to that cells
+
+    # Average the distance to each point on the border
+
+    # Modify the algorithm to do the same on reduced gmaps
+        # I need Dijkstra algorithm
+
+    # Try to improve the segmentation to separate cells and average for each cell
+    # not for the borders
 
     pass

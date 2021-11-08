@@ -177,6 +177,7 @@ def main():
     """
     print_different_values_image(img)
 
+
 if __name__ == "__main__":
     main()
 
