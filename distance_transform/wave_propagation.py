@@ -76,6 +76,57 @@ def wave_propagation_dt_image(image: np.array, seeds: typing.List[typing.Tuple[i
     return output_image
 
 
+def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int],
+                                      accumulation_directions: typing.List[bool] = None) -> None:
+    # Initialization
+    for dart in gmap.darts:
+        gmap.distances[dart] = -1
+
+    # Initialize accumulation directions if None
+    if accumulation_directions is None:
+        accumulation_directions = []
+        for i in range(gmap.n + 1):
+            accumulation_directions.append(True)
+
+    # Initialize distance to 0 for seeds and add the seeds to the queue
+    curr_queue = Queue()
+    next_queue = Queue()
+    for dart in gmap.darts:
+        if gmap.image_labels[dart] in seed_labels:
+            curr_queue.put(dart)
+            gmap.distances[dart] = 0
+
+    while not curr_queue.empty():
+        while not curr_queue.empty():
+            dart = curr_queue.get()
+            # Visit all the neighbours
+            for i in range(gmap.n + 1):
+                neighbour = gmap.ai(i, dart)
+                # Check if I can propagate to that dart
+                if gmap.image_labels[neighbour] not in propagation_labels:
+                    continue
+
+                # Due to the accumulation policies, it happens that the first distance value associated to a neighbour
+                # could not be the right one. All the values have to be checked. View example on joplin (01/11/2021)
+                # I don't remember exactly what this part do. I have to check again.
+                if accumulation_directions[i]:
+                    if gmap.distances[neighbour] == -1:
+                        next_queue.put(neighbour)
+                    if gmap.distances[neighbour] == -1 \
+                            or gmap.distances[dart] + 1 < gmap.distances[neighbour]:
+                        gmap.distances[neighbour] = gmap.distances[dart] + 1
+                else:
+                    if gmap.distances[neighbour] == -1:
+                        curr_queue.put(neighbour)
+                    if gmap.distances[neighbour] == -1 \
+                            or gmap.distances[dart] < gmap.distances[neighbour]:
+                        gmap.distances[neighbour] = gmap.distances[dart]
+        curr_queue = next_queue
+        next_queue = Queue()
+
+
+
+
 def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.List[int]], accumulation_directions: typing.List[bool] = None) -> None:
     """
     It computes the dt for the gmap passed as parameter.
