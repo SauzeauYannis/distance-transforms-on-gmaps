@@ -5,7 +5,27 @@ from distance_transform.wave_propagation import generalized_wave_propagation_gma
 from combinatorial.pixelmap import LabelMap
 
 
-def compute_diffusion_distance(image_path: str, dt_image_path: str, verbose: bool = False) -> None:
+def compute_diffusion_distance(gmap, label: int) -> float:
+    """
+    It's the average of the distance of each point with label equal to the label passed as parameter
+
+    At the moment I am computing the average on darts
+    Probably I should compute the average on faces. It is not so difficult to do that
+    """
+
+    sum = 0
+    number_of_values = 0
+
+    for dart in gmap.darts:
+        if gmap.image_labels[dart] == label:
+            number_of_values += 1
+            sum += gmap.distances[dart]
+
+    average = sum / number_of_values
+    return average
+
+
+def compute_dt_for_diffusion_distance(image_path: str, dt_image_path: str = None, verbose: bool = False):
     """
     Computes the diffusion distance of the cell represented by the image in image_path.
 
@@ -42,7 +62,10 @@ def compute_diffusion_distance(image_path: str, dt_image_path: str, verbose: boo
     if verbose:
         print("dt image successfully computed")
 
-    cv2.imwrite(dt_image_path, dt_image)
+    if dt_image_path:
+        cv2.imwrite(dt_image_path, dt_image)
+
+    return gmap
 
     # Average the distance to each point on the border
 
