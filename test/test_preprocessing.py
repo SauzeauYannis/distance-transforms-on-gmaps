@@ -30,4 +30,22 @@ class TestPreprocessing(TestCase):
         new_image = generalized_find_borders(image, 0, 50)
         cv2.imwrite('results/borders_image_test.png', new_image)
 
+    def test_is_equal_to_neighbours_true(self):
+        image = cv2.imread("../data/5_5_boundary.png", 0)
+        expected = True
+        actual = is_equal_to_neighbours(image, (3, 3))
+        self.assertEqual(expected, actual)
+
+    def test_is_equal_to_neighbours_border(self):
+        image = cv2.imread("../data/5_5_boundary.png", 0)
+        expected = True
+        actual = is_equal_to_neighbours(image, (0, 0))
+        self.assertEqual(expected, actual)
+
+    def test_is_equal_to_neighbours_false(self):
+        image = cv2.imread("../data/5_5_boundary.png", 0)
+        expected = False
+        actual = is_equal_to_neighbours(image, (0, 2))
+        self.assertEqual(expected, actual)
+
 
