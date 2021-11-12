@@ -1,6 +1,7 @@
 import typing
 
 import numpy as np
+import math
 
 
 def generalized_find_borders(image: np.array, region_label_value: int, border_label_value: int) -> np.array:
@@ -65,6 +66,7 @@ def find_borders(labeled_image: np.array, label_value: int) -> np.array:
 
     return image
 
+
 def find_borders_on_gmap(gmap, label_value: int, face_value):
     """
 
@@ -84,31 +86,6 @@ def find_borders_on_gmap(gmap, label_value: int, face_value):
 
 def clean_borders(image: np.array, kernel_size: int) -> np.array:
 
-    def get_most_common_value(image: np.array, x: int, y: int, kernel_size: int):
-        x_kernel_start = x - int(((kernel_size - 1) / 2))
-        y_kernel_start = y - int(((kernel_size - 1) / 2))
-
-        values = {}
-
-        for i in range(kernel_size):
-            for j in range(kernel_size):
-                curr_x = x_kernel_start + i
-                curr_y = y_kernel_start + j
-                if 0 <= curr_x < image.shape[0] and 0 <= curr_y < image.shape[1]:
-                    if image[curr_x][curr_y] not in values:
-                        values[image[curr_x][curr_y]] = 1
-                    else:
-                        values[image[curr_x][curr_y]] = values[image[curr_x][curr_y]] + 1
-
-        max_value = -1
-        max_key = None
-        for key, value in values.items():
-            if value > max_value:
-                max_value = value
-                max_key = key
-
-        return max_key
-
     if kernel_size % 2 == 0:
         raise Exception("The size of the kernel must be odd")
 
@@ -119,6 +96,41 @@ def clean_borders(image: np.array, kernel_size: int) -> np.array:
             cleaned_image[i][j] = get_most_common_value(image, i, j, kernel_size)
 
     return cleaned_image
+
+
+def get_most_common_value(image: np.array, x: int, y: int, kernel_size: int, center_kernel: bool = True):
+    """
+    Center kernel specify if the kernel has to be centered in the pixel value or not.
+    If not the current pixel is positioned in the upper left position of the kernel
+    """
+
+    if center_kernel:
+        x_kernel_start = x - int(((kernel_size - 1) / 2))
+        y_kernel_start = y - int(((kernel_size - 1) / 2))
+    else:
+        x_kernel_start = x
+        y_kernel_start = y
+
+    values = {}
+
+    for i in range(kernel_size):
+        for j in range(kernel_size):
+            curr_x = x_kernel_start + i
+            curr_y = y_kernel_start + j
+            if 0 <= curr_x < image.shape[0] and 0 <= curr_y < image.shape[1]:
+                if image[curr_x][curr_y] not in values:
+                    values[image[curr_x][curr_y]] = 1
+                else:
+                    values[image[curr_x][curr_y]] = values[image[curr_x][curr_y]] + 1
+
+    max_value = -1
+    max_key = None
+    for key, value in values.items():
+        if value > max_value:
+            max_value = value
+            max_key = key
+
+    return max_key
 
 
 def remove_noise_from_labeled_image(image: np.array, labels: typing.Dict) -> np.array:
@@ -151,4 +163,40 @@ def get_different_values_image(image: np.array) -> typing.List:
 
     return list(values)
 
+
+def reduce_image_size(image: np.array, kernel_size: int) -> np.array:
+    """
+    It reduces the size of the image passed as parameter.
+
+    The shape of the new image is equal to ceil(shape / kernel size)
+    For each pixel a kernel of size "kernel_size" is considered.
+    The considered pixel is located in the upper left corner of the kernel.
+    The value of the new pixel is the most common value in the image inside the kernel.
+
+    Example:
+    kernel_size = 2
+
+    1 1 3       1 3
+    0 1 3  ->   0 2
+    0 0 2
+
+    Explanation:
+    1 1 -> 1   3 -> 3
+    0 1        3
+
+    0 0 -> 0   2 -> 2
+
+    :param image:
+    :param kernel_size:
+    :return:
+    """
+
+    new_shape = [math.ceil(shape / kernel_size) for shape in image.shape]
+    reduced_image = np.zeros(new_shape)
+
+    for i in range(reduced_image.shape[0]):
+        for j in range(reduced_image.shape[1]):
+            reduced_image[i][j] = get_most_common_value(image, i * kernel_size, j * kernel_size, kernel_size)
+
+    return reduced_image
 

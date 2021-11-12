@@ -20,7 +20,7 @@ class TestPreprocessing(TestCase):
         cv2.imwrite('results/cleaned_cross_section_leaf.png', cleaned_image)
         self.assertListEqual(sorted(values), sorted(list(labels.values())))
 
-    def test_clean_borders(self):
+    def test_clean_borders_big_image(self):
         image = cv2.imread('results/cleaned_cross_section_leaf.png', 0)
         cleaned_image = clean_borders(image, 9)
         cv2.imwrite('results/cleaned_borders_cross_section_leaf.png', cleaned_image)
@@ -59,4 +59,11 @@ class TestPreprocessing(TestCase):
         actual = is_equal_to_neighbours(image, (0, 2))
         self.assertEqual(expected, actual)
 
+    def test_reduce_image_size(self):
+        image = cv2.imread("../data/5_5_boundary.png", 0)
+        expected = cv2.imread("../data/3_3_boundary_reduced.png", 0)
+        actual = reduce_image_size(image, 2)
 
+        for i in range(expected.shape[0]):
+            for j in range(expected.shape[1]):
+                self.assertEqual(actual[i][j], expected[i][j])
