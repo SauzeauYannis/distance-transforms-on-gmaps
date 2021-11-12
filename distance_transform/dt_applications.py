@@ -3,6 +3,7 @@ from distance_transform.preprocessing import generalized_find_borders
 from data.labels import labels
 from distance_transform.wave_propagation import generalized_wave_propagation_gmap
 from combinatorial.pixelmap import LabelMap
+import numpy as np
 
 
 def compute_diffusion_distance(gmap, label: int) -> float:
@@ -25,7 +26,7 @@ def compute_diffusion_distance(gmap, label: int) -> float:
     return average
 
 
-def compute_dt_for_diffusion_distance(image_path: str, dt_image_path: str = None, verbose: bool = False):
+def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None, verbose: bool = False):
     """
     Computes the diffusion distance of the cell represented by the image in image_path.
 
@@ -33,10 +34,7 @@ def compute_dt_for_diffusion_distance(image_path: str, dt_image_path: str = None
     Add the parameter reduction_factor in order to compute dt on the reduced gmap
     """
 
-    # Read image
-    image = cv2.imread(image_path, 0)  # the second parameter with value 0 is needed to read the greyscale image
-    if verbose:
-        print("image successfully read")
+
 
     # Compress image
 
