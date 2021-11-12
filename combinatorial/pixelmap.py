@@ -355,11 +355,8 @@ class LabelMap (PixelMap):
         plt.title (self.__str__())
         plt.show()
 
-    def from_dt_gmap_to_gray_image(self):
+    def build_dt_image(self, interpolate_missing_values: bool = True):
         image = np.zeros((self.n_rows, self.n_cols))
-
-        # the method has to be modified because it not works
-        # when the gmap is simplified.
 
         max_distance = self._evaluate_max_dt_value()
 
@@ -367,9 +364,19 @@ class LabelMap (PixelMap):
             for j in range(image.shape[1]):
                 # get dart associated to each cell
                 dart = (i * image.shape[1] * 8) + j * 8
-                # check if dart has been removed
-                while self.ai(0, dart) == -1:
-                    dart = self.face_identifiers[dart]
+
+                # check if the current dart has been deleted
+                if self.ai(0, dart) == -1:
+                    if interpolate_missing_values:
+                        # if the darts has been removed, take the new corresponding dart
+                        # to assign a color to the corresponding cell
+                        while self.ai(0, dart) == -1:
+                            dart = self.face_identifiers[dart]
+                    else:
+                        # At the moment I just use white color if the dart
+                        # Probably it's better to use an rgb image
+                        image[i][j] = 255
+                        continue
 
                 distance = self.distances[dart]
                 if distance == -1:
@@ -377,9 +384,10 @@ class LabelMap (PixelMap):
                     # for propagating the distance
                     image[i][j] = 255
                 else:
-                    # normalize in 0:200 (not 255 because it is associated with pixels with no distance values)
+                    # normalize in 0:200 (not 255 because 255 is associated with pixels with no distance values)
                     norm_distance = distance / max_distance * 200
                     image[i][j] = norm_distance
+
         return image
 
     def plot_labels(self):

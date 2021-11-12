@@ -147,7 +147,7 @@ def test_norm_image(path):
     accumulation_directions = generate_accumulation_directions_cell(2)
     wave_propagation_dt_gmap(gmap, None, accumulation_directions)
     # get image and show results
-    dt_image = gmap.from_dt_gmap_to_gray_image()
+    dt_image = gmap.build_dt_image()
     plot_dt_image(dt_image, None)
 
 

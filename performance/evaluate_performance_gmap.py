@@ -64,7 +64,7 @@ def measure_time_vertices_reduction(gmap) -> None:
 
 def measure_time_image_creation(gmap) -> None:
     start = time.time()
-    gmap.from_dt_gmap_to_gray_image()
+    gmap.build_dt_image()
     end = time.time()
     logger.info(f"image successfully created in {end-start} seconds.")
 

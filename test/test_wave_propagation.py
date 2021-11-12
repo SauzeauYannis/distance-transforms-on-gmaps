@@ -288,7 +288,7 @@ class TestWavePropagation(TestCase):
         expected_gmap.plot_dt(fill_cell='face')
         actual_gmap.plot_dt(fill_cell='face')
 
-        dt_image = actual_gmap.from_dt_gmap_to_gray_image()
+        dt_image = actual_gmap.build_dt_image()
         plot_dt_image(dt_image, None)
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
@@ -306,7 +306,7 @@ class TestWavePropagation(TestCase):
         gmap.plot_dt(fill_cell='face')
         gmap.plot_faces_dt()
 
-        dt_image = gmap.from_dt_gmap_to_gray_image()
+        dt_image = gmap.build_dt_image()
         plot_dt_image(dt_image, None)
 
         self.assertTrue(True)
@@ -323,7 +323,8 @@ class TestWavePropagation(TestCase):
         gmap.remove_edges(0.5)
         gmap.plot()
 
-    def _compute_dt_reduction(self, image, reduction_factor: float, show_gmap: bool = True):
+    def _compute_dt_reduction(self, image, reduction_factor: float, show_gmap: bool = True,
+                              build_image_interpolate: bool = True):
         gmap = LabelMap.from_labels(image)
         print("gmap successfully created")
         gmap.remove_edges(reduction_factor)
@@ -341,7 +342,7 @@ class TestWavePropagation(TestCase):
         if show_gmap:
             gmap.plot_dt(fill_cell='face')
 
-        dt_image = gmap.from_dt_gmap_to_gray_image()
+        dt_image = gmap.build_dt_image(interpolate_missing_values=build_image_interpolate)
         print("image successfully retrieved")
         plot_dt_image(dt_image, None)
 
@@ -386,3 +387,8 @@ class TestWavePropagation(TestCase):
 
         # plot
         actual_gmap.plot_faces_dt()
+
+    def test_build_dt_image_without_interpolation_big_image(self):
+        image = cv2.imread('../data/100_100_portion_leaf.png', 0)
+        image_borders = find_borders(image, 152)
+        self._compute_dt_reduction(image_borders, 0.5, False, build_image_interpolate=False)
