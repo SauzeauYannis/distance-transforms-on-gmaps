@@ -26,6 +26,17 @@ class TestPreprocessing(TestCase):
         cv2.imwrite('results/cleaned_borders_cross_section_leaf.png', cleaned_image)
 
     def test_generalized_find_borders(self):
+        image = cv2.imread("../data/5_5_boundary.png", 0)
+        expected = cv2.imread("../data/5_5_boundary_gray_region.png", 0)
+        actual = generalized_find_borders(image, 195, 255)
+
+        self.assertEqual(expected.shape, actual.shape)
+
+        for i in range(expected.shape[0]):
+            for j in range(expected.shape[1]):
+                self.assertEqual(actual[i][j], expected[i][j])
+
+    def test_generalized_find_borders_big_image(self):
         image = cv2.imread('../data/cleaned_borders_cross_section_leaf.png', 0)
         new_image = generalized_find_borders(image, 0, 50)
         cv2.imwrite('results/borders_image_test.png', new_image)
