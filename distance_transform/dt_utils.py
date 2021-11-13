@@ -2,6 +2,9 @@ import random
 
 import numpy as np
 import matplotlib.pyplot as plt
+from distance_transform.wave_propagation import wave_propagation_dt_gmap
+from combinatorial.pixelmap import LabelMap
+from distance_transform.wave_propagation import generate_accumulation_directions_cell
 
 
 def plot_binary_image(image: np.array) -> None:
@@ -62,3 +65,28 @@ def gmap_dt_equal(gmap_1, gmap_2) -> bool:
             return False
 
     return True
+
+
+def compute_dt_reduction(image, reduction_factor: float, show_gmap: bool = True,
+                        build_image_interpolate: bool = True):
+
+        gmap = LabelMap.from_labels(image)
+        print("gmap successfully created")
+        gmap.remove_edges(reduction_factor)
+        print("edges successfully removed")
+        gmap.remove_vertices()
+        print("vertices successfully removed")
+        if show_gmap:
+            gmap.plot()
+
+        accumulation_directions = generate_accumulation_directions_cell(2)
+        wave_propagation_dt_gmap(gmap, None, accumulation_directions)
+        print("dt successfully computed")
+
+        # plot
+        if show_gmap:
+            gmap.plot_dt(fill_cell='face')
+
+        dt_image = gmap.build_dt_image(interpolate_missing_values=build_image_interpolate)
+        print("image successfully retrieved")
+        plot_dt_image(dt_image, None)
