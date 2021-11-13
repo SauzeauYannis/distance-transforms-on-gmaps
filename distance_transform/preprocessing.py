@@ -2,7 +2,10 @@ import typing
 
 import numpy as np
 import math
+import random
+from queue import Queue
 
+random.seed(42)
 
 def generalized_find_borders(image: np.array, region_label_value: int, border_label_value: int) -> np.array:
     """
@@ -200,3 +203,115 @@ def reduce_image_size(image: np.array, kernel_size: int) -> np.array:
 
     return reduced_image
 
+
+def connected_component_labeling_one_pass(image: np.array) -> np.array:
+    """
+    Pay attention to the number of connected components.
+    It influences the size of the resulting numpy array.
+    """
+
+    """
+    The maximum number of connected components is equal to the number of pixels in the worst case
+    I assume that 4 bytes will be sufficient.
+    """
+    labeled_image = np.zeros(image.shape, dtype=np.int32)
+
+    # initialization
+    # Temporary initialize to -1 if no label has been assigned
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            labeled_image[i][j] = -1
+
+    next_label = 0
+
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            if labeled_image[i][j] == -1:
+                # A new connected component has been found
+                # Assign the same label to the connected component using wave propagation algorithm
+                wave_propagation_labeling(image, labeled_image, (i, j), next_label)
+                next_label += 1
+
+    return labeled_image
+
+
+def wave_propagation_labeling(image: np.array, labeled_image: np.array,
+                              position: typing.Tuple[int, int], label: int) -> None:
+    """
+    4 connected neighborhood
+    """
+    def is_point_in_connected_component(image: np.array, labeled_image: np.array,
+                                        position: typing.Tuple[int, int], label: int) -> bool:
+        # check if point is in image
+        if position[0] < 0 or position[0] >= image.shape[0] or position[1] < 0 or position[1] >= image.shape[1]:
+            return False
+
+        # check if the point has already got a label
+        if labeled_image[position[0]][position[1]] != -1:
+            return False
+
+        # check if the point has the same label of the connected component in the image
+        if image[position[0]][position[1]] != label:
+            return False
+
+        return True
+
+    queue = Queue()
+    labeled_image[position[0]][position[1]] = label
+    queue.put(position)
+
+    while not queue.empty():
+        curr_position = queue.get()
+
+        # check neighbours
+        # up
+        next_position = (curr_position[0] - 1, curr_position[1])
+        if is_point_in_connected_component(image, labeled_image, next_position,
+                                           image[curr_position[0]][curr_position[1]]):
+            labeled_image[next_position[0]][next_position[1]] = label
+            queue.put(next_position)
+
+        # right
+        next_position = (curr_position[0], curr_position[1] + 1)
+        if is_point_in_connected_component(image, labeled_image, next_position,
+                                           image[curr_position[0]][curr_position[1]]):
+            labeled_image[next_position[0]][next_position[1]] = label
+            queue.put(next_position)
+
+        # down
+        next_position = (curr_position[0] + 1, curr_position[1])
+        if is_point_in_connected_component(image, labeled_image, next_position,
+                                           image[curr_position[0]][curr_position[1]]):
+            labeled_image[next_position[0]][next_position[1]] = label
+            queue.put(next_position)
+
+        # left
+        next_position = (curr_position[0], curr_position[1] - 1)
+        if is_point_in_connected_component(image, labeled_image, next_position,
+                                           image[curr_position[0]][curr_position[1]]):
+            labeled_image[next_position[0]][next_position[1]] = label
+            queue.put(next_position)
+
+
+def build_rgb_image_from_labeled_image(labeled_image: np.array) -> np.array:
+
+    def generate_random_color() -> typing.Tuple[np.uint8, np.uint8, np.uint8]:
+        r = math.floor(random.random() * 255)
+        g = math.floor(random.random() * 255)
+        b = math.floor(random.random() * 255)
+
+        return r, g, b
+
+    rgb_image_shape = (labeled_image.shape[0], labeled_image.shape[1], 3)
+    rgb_image = np.zeros(rgb_image_shape, dtype=np.uint8)
+
+    colors = {}
+
+    for i in range(labeled_image.shape[0]):
+        for j in range(labeled_image.shape[1]):
+            if labeled_image[i][j] not in colors:
+                colors[labeled_image[i][j]] = generate_random_color()
+
+            rgb_image[i][j] = colors[labeled_image[i][j]]
+
+    return rgb_image

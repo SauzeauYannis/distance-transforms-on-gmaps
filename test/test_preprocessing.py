@@ -9,6 +9,18 @@ class TestPreprocessing(TestCase):
     def setUp(self) -> None:
         pass
 
+    def _matrix_compare(self, expected_matrix: np.array, actual_matrix: np.array) -> True:
+        """
+        It returns True if the two matrix are equal.
+        It returns False otherwise.
+        """
+        for i in range(expected_matrix.shape[0]):
+            for j in range(expected_matrix.shape[1]):
+                if expected_matrix[i][j] != actual_matrix[i][j]:
+                    return False
+
+        return True
+
     def test_remove_noise_from_labeled_image(self):
         image = cv2.imread('../data/cross_section_leaf.png', 0)
         values = get_different_values_image(image)
@@ -20,11 +32,6 @@ class TestPreprocessing(TestCase):
         cv2.imwrite('results/cleaned_cross_section_leaf.png', cleaned_image)
         self.assertListEqual(sorted(values), sorted(list(labels.values())))
 
-    def test_clean_borders_big_image(self):
-        image = cv2.imread('results/cleaned_cross_section_leaf.png', 0)
-        cleaned_image = clean_borders(image, 9)
-        cv2.imwrite('results/cleaned_borders_cross_section_leaf.png', cleaned_image)
-
     def test_generalized_find_borders(self):
         image = cv2.imread("../data/5_5_boundary.png", 0)
         expected = cv2.imread("../data/5_5_boundary_gray_region.png", 0)
@@ -35,11 +42,6 @@ class TestPreprocessing(TestCase):
         for i in range(expected.shape[0]):
             for j in range(expected.shape[1]):
                 self.assertEqual(actual[i][j], expected[i][j])
-
-    def test_generalized_find_borders_big_image(self):
-        image = cv2.imread('../data/cleaned_borders_cross_section_leaf.png', 0)
-        new_image = generalized_find_borders(image, 0, 50)
-        cv2.imwrite('results/borders_image_test.png', new_image)
 
     def test_is_equal_to_neighbours_true(self):
         image = cv2.imread("../data/5_5_boundary.png", 0)
@@ -64,6 +66,33 @@ class TestPreprocessing(TestCase):
         expected = cv2.imread("../data/3_3_boundary_reduced.png", 0)
         actual = reduce_image_size(image, 2)
 
-        for i in range(expected.shape[0]):
-            for j in range(expected.shape[1]):
-                self.assertEqual(actual[i][j], expected[i][j])
+        self.assertTrue(self._matrix_compare(expected, actual))
+
+    def test_connected_component_labeling_one_pass(self):
+        image = cv2.imread("../data/5_5_boundary.png", 0)
+
+        expected = np.zeros(image.shape, dtype=np.uint8)
+        expected[1][2] = 1
+        expected[1][3] = 1
+        expected[1][4] = 1
+        expected[2][4] = 1
+
+        expected[2][1] = 2
+        expected[3][1] = 2
+        expected[4][1] = 2
+
+        expected[2][2] = 3
+        expected[2][3] = 3
+        expected[3][2] = 3
+        expected[3][3] = 3
+        expected[3][4] = 3
+        expected[4][2] = 3
+        expected[4][3] = 3
+        expected[4][4] = 3
+
+        actual = connected_component_labeling_one_pass(image)
+
+        print(f"number of labels: {np.max(actual) + 1}")
+
+        self.assertTrue(self._matrix_compare(expected, actual))
+
