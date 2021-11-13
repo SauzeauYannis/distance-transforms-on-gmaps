@@ -293,15 +293,15 @@ def wave_propagation_labeling(image: np.array, labeled_image: np.array,
             queue.put(next_position)
 
 
+def generate_random_color() -> typing.Tuple[np.uint8, np.uint8, np.uint8]:
+    r = math.floor(random.random() * 255)
+    g = math.floor(random.random() * 255)
+    b = math.floor(random.random() * 255)
+
+    return r, g, b
+
+
 def build_rgb_image_from_labeled_image(labeled_image: np.array) -> np.array:
-
-    def generate_random_color() -> typing.Tuple[np.uint8, np.uint8, np.uint8]:
-        r = math.floor(random.random() * 255)
-        g = math.floor(random.random() * 255)
-        b = math.floor(random.random() * 255)
-
-        return r, g, b
-
     rgb_image_shape = (labeled_image.shape[0], labeled_image.shape[1], 3)
     rgb_image = np.zeros(rgb_image_shape, dtype=np.uint8)
 

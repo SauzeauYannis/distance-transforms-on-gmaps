@@ -3,6 +3,7 @@ from distance_transform.preprocessing import generalized_find_borders
 from data.labels import labels
 from distance_transform.wave_propagation import generalized_wave_propagation_gmap
 from combinatorial.pixelmap import LabelMap
+from distance_transform.preprocessing import connected_component_labeling_one_pass
 import numpy as np
 
 
@@ -26,7 +27,8 @@ def compute_diffusion_distance(gmap, label: int) -> float:
     return average
 
 
-def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None, verbose: bool = False):
+def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None, verbose: bool = False,
+                                      compute_voronoi_diagram: bool = False):
     """
     Computes the diffusion distance of the cell represented by the image in image_path.
 
@@ -44,8 +46,13 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     if verbose:
         print("image with borders successfully computed")
 
+    connected_components_labels = None
+    if compute_voronoi_diagram:
+        # Find connected components labels
+        connected_components_labels = connected_component_labeling_one_pass(image_with_borders)
+
     # build gmap
-    gmap = LabelMap.from_labels(image_with_borders)
+    gmap = LabelMap.from_labels(image_with_borders, connected_components_labels=connected_components_labels)
     if verbose:
         print("gmap successfully builded")
 

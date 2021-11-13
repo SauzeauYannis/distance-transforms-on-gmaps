@@ -78,6 +78,11 @@ def wave_propagation_dt_image(image: np.array, seeds: typing.List[typing.Tuple[i
 
 def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int],
                                       accumulation_directions: typing.List[bool] = None) -> None:
+    """
+    It also saves for each dart the connected_component_label of the closest seed.
+    It is useful for the generation of voronoi diagrams.
+    """
+
     # Initialization
     for dart in gmap.darts:
         gmap.distances[dart] = -1
@@ -95,6 +100,7 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
         if gmap.image_labels[dart] in seed_labels:
             curr_queue.put(dart)
             gmap.distances[dart] = 0
+            gmap.dt_connected_components_labels[dart] = gmap.connected_components_labels[dart]
 
     while not curr_queue.empty():
         while not curr_queue.empty():
@@ -115,16 +121,16 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
                     if gmap.distances[neighbour] == -1 \
                             or gmap.distances[dart] + 1 < gmap.distances[neighbour]:
                         gmap.distances[neighbour] = gmap.distances[dart] + 1
+                        gmap.dt_connected_components_labels[neighbour] = gmap.dt_connected_components_labels[dart]
                 else:
                     if gmap.distances[neighbour] == -1:
                         curr_queue.put(neighbour)
                     if gmap.distances[neighbour] == -1 \
                             or gmap.distances[dart] < gmap.distances[neighbour]:
                         gmap.distances[neighbour] = gmap.distances[dart]
+                        gmap.dt_connected_components_labels[neighbour] = gmap.dt_connected_components_labels[dart]
         curr_queue = next_queue
         next_queue = Queue()
-
-
 
 
 def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.List[int]], accumulation_directions: typing.List[bool] = None) -> None:

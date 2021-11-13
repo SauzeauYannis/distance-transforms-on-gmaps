@@ -130,7 +130,7 @@ class nGmap(DualArray, Marks):
     def _init_structures(cls, number_of_darts: int):
         logger.debug(f"The number of darts is: {number_of_darts}")
         # uint32 is sufficient for 1000x1000 images.
-        dtype = np.int32 # I use a signed dtype for using negative values as markers (example, None type)
+        dtype = np.int32  # I use a signed dtype for using negative values as markers (example, None type)
         if number_of_darts > (np.iinfo(dtype).max + 1):
             raise Exception(f"{dtype} is not sufficient to represent {number_of_darts} darts")
 
@@ -144,6 +144,22 @@ class nGmap(DualArray, Marks):
         cls.image_labels = np.zeros(number_of_darts, dtype=np.int16)
         logger.debug(f"labels array successfully initialized with shape {cls.image_labels.shape}"
                      f" and dtype {cls.image_labels.dtype}")
+
+        # allocate connected components labels array
+        # In order to reduce the space occupied by this array and by the labels array
+        # Only this array can be allocated and then a structure that maintains the relation
+        # between connected components of the same type can be used
+        # int32 (-1 if no label is passed in input) is sufficient for 1000x1000 images.
+        # I can retrieve the minimum size by the number of labels
+        cls.connected_components_labels = np.zeros(number_of_darts, dtype=np.int32)
+        logger.debug(f"labels array successfully initialized with shape {cls.connected_components_labels.shape}"
+                     f" and dtype {cls.connected_components_labels.dtype}")
+
+        # It stores the label of the closes connected component label after the evaluation of dt
+        # Useful for voronoi diagram
+        cls.dt_connected_components_labels = np.zeros(number_of_darts, dtype=np.int32)
+        logger.debug(f"labels array successfully initialized with shape {cls.dt_connected_components_labels.shape}"
+                     f" and dtype {cls.dt_connected_components_labels.dtype}")
 
         # allocate face identifiers array
         cls.face_identifiers = np.zeros(number_of_darts, dtype=dtype)

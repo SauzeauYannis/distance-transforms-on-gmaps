@@ -10,6 +10,7 @@ from combinatorial.utils import *
 from .gmaps import nGmap
 from .zoo import G2_SQUARE_BOUNDED, G2_SQUARE_UNBOUNDED
 import random
+from distance_transform.preprocessing import generate_random_color
 
 from memory_profiler import profile
 
@@ -240,10 +241,10 @@ class LabelMap (PixelMap):
     _initial_dart_polylines_00 -= .5
 
     @classmethod
-    def from_labels (cls, labels, add_polyline: bool = True):
+    def from_labels(cls, labels, add_polyline: bool = True, connected_components_labels: np.array = None):
         if type(labels) == str:
             n_lines = len (labels.splitlines())
-            labels = np.fromstring (labels, sep=' ', dtype=np.uint8).reshape (n_lines, -1)
+            labels = np.fromstring (labels, sep=' ', dtype=np.uint8).reshape(n_lines, -1)
         c = cls.from_shape(labels.shape[0], labels.shape[1])
         cls._labels = labels
 
@@ -256,11 +257,11 @@ class LabelMap (PixelMap):
                 c._dart_polyline [d][..., 1] += (d // 8) // c.n_cols
 
         # save labels
-        cls._save_labels(c, labels)
+        cls._save_labels(c, labels, connected_components_labels)
 
         return c
 
-    def _save_labels(gmap, labels: np.array) -> None:
+    def _save_labels(gmap, labels: np.array, connected_components_labels: np.array) -> None:
         for i in range(labels.shape[0]):
             for j in range(labels.shape[1]):
                 # Get the first dart associated to each pixel
@@ -268,6 +269,10 @@ class LabelMap (PixelMap):
                 # Save label to all the darts of the cells
                 for k in range(8):
                     gmap.image_labels[start_identifier + k] = labels[i][j]
+                    if connected_components_labels is not None:
+                        gmap.connected_components_labels[start_identifier + k] = connected_components_labels[i][j]
+                    else:
+                        gmap.connected_components_labels[start_identifier + k] = -1
 
 
     def plot(self, number_darts=True, image_palette='gray'):
@@ -355,7 +360,47 @@ class LabelMap (PixelMap):
         plt.title (self.__str__())
         plt.show()
 
-    def build_dt_image(self, interpolate_missing_values: bool = True):
+    def generate_dt_voronoi_diagram(self, seed_labels: typing.List[int] = None) -> np.array:
+        """
+        It generates an rgb dt voronoi diagram.
+
+        seed_labels contains a list of labels which color should be black.
+        It can be used to color the stomata to a different color (black in that case).
+        in order to distinguish stomata and the area of influence.
+
+        """
+
+        voronoi_diagram = np.zeros((self.n_rows, self.n_cols, 3))
+
+        colors = {}
+
+        for i in range(voronoi_diagram.shape[0]):
+            for j in range(voronoi_diagram.shape[1]):
+                # get dart associated to each cell
+                dart = (i * voronoi_diagram.shape[1] * 8) + j * 8
+
+                # If the darts has been removed, take the new corresponding dart
+                # to assign a color to the corresponding cell
+                while self.ai(0, dart) == -1:
+                    dart = self.face_identifiers[dart]
+
+                if self.distances[dart] == -1:
+                    # distance not computed for that dart
+                    voronoi_diagram[i][j] = (255, 255, 255)  # white
+                    continue
+
+                if seed_labels is not None and self.image_labels[dart] in seed_labels:
+                    voronoi_diagram[i][j] = (0, 0, 0)  # black
+                    continue
+
+                if self.dt_connected_components_labels[dart] not in colors:
+                    colors[self.dt_connected_components_labels[dart]] = generate_random_color()
+
+                voronoi_diagram[i][j] = colors[self.dt_connected_components_labels[dart]]
+
+        return voronoi_diagram
+
+    def build_dt_image(self, interpolate_missing_values: bool = True) -> np.array:
         image = np.zeros((self.n_rows, self.n_cols))
 
         max_distance = self._evaluate_max_dt_value()
