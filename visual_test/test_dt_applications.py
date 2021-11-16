@@ -59,3 +59,16 @@ class TestPreprocessing(TestCase):
 
         self.assertTrue(True)
 
+    def test_generate_dt_voronoi_diagram_image_multiple_stomata_reduced_gmap(self):
+        image_name = "DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png"
+        image = cv2.imread("../data/time_1/cross/" + image_name, 0)
+        reduced_image = reduce_image_size(image, 5)
+        gmap = compute_dt_for_diffusion_distance(reduced_image, "results/dt_diffusion_reduced_image_" + image_name,
+                                                 True, compute_voronoi_diagram=True, reduction_factor=0.5)
+        dt_voronoi_diagram = gmap.generate_dt_voronoi_diagram([labels["stomata"]])
+        cv2.imwrite("results/dt_voronoi_diagram_reduced_gmap_" + image_name, dt_voronoi_diagram)
+        diffusion_distance = compute_diffusion_distance(gmap, 50)
+        print(f"diffusion_distance: {diffusion_distance}")
+
+        self.assertTrue(True)
+

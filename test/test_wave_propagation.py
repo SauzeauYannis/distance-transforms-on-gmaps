@@ -244,6 +244,8 @@ class TestWavePropagation(TestCase):
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 
+        expected_gmap.plot()
+
         # simplify gmap
         actual_gmap.remove_edges()
         actual_gmap.remove_vertices()
@@ -303,8 +305,10 @@ class TestWavePropagation(TestCase):
     def test_reduction_factor_05(self):
         image = cv2.imread('../data/5_5_boundary.png', 0)
         gmap = LabelMap.from_labels(image)
+        gmap.plot(number_darts=False)
         gmap.remove_edges(0.5)
-        gmap.plot()
+        gmap.remove_vertices()
+        gmap.plot(number_darts=False)
         self.assertTrue(True)
 
     def test_dt_reduction_05(self):
