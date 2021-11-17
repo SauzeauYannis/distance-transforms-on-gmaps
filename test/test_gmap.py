@@ -16,6 +16,14 @@ class TestWavePropagation(TestCase):
     def setUp(self) -> None:
         pass
 
+    def _compare_weights(self, expected: np.array, actual: np.array) -> bool:
+        for i in range(expected.shape[0]):
+            if expected[i] != -1:
+                if expected[i] != actual[i]:
+                    return False
+
+        return True
+
     def test_build_dt_image(self):
         image = cv2.imread('../data/5_5_boundary.png', 0)
         gmap = LabelMap.from_labels(image)
@@ -173,3 +181,45 @@ class TestWavePropagation(TestCase):
         expected[4][4] = 100
 
         self.assertTrue(matrix_compare(dt_grey_image, expected))
+
+    def test_reduce_gmap_propagate_weights(self):
+        random.seed(42)
+        image = cv2.imread('../data/3_3_boundary_reduced.png', 0)
+        gmap = LabelMap.from_labels(image)
+        n_darts = gmap.n_darts
+
+        gmap.remove_edges(0.5)
+        gmap.remove_vertices()
+
+        weights = gmap.weights
+        expected = np.full(n_darts, fill_value=-1, dtype=np.int32)
+        expected[1] = 5
+        expected[2] = 1
+        expected[3] = 1
+        expected[8] = 3
+        expected[12:16] = 1
+        expected[19] = 3
+        expected[20] = 1
+        expected[21] = 1
+        expected[26] = 1
+        expected[27] = 1
+        expected[32:48] = 1
+        expected[50] = 1
+        expected[51] = 1
+        expected[52] = 5
+        expected[56:66] = 1
+        expected[66] = 2
+        expected[69] = 2
+        expected[70] = 1
+        expected[71] = 1
+
+        self.assertTrue(self._compare_weights(expected, weights))
+
+    def test_remove_vertex_example(self):
+        random.seed(42)
+        image = cv2.imread('../data/3_3_boundary_reduced.png', 0)
+        gmap = LabelMap.from_labels(image)
+        gmap.plot()
+        gmap.remove_edges(0.1)
+        gmap.remove_vertices()
+        gmap.plot()

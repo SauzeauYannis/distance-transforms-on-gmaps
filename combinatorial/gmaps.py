@@ -129,15 +129,25 @@ class nGmap(DualArray, Marks):
     @classmethod
     def _init_structures(cls, number_of_darts: int):
         logger.debug(f"The number of darts is: {number_of_darts}")
-        # uint32 is sufficient for 1000x1000 images.
-        dtype = np.int32  # I use a signed dtype for using negative values as markers (example, None type)
-        if number_of_darts > (np.iinfo(dtype).max + 1):
+        # int32 is sufficient for 1000x1000 images.
+        # I use a signed dtype for using negative values as markers (example, None type)
+        if number_of_darts > (np.iinfo(np.int32).max + 1):
             raise Exception(f"{dtype} is not sufficient to represent {number_of_darts} darts")
 
         # allocate distances array
-        cls.distances = np.zeros(number_of_darts, dtype=dtype)
+        cls.distances = np.zeros(number_of_darts, dtype=np.int32)
         logger.debug(f"distances array successfully initialized with shape {cls.distances.shape}"
                      f" and dtype {cls.distances.dtype}")
+
+        # allocate weights array
+        # It maints the wegiht associated to each dart.
+        # Each dart keeps the weight associated to the corresponding edge
+        # So if alfa0(d) = d1 then weight(d) = weight(d1)
+        # And it's the same for alfa1
+        # I can make a security check based on that consideration
+        cls.weights = np.ones(number_of_darts, dtype=np.uint32)
+        logger.debug(f"weights array successfully initialized with shape {cls.weights.shape}"
+                     f" and dtype {cls.weights.dtype}")
 
         # allocate labels array
         # int16 is sufficient to represent a label
@@ -152,17 +162,17 @@ class nGmap(DualArray, Marks):
         # int32 (-1 if no label is passed in input) is sufficient for 1000x1000 images.
         # I can retrieve the minimum size by the number of labels
         cls.connected_components_labels = np.zeros(number_of_darts, dtype=np.int32)
-        logger.debug(f"labels array successfully initialized with shape {cls.connected_components_labels.shape}"
+        logger.debug(f"connected_components_labels array successfully initialized with shape {cls.connected_components_labels.shape}"
                      f" and dtype {cls.connected_components_labels.dtype}")
 
         # It stores the label of the closes connected component label after the evaluation of dt
         # Useful for voronoi diagram
         cls.dt_connected_components_labels = np.zeros(number_of_darts, dtype=np.int32)
-        logger.debug(f"labels array successfully initialized with shape {cls.dt_connected_components_labels.shape}"
+        logger.debug(f"dt_connected_components_labels array successfully initialized with shape {cls.dt_connected_components_labels.shape}"
                      f" and dtype {cls.dt_connected_components_labels.dtype}")
 
         # allocate face identifiers array
-        cls.face_identifiers = np.zeros(number_of_darts, dtype=dtype)
+        cls.face_identifiers = np.zeros(number_of_darts, dtype=np.int32)
         logger.debug(f"face_identifiers array successfully initialized with shape {cls.face_identifiers.shape}"
                      f" and dtype {cls.face_identifiers.dtype}")
 
@@ -489,20 +499,18 @@ class nGmap(DualArray, Marks):
 
         logging.debug (f'{"Remove" if rc == 1 else "Contract"} {i}-Cell of dart {dart}')
 
-        # Complexity
         if not skip_check:
             assert self._is_i_removable_or_contractible(i, dart, rc),\
                 f'{i}-cell of dart {dart} is not {"removable" if rc == 1 else "contractible"}!'
 
-        # Complexity
         i_cell = set(self.cell_i(i, dart))  # mark all the darts in ci(d)
         logging.debug (f'\n{i}-cell to be removed {i_cell}')
         for d in i_cell:
-            d1 = self.ai (i,d) # d1 ← d.Alphas[i];
+            d1 = self.ai(i,d) # d1 ← d.Alphas[i];
             if d1 not in i_cell:  # if not isMarkedNself(d1,ma) then
                 # d2 ← d.Alphas[i + 1].Alphas[i];
-                d2 = self.ai (i+rc,d)
-                d2 = self.ai (i   ,d2)
+                d2 = self.ai(i+rc,d)
+                d2 = self.ai(i   ,d2)
                 # It should costant time
                 while d2 in i_cell: # while isMarkedNself(d2,ma) do
                     # d2 ← d.Alphas[i + 1].Alphas[i];
@@ -511,6 +519,11 @@ class nGmap(DualArray, Marks):
                 logging.debug (f'Modifying alpha_{i} of dart {d1} from {self.ai (i,d1)} to {d2}')
 
                 self.set_ai(i,d1,d2) # d1.Alphas[i] ← d2;
+                # If I am removing a vertex
+                if i == 0:
+                    # update weight (sum current weight to the weight of the removed dart)
+                    self.weights[d1] = self.weights[d1] + self.weights[self.ai(1, d)]
+
                 # Update the face identifier value of the removed dart
                 # I choose d1 but I can also choose d2.
                 # I have to memorize to which face is now associated d when it is removed
