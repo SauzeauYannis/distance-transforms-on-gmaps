@@ -7,6 +7,7 @@ from distance_transform.dt_utils import *
 from combinatorial.pixelmap import LabelMap
 from distance_transform.preprocessing import *
 import cv2
+from combinatorial.utils import build_dt_grey_image
 
 
 class TestWavePropagation(TestCase):
@@ -37,7 +38,7 @@ class TestWavePropagation(TestCase):
         gmap.plot_dt(fill_cell='face')
         gmap.plot_faces_dt()
 
-        dt_image = gmap.build_dt_color_image()
+        dt_image = build_dt_grey_image(gmap)
         plot_dt_image(dt_image, None)
 
         self.assertTrue(True)
@@ -63,7 +64,7 @@ class TestWavePropagation(TestCase):
         def _compute_test_dt(gmap, accumulation_directions):
             generalized_wave_propagation_gmap(gmap, [0], [0, 195, 255], accumulation_directions=accumulation_directions)
             gmap.plot_dt(fill_cell=True)
-            dt_image = gmap.build_dt_color_image()
+            dt_image = build_dt_grey_image(gmap)
             plot_dt_image(dt_image)
 
         image = cv2.imread('../data/5_5_boundary.png', 0)

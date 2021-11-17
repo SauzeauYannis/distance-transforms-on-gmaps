@@ -1,5 +1,6 @@
 import typing
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def build_polygon_from_segments(segments: typing.Tuple[typing.List[typing.List[float]], typing.List[typing.List[float]]])\
@@ -112,3 +113,22 @@ def build_polygon_from_segments(segments: typing.Tuple[typing.List[typing.List[f
 
     return polygon_x_values, polygon_y_values
 
+
+def build_dt_grey_image(gmap, interpolate_missing_values: bool = True) -> np.array:
+        dt_image = gmap.build_dt_image(interpolate_missing_values=interpolate_missing_values)
+
+        dt_grey_image = np.zeros((gmap.n_rows, gmap.n_cols), dtype=np.uint8)
+
+        max_distance = np.max(dt_image)
+
+        for i in range(dt_grey_image.shape[0]):
+            for j in range(dt_grey_image.shape[1]):
+                # I use the white color both for -1 and -2
+                if dt_image[i][j] == -1 or dt_image[i][j] == -2:
+                    dt_grey_image[i][j] = 255
+                else:
+                    # normalize in 0:200 (not 255 because 255 is associated with pixels with no distance values)
+                    norm_distance = round(dt_image[i][j] / max_distance * 200)
+                    dt_grey_image[i][j] = norm_distance
+
+        return dt_grey_image

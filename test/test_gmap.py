@@ -6,6 +6,7 @@ from combinatorial.pixelmap import PixelMap
 from distance_transform.dt_utils import *
 from combinatorial.pixelmap import LabelMap
 from distance_transform.preprocessing import *
+from combinatorial.utils import build_dt_grey_image
 from test_utils import *
 import cv2
 import random
@@ -94,9 +95,6 @@ class TestWavePropagation(TestCase):
         expected[4][3] = 1
         expected[4][4] = 1
 
-        print(dt_image)
-        print(expected)
-
         self.assertTrue(matrix_compare(dt_image, expected))
 
     def test_build_dt_reduced_image_interpolate_false(self):
@@ -138,3 +136,40 @@ class TestWavePropagation(TestCase):
         expected[4][4] = -1
 
         self.assertTrue(matrix_compare(dt_image, expected))
+
+    def test_build_dt_grey_image(self):
+        random.seed(42)
+        image = cv2.imread('../data/5_5_boundary.png', 0)
+        gmap = LabelMap.from_labels(image)
+        gmap.remove_edges(0.5)
+        gmap.remove_vertices()
+        generalized_wave_propagation_gmap(gmap, [0], [0, 195],
+                                          accumulation_directions=generate_accumulation_directions_cell(2))
+        dt_grey_image = build_dt_grey_image(gmap)
+
+        self.assertEqual(dt_grey_image.shape, image.shape)
+        expected = np.zeros(image.shape, dtype=dt_grey_image.dtype)
+        expected[0][0] = 255
+        expected[0][1] = 255
+        expected[0][2] = 255
+        expected[0][3] = 255
+        expected[0][4] = 255
+
+        expected[1][0] = 255
+        expected[1][1] = 255
+
+        expected[2][0] = 255
+        expected[2][2] = 100
+        expected[2][3] = 100
+
+        expected[3][0] = 255
+        expected[3][2] = 100
+        expected[3][3] = 200
+        expected[3][4] = 100
+
+        expected[4][0] = 255
+        expected[4][2] = 100
+        expected[4][3] = 100
+        expected[4][4] = 100
+
+        self.assertTrue(matrix_compare(dt_grey_image, expected))

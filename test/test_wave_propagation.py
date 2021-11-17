@@ -291,7 +291,7 @@ class TestWavePropagation(TestCase):
         expected_gmap.plot_dt(fill_cell='face')
         actual_gmap.plot_dt(fill_cell='face')
 
-        dt_image = actual_gmap.build_dt_color_image()
+        dt_image = build_dt_grey_image(actual_gmap)
         plot_dt_image(dt_image, None)
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))

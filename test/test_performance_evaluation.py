@@ -1,5 +1,6 @@
 from unittest import TestCase
 import numpy as np
+from combinatorial.utils import build_dt_grey_image
 
 from distance_transform.performance_evaluation import *
 

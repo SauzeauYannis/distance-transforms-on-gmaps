@@ -11,6 +11,7 @@ from combinatorial.pixelmap import LabelMap
 import tracemalloc
 from memory_profiler import profile
 from distance_transform.wave_propagation import *
+from combinatorial.utils import build_dt_grey_image
 
 # temp
 # from combinatorial_original.pixelmap import LabelMap
@@ -64,7 +65,7 @@ def measure_time_vertices_reduction(gmap) -> None:
 
 def measure_time_image_creation(gmap) -> None:
     start = time.time()
-    gmap.build_dt_color_image()
+    build_dt_grey_image(gmap)
     end = time.time()
     logger.info(f"image successfully created in {end-start} seconds.")
 

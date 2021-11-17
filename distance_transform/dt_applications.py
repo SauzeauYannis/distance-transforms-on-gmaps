@@ -5,6 +5,7 @@ from distance_transform.wave_propagation import generalized_wave_propagation_gma
 from combinatorial.pixelmap import LabelMap
 from distance_transform.preprocessing import connected_component_labeling_one_pass
 import numpy as np
+from combinatorial.utils import build_dt_grey_image
 
 
 def compute_diffusion_distance(gmap, label: int) -> float:
@@ -33,7 +34,7 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     Computes the diffusion distance of the cell represented by the image in image_path.
 
     Add the parameter save_gmap in order to save the gmap
-    Add the parameter reduction_factor in order to compute dt on the reduced gmap
+    Add the parameter reduction_factor in order to compute dt on the reduced gfap
     """
 
     # Find borders
@@ -66,7 +67,7 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
         print("Dt successfully computed")
 
     # Save dt image
-    dt_image = gmap.build_dt_color_image()
+    dt_image = build_dt_grey_image(gmap)
     if verbose:
         print("dt image successfully computed")
 

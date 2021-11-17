@@ -3,6 +3,7 @@ from distance_transform.dt_applications import *
 from combinatorial.pixelmap import PixelMap
 from distance_transform.preprocessing import *
 import cv2
+from combinatorial.utils import build_dt_grey_image
 
 
 class TestPreprocessing(TestCase):

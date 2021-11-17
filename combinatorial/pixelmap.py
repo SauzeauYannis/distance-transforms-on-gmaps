@@ -470,6 +470,9 @@ class LabelMap (PixelMap):
         :return:
         """
 
+        # I have to work on it
+        # It's not super simple
+
         """
         image = np.zeros((self.n_rows, self.n_cols))
 
@@ -504,41 +507,6 @@ class LabelMap (PixelMap):
         """
 
         return None
-
-    def build_dt_color_image(self, interpolate_missing_values: bool = True) -> np.array:
-        image = np.zeros((self.n_rows, self.n_cols))
-
-        max_distance = self._evaluate_max_dt_value()
-
-        for i in range(image.shape[0]):
-            for j in range(image.shape[1]):
-                # get dart associated to each cell
-                dart = (i * image.shape[1] * 8) + j * 8
-
-                # check if the current dart has been deleted
-                if self.ai(0, dart) == -1:
-                    if interpolate_missing_values:
-                        # if the darts has been removed, take the new corresponding dart
-                        # to assign a color to the corresponding cell
-                        while self.ai(0, dart) == -1:
-                            dart = self.face_identifiers[dart]
-                    else:
-                        # At the moment I just use white color if the dart
-                        # Probably it's better to use an rgb image
-                        image[i][j] = 255
-                        continue
-
-                distance = self.distances[dart]
-                if distance == -1:
-                    # the distance is None if the corresponding cell has not been used
-                    # for propagating the distance
-                    image[i][j] = 255
-                else:
-                    # normalize in 0:200 (not 255 because 255 is associated with pixels with no distance values)
-                    norm_distance = distance / max_distance * 200
-                    image[i][j] = norm_distance
-
-        return image
 
     def plot_labels(self):
         for representative_dart in self.darts_of_i_cells(2):
