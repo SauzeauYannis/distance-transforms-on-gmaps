@@ -203,7 +203,7 @@ def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.Lis
         next_queue = Queue()
 
 
-def generate_accumulation_directions_vertex(gmap_size: int) -> typing.List[int]:
+def generate_accumulation_directions_vertex(gmap_size: int) -> typing.List[bool]:
     accumulation_directions = []
 
     accumulation_directions.append(True)
@@ -219,6 +219,10 @@ def generate_accumulation_directions_cell(gmap_size: int) -> typing.List[bool]:
     For a 2gmap is the face (2cell) for a 3gmap is the volume (3cell).
     Note that the face in a 2gmap corresponds to a pixel in the corresponding image.
     and the volume in a 3gmap corresponds to a voxel in the corresponding 3d image.
+
+    Note:
+    The size of a n-gmap is n.
+    So for a 2gmap the gmap size is equal to 2.
 
     """
     accumulation_directions = []

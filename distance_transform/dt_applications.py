@@ -66,7 +66,7 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
         print("Dt successfully computed")
 
     # Save dt image
-    dt_image = gmap.build_dt_image()
+    dt_image = gmap.build_dt_color_image()
     if verbose:
         print("dt image successfully computed")
 

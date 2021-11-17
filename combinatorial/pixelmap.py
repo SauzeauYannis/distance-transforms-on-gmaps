@@ -401,6 +401,111 @@ class LabelMap (PixelMap):
         return voronoi_diagram
 
     def build_dt_image(self, interpolate_missing_values: bool = True) -> np.array:
+        """
+        It builds an image that keeps for each pixel the distance value kept in the graph.
+        A pixel can have 3 different values:
+        - From 0 to +inf if the corresponding cell in the gmap has a valid distance value.
+        - -2 if the corresponding cell in the gmap has not been used to propagate distances.
+        - -1 if the corresponding cell in the gmap does not exist (due to reduction).
+          and "interpolate_missing_values" is False.
+
+        :param interpolate_missing_values:
+        :return:
+        """
+
+        image = np.zeros((self.n_rows, self.n_cols))
+
+        for i in range(image.shape[0]):
+            for j in range(image.shape[1]):
+                # Get the dart associated to each pixel
+                dart = (i * image.shape[1] * 8) + j * 8
+
+                # Check if the current dart has been deleted during the reduction process of the gmap
+                if self.ai(0, dart) == -1:
+                    if interpolate_missing_values:
+                        # If the dart has been removed take the new corresponding dart
+                        # to assign a distance value to the pixel associated to the removed dart
+                        while self.ai(0, dart) == -1:
+                            dart = self.face_identifiers[dart]
+                    else:
+                        image[i][j] = -1
+                        continue
+
+                distance = self.distances[dart]
+                if distance == -1:
+                    # the distance is -1 if the corresponding face has not been used
+                    # for propagating the distance
+                    image[i][j] = -2
+                else:
+                    image[i][j] = distance
+
+        return image
+
+    def build_generalized_dt_image(self, interpolate_missing_values: bool = True) -> np.array:
+        """
+        It builds an image that keeps for each pixel the distance value kept in the graph.
+        A pixel can have 3 different values:
+        - From 0 to +inf if the corresponding cell in the gmap has a valid distance value.
+        - -2 if the corresponding cell in the gmap has not been used to propagate distances.
+        - -1 if the corresponding cell in the gmap does not exist (due to reduction).
+          and "interpolate_missing_values" is False.
+
+        In case dt is computed using 2-cells (faces) as accumulation directions all the darts in each cell
+        will have the same value. So the value of the corresponding pixel in the image will be equals to the
+        value of one of the darts in the cell.
+
+        If other types of accumulation directions are used it can happen that the values of distance associated
+        to darts in the same face can be different. In that case the average of the values approximated to the
+        closest integer is returned as the value of the pixel.
+        If one of the values is negative (-1 or -2) then the smallest negative value is returned (since it's a
+        special case, where the cell has not been used during the propagation or interpolate_missing_values has
+        not been used, so the averga has not to be computed).
+
+        Since the average of the distance values has to be computed for each cell this function is slower than the
+        naive one, since all the darts in the cell have to be considered.
+
+        :param interpolate_missing_values: If True, even if a cell in the actual gmap does not exist due to reduction
+                                           a value to the corresponding pixel is computed considering the cell that
+                                           contains the disappeared cell after the reduction.
+        :return:
+        """
+
+        """
+        image = np.zeros((self.n_rows, self.n_cols))
+
+        for i in range(image.shape[0]):
+            for j in range(image.shape[1]):
+                # Get the dart associated to each pixel
+                dart = (i * image.shape[1] * 8) + j * 8
+
+                # Get all the darts associated to the considered face
+                darts = gmap.orb
+
+                # Check if the current dart has been deleted during the reduction process of the gmap
+                if self.ai(0, dart) == -1:
+                    if interpolate_missing_values:
+                        # If the dart has been removed take the new corresponding dart
+                        # to assign a distance value to the pixel associated to the removed dart
+                        while self.ai(0, dart) == -1:
+                            dart = self.face_identifiers[dart]
+                    else:
+                        image[i][j] = -1
+                        continue
+
+                distance = self.distances[dart]
+                if distance == -1:
+                    # the distance is None if the corresponding cell has not been used
+                    # for propagating the distance
+                    image[i][j] = 255
+                else:
+                    # normalize in 0:200 (not 255 because 255 is associated with pixels with no distance values)
+                    norm_distance = distance / max_distance * 200
+                    image[i][j] = norm_distance
+        """
+
+        return None
+
+    def build_dt_color_image(self, interpolate_missing_values: bool = True) -> np.array:
         image = np.zeros((self.n_rows, self.n_cols))
 
         max_distance = self._evaluate_max_dt_value()

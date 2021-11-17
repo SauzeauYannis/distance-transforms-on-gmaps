@@ -37,7 +37,7 @@ class TestWavePropagation(TestCase):
         gmap.plot_dt(fill_cell='face')
         gmap.plot_faces_dt()
 
-        dt_image = gmap.build_dt_image()
+        dt_image = gmap.build_dt_color_image()
         plot_dt_image(dt_image, None)
 
         self.assertTrue(True)
@@ -58,3 +58,31 @@ class TestWavePropagation(TestCase):
         image = cv2.imread('../data/100_100_portion_leaf.png', 0)
         image_borders = find_borders(image, 152)
         compute_dt_reduction(image_borders, 0.5, False, build_image_interpolate=False)
+
+    def test_increase_distance_face_vs_vertex_unweighted(self):
+        def _compute_test_dt(gmap, accumulation_directions):
+            generalized_wave_propagation_gmap(gmap, [0], [0, 195, 255], accumulation_directions=accumulation_directions)
+            gmap.plot_dt(fill_cell=True)
+            dt_image = gmap.build_dt_color_image()
+            plot_dt_image(dt_image)
+
+        image = cv2.imread('../data/5_5_boundary.png', 0)
+        gmap = LabelMap.from_labels(image)
+
+        # orginal face
+        _compute_test_dt(gmap, generate_accumulation_directions_cell(2))
+
+        # original vertex
+        _compute_test_dt(gmap, generate_accumulation_directions_vertex(2))
+
+        gmap.remove_edges(0.5)
+        gmap.remove_vertices()
+
+        # reduced face
+        _compute_test_dt(gmap, generate_accumulation_directions_cell(2))
+
+        # reduced vertex
+        _compute_test_dt(gmap, generate_accumulation_directions_vertex(2))
+
+        self.assertTrue(True)
+

@@ -87,6 +87,6 @@ def compute_dt_reduction(image, reduction_factor: float, show_gmap: bool = True,
         if show_gmap:
             gmap.plot_dt(fill_cell='face')
 
-        dt_image = gmap.build_dt_image(interpolate_missing_values=build_image_interpolate)
+        dt_image = gmap.build_dt_color_image(interpolate_missing_values=build_image_interpolate)
         print("image successfully retrieved")
         plot_dt_image(dt_image, None)

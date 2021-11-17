@@ -2,24 +2,13 @@ from unittest import TestCase
 from distance_transform.preprocessing import *
 from data.labels import labels
 import cv2
-import matplotlib.pyplot as plt
+
+from test.test_utils import matrix_compare
 
 
 class TestPreprocessing(TestCase):
     def setUp(self) -> None:
         pass
-
-    def _matrix_compare(self, expected_matrix: np.array, actual_matrix: np.array) -> True:
-        """
-        It returns True if the two matrix are equal.
-        It returns False otherwise.
-        """
-        for i in range(expected_matrix.shape[0]):
-            for j in range(expected_matrix.shape[1]):
-                if expected_matrix[i][j] != actual_matrix[i][j]:
-                    return False
-
-        return True
 
     def test_remove_noise_from_labeled_image(self):
         image = cv2.imread('../data/cross_section_leaf.png', 0)
@@ -66,7 +55,7 @@ class TestPreprocessing(TestCase):
         expected = cv2.imread("../data/3_3_boundary_reduced.png", 0)
         actual = reduce_image_size(image, 2)
 
-        self.assertTrue(self._matrix_compare(expected, actual))
+        self.assertTrue(matrix_compare(expected, actual))
 
     def test_connected_component_labeling_one_pass(self):
         image = cv2.imread("../data/5_5_boundary.png", 0)
@@ -94,5 +83,5 @@ class TestPreprocessing(TestCase):
 
         print(f"number of labels: {np.max(actual) + 1}")
 
-        self.assertTrue(self._matrix_compare(expected, actual))
+        self.assertTrue(matrix_compare(expected, actual))
 

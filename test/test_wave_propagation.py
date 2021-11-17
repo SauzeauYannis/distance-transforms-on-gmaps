@@ -239,6 +239,7 @@ class TestWavePropagation(TestCase):
         """
         Test if distance propagates correctly only through faces
         """
+        random.seed(42)
 
         image = cv2.imread('../data/5_5_boundary.png', 0)
         actual_gmap = LabelMap.from_labels(image)
@@ -290,12 +291,13 @@ class TestWavePropagation(TestCase):
         expected_gmap.plot_dt(fill_cell='face')
         actual_gmap.plot_dt(fill_cell='face')
 
-        dt_image = actual_gmap.build_dt_image()
+        dt_image = actual_gmap.build_dt_color_image()
         plot_dt_image(dt_image, None)
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
     def test_reduction_factor_0(self):
+        random.seed(42)
         image = cv2.imread('../data/5_5_boundary.png', 0)
         gmap = LabelMap.from_labels(image)
         gmap.remove_edges(0.0)
@@ -303,25 +305,29 @@ class TestWavePropagation(TestCase):
         self.assertTrue(True)
 
     def test_reduction_factor_05(self):
+        random.seed(42)
         image = cv2.imread('../data/5_5_boundary.png', 0)
         gmap = LabelMap.from_labels(image)
-        gmap.plot(number_darts=False)
+        gmap.plot(number_darts=True)
         gmap.remove_edges(0.5)
         gmap.remove_vertices()
-        gmap.plot(number_darts=False)
+        gmap.plot(number_darts=True)
         self.assertTrue(True)
 
     def test_dt_reduction_05(self):
+        random.seed(42)
         image = cv2.imread('../data/5_5_boundary.png', 0)
         compute_dt_reduction(image, 0.5)
         self.assertTrue(True)
 
     def test_dt_reduction_0(self):
+        random.seed(42)
         image = cv2.imread('../data/5_5_boundary.png', 0)
         compute_dt_reduction(image, 0)
         self.assertTrue(True)
 
     def test_reduction_factor_pyramid(self):
+        random.seed(42)
         image = cv2.imread('../data/5_5_boundary.png', 0)
         gmap = LabelMap.from_labels(image)
         gmap.remove_edges(0.5)
