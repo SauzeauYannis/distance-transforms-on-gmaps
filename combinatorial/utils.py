@@ -121,6 +121,11 @@ def build_dt_grey_image(gmap, interpolate_missing_values: bool = True) -> np.arr
 
         max_distance = np.max(dt_image)
 
+        if max_distance == 0:
+            max_distance = 1
+
+        print(dt_image)
+
         for i in range(dt_grey_image.shape[0]):
             for j in range(dt_grey_image.shape[1]):
                 # I use the white color both for -1 and -2
@@ -132,3 +137,19 @@ def build_dt_grey_image(gmap, interpolate_missing_values: bool = True) -> np.arr
                     dt_grey_image[i][j] = norm_distance
 
         return dt_grey_image
+
+
+def are_weights_consistent(gmap) -> bool:
+    """
+    It returns True if all the darts of the same edge have the same weights
+    """
+
+    weights = gmap.weights
+    for dart in gmap.darts:
+        # get all darts associated to that edge
+        edge_weight = weights[dart]
+        for orbit_dart in gmap.cell_i(1, dart):
+            if edge_weight != weights[orbit_dart]:
+                return False
+
+    return True

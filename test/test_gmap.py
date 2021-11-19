@@ -8,11 +8,12 @@ from combinatorial.pixelmap import LabelMap
 from distance_transform.preprocessing import *
 from combinatorial.utils import build_dt_grey_image
 from test_utils import *
+from combinatorial.utils import *
 import cv2
 import random
 
 
-class TestWavePropagation(TestCase):
+class TestGmap(TestCase):
     def setUp(self) -> None:
         pass
 
@@ -214,6 +215,19 @@ class TestWavePropagation(TestCase):
         expected[71] = 1
 
         self.assertTrue(self._compare_weights(expected, weights))
+
+    def test_reduce_gmap_propagate_weights_consistency(self):
+        """
+        I test at least that all the darts of the same edge have the same weight
+        """
+        random.seed(42)
+        image = cv2.imread('../data/20_20_reduced_portion_leaf.png', 0)
+        gmap = LabelMap.from_labels(image)
+
+        gmap.remove_edges(0.5)
+        gmap.remove_vertices()
+
+        self.assertTrue(are_weights_consistent(gmap))
 
     def test_remove_vertex_example(self):
         random.seed(42)

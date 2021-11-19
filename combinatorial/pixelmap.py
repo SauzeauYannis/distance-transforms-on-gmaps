@@ -316,6 +316,13 @@ class LabelMap (PixelMap):
         # the reduction
         # I have to take darts of the same 2-cell
 
+        """
+
+        :param show_values:
+        :param fill_cell:       face
+        :return:
+        """
+
         # evaluate max distance
         max_distance = self._evaluate_max_dt_value()
 
