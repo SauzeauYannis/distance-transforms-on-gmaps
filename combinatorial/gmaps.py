@@ -123,11 +123,12 @@ class DualArray(np.ndarray):
 class nGmap(DualArray, Marks):
     """g-map based on indices"""
 
-    def __init__ (self, array):
+    def __init__(self, array):
         super().__init__(8, self.shape[1])  # Create 8 marks for each (possible) dart
 
-    @classmethod
-    def _init_structures(cls, number_of_darts: int):
+        self._init_structures(number_of_darts=self.n_darts)
+
+    def _init_structures(self, number_of_darts: int):
         logger.debug(f"The number of darts is: {number_of_darts}")
         # int32 is sufficient for 1000x1000 images.
         # I use a signed dtype for using negative values as markers (example, None type)
@@ -135,9 +136,9 @@ class nGmap(DualArray, Marks):
             raise Exception(f"{dtype} is not sufficient to represent {number_of_darts} darts")
 
         # allocate distances array
-        cls.distances = np.zeros(number_of_darts, dtype=np.int32)
-        logger.debug(f"distances array successfully initialized with shape {cls.distances.shape}"
-                     f" and dtype {cls.distances.dtype}")
+        self.distances = np.zeros(number_of_darts, dtype=np.int32)
+        logger.debug(f"distances array successfully initialized with shape {self.distances.shape}"
+                     f" and dtype {self.distances.dtype}")
 
         # allocate weights array
         # It maints the wegiht associated to each dart.
@@ -145,15 +146,15 @@ class nGmap(DualArray, Marks):
         # So if alfa0(d) = d1 then weight(d) = weight(d1)
         # And it's the same for alfa1
         # I can make a security check based on that consideration
-        cls.weights = np.ones(number_of_darts, dtype=np.uint32)
-        logger.debug(f"weights array successfully initialized with shape {cls.weights.shape}"
-                     f" and dtype {cls.weights.dtype}")
+        self.weights = np.ones(number_of_darts, dtype=np.uint32)
+        logger.debug(f"weights array successfully initialized with shape {self.weights.shape}"
+                     f" and dtype {self.weights.dtype}")
 
         # allocate labels array
         # int16 is sufficient to represent a label
-        cls.image_labels = np.zeros(number_of_darts, dtype=np.int16)
-        logger.debug(f"labels array successfully initialized with shape {cls.image_labels.shape}"
-                     f" and dtype {cls.image_labels.dtype}")
+        self.image_labels = np.zeros(number_of_darts, dtype=np.int16)
+        logger.debug(f"labels array successfully initialized with shape {self.image_labels.shape}"
+                     f" and dtype {self.image_labels.dtype}")
 
         # allocate connected components labels array
         # In order to reduce the space occupied by this array and by the labels array
@@ -161,20 +162,20 @@ class nGmap(DualArray, Marks):
         # between connected components of the same type can be used
         # int32 (-1 if no label is passed in input) is sufficient for 1000x1000 images.
         # I can retrieve the minimum size by the number of labels
-        cls.connected_components_labels = np.zeros(number_of_darts, dtype=np.int32)
-        logger.debug(f"connected_components_labels array successfully initialized with shape {cls.connected_components_labels.shape}"
-                     f" and dtype {cls.connected_components_labels.dtype}")
+        self.connected_components_labels = np.zeros(number_of_darts, dtype=np.int32)
+        logger.debug(f"connected_components_labels array successfully initialized with shape {self.connected_components_labels.shape}"
+                     f" and dtype {self.connected_components_labels.dtype}")
 
         # It stores the label of the closes connected component label after the evaluation of dt
         # Useful for voronoi diagram
-        cls.dt_connected_components_labels = np.zeros(number_of_darts, dtype=np.int32)
-        logger.debug(f"dt_connected_components_labels array successfully initialized with shape {cls.dt_connected_components_labels.shape}"
-                     f" and dtype {cls.dt_connected_components_labels.dtype}")
+        self.dt_connected_components_labels = np.zeros(number_of_darts, dtype=np.int32)
+        logger.debug(f"dt_connected_components_labels array successfully initialized with shape {self.dt_connected_components_labels.shape}"
+                     f" and dtype {self.dt_connected_components_labels.dtype}")
 
         # allocate face identifiers array
-        cls.face_identifiers = np.zeros(number_of_darts, dtype=np.int32)
-        logger.debug(f"face_identifiers array successfully initialized with shape {cls.face_identifiers.shape}"
-                     f" and dtype {cls.face_identifiers.dtype}")
+        self.face_identifiers = np.zeros(number_of_darts, dtype=np.int32)
+        logger.debug(f"face_identifiers array successfully initialized with shape {self.face_identifiers.shape}"
+                     f" and dtype {self.face_identifiers.dtype}")
 
     @classmethod
     def n_by_d (cls, n, n_darts):
@@ -196,8 +197,6 @@ class nGmap(DualArray, Marks):
         if not result.is_valid:
             logging.critical('Have you passed an invalid involution array?')
             raise ValueError
-
-        cls._init_structures(a.shape[1])
 
         return result
 

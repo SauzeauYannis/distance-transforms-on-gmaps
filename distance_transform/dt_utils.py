@@ -59,7 +59,6 @@ def gmap_dt_equal(gmap_1, gmap_2) -> bool:
 
         distance_1 = gmap_1.distances[dart_1]
         distance_2 = gmap_2.distances[dart_2]
-        print(f"dart_1: {dart_1}, dart_2: {dart_2}, distance_1: {distance_1}, distance_2: {distance_2}")
         if distance_1 != distance_2:
             print(f"dart id: {dart_1} - dart 1 distance: {distance_1} - dart 2 distance: {distance_2}")
             return False

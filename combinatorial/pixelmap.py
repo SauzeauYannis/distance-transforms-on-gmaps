@@ -222,7 +222,6 @@ class PixelMap (nGmap):
             for d_bound,d_block in enumerate (_iter_boundary(R,C)):
                 alphas_block [2, d_block] = d_bound + 8*R*C
                 alphas_bound [2, d_bound] = d_block
-
         return cls.from_alpha_array(alphas_all)
 
 # Cell
