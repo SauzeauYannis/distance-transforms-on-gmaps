@@ -1,11 +1,14 @@
 from unittest import TestCase
 
 import numpy as np
+
+from combinatorial.utils import build_dt_grey_image
 from distance_transform.wave_propagation import *
 from combinatorial.pixelmap import PixelMap
 from distance_transform.dt_utils import *
 from combinatorial.pixelmap import LabelMap
 from distance_transform.preprocessing import *
+from combinatorial.utils import *
 import cv2
 
 

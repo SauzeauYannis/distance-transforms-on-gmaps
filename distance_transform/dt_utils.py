@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from distance_transform.wave_propagation import wave_propagation_dt_gmap
 from combinatorial.pixelmap import LabelMap
 from distance_transform.wave_propagation import generate_accumulation_directions_cell
+from combinatorial.utils import *
 
 
 def plot_binary_image(image: np.array) -> None:
