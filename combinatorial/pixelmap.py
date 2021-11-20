@@ -53,7 +53,7 @@ class PixelMap (nGmap):
     text_HAs = 'center center right right center center left left'.split()
     text_VAs = 'top top center center bottom bottom center center'.split()
 
-    def _plot_dart_no_dt(self, dart_id, dt: np.uint32, rotate = False):
+    def _plot_dart_attribute(self, dart_id, attribute_value, rotate = False):
         if dart_id >= 8*self.n_rows*self.n_cols:
             return # TODO plot the boundary darts, too, if the maps is unbounded
         vi0, vi1 = dart_id % 8, 1 + dart_id % 8
@@ -63,7 +63,7 @@ class PixelMap (nGmap):
         verts += [(dart_id // 8) % self.n_cols, (dart_id // 8) // self.n_cols]
         mid = .5 * verts[0] + .5 * verts[1]
         mid += 0.005 * PixelMap.text_offsets [vi0]
-        plt.text (mid[0], mid[1], dt,
+        plt.text(mid[0], mid[1], attribute_value,
                   ha      = PixelMap.text_HAs  [dart_id % 8],
                   va      = PixelMap.text_VAs   [dart_id % 8],
                   rotation=PixelMap.text_angles[dart_id % 8] * rotate
@@ -97,7 +97,7 @@ class PixelMap (nGmap):
                 y.append (vertices [dart%8,1] + (dart // 8) // self.n_cols)
                 if number_darts:
                     distance = self.distances[dart]
-                    self._plot_dart_no_dt(dart, distance)
+                    self._plot_dart_attribute(dart, distance)
             x.append (vertices [some_dart%8,0] + (some_dart // 8) %  self.n_cols)
             y.append (vertices [some_dart%8,1] + (some_dart // 8) // self.n_cols)
 
@@ -274,8 +274,10 @@ class LabelMap (PixelMap):
                         gmap.connected_components_labels[start_identifier + k] = -1
 
 
-    def plot(self, number_darts=True, image_palette='gray'):
+    def plot(self, attribute_to_show: str = "dart_id", image_palette='gray'):
         """Plots the label map.
+
+        attribute_to_show: "dart_id, "weight"
 
         image_palette : None to not show the label pixels.
         """
@@ -285,8 +287,12 @@ class LabelMap (PixelMap):
             plt.plot([self._dart_polyline[d][-1,0],self._dart_polyline[e][-1,0]],[self._dart_polyline[d][-1,1],self._dart_polyline[e][-1,1]], 'k-')
             # f = self.a1(d)
             # plt.plot ([self._dart_polyline[d][ 0,0],self._dart_polyline[f][ 0,0]],[self._dart_polyline[d][ 0,1],self._dart_polyline[f][ 0,1]], 'b-')
-            if number_darts:
+            if attribute_to_show == "dart_id":
                 self._plot_dart_no(d)
+            elif attribute_to_show == "weight":
+                self._plot_dart_attribute(d, self.weights[d])
+            else:
+                raise Exception("Unsupported attribute type")
             plt.scatter(self._dart_polyline[d][ 0,0], self._dart_polyline[d][ 0,1], c='k')
 #             plt.scatter(self._dart_polyline[d][-1,0], self._dart_polyline[d][-1,1], marker='+')
 
@@ -342,7 +348,7 @@ class LabelMap (PixelMap):
                 plt.plot(x, y, 'k-')
 
                 if show_values:
-                    self._plot_dart_no_dt(d, distance)
+                    self._plot_dart_attribute(d, distance)
 
                 plt.scatter(self._dart_polyline[d][0, 0], self._dart_polyline[d][0, 1], c='k')
                 x_values_face.append(x)
@@ -516,7 +522,7 @@ class LabelMap (PixelMap):
 
     def plot_labels(self):
         for representative_dart in self.darts_of_i_cells(2):
-            self._plot_dart_no_dt(representative_dart, self.labels[representative_dart])
+            self._plot_dart_attribute(representative_dart, self.labels[representative_dart])
             for d in self.cell_2(representative_dart):
                 e = self.a0(d)
                 x = list(self._dart_polyline[d][ :,0]) + [self._dart_polyline[d][-1,0],self._dart_polyline[e][-1,0]]

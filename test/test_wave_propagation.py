@@ -311,10 +311,10 @@ class TestWavePropagation(TestCase):
         random.seed(42)
         image = cv2.imread('../data/5_5_boundary.png', 0)
         gmap = LabelMap.from_labels(image)
-        gmap.plot(number_darts=True)
+        gmap.plot(attribute_to_show=True)
         gmap.remove_edges(0.5)
         gmap.remove_vertices()
-        gmap.plot(number_darts=True)
+        gmap.plot(attribute_to_show=True)
         self.assertTrue(True)
 
     def test_dt_reduction_05(self):

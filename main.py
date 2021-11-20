@@ -67,13 +67,13 @@ def label_map_example():
     print(image.shape)
 
     lm_spiral = LabelMap.from_labels(image)
-    lm_spiral.plot(number_darts=False)
+    lm_spiral.plot(attribute_to_show=False)
     print(lm_spiral)
 
     lm_spiral.remove_edges()
     lm_spiral.remove_vertices()
     print(lm_spiral)
-    lm_spiral.plot(number_darts=True)
+    lm_spiral.plot(attribute_to_show=True)
 
     return lm_spiral
 
@@ -82,7 +82,7 @@ def dt_on_label_map_example():
     gmap = label_map_example()
     wave_propagation_dt_gmap(gmap, [9, 191])
     gmap.plot_faces_dt()
-    gmap.plot(number_darts=True)
+    gmap.plot(attribute_to_show=True)
 
 
 def dt_cell_10():
@@ -97,7 +97,7 @@ def dt_cell_10():
     # vertices
 
     gmap = LabelMap.from_labels(image)
-    gmap.plot(number_darts=True)
+    gmap.plot(attribute_to_show=True)
     gmap.plot_labels()
 
     seeds = [6, 5, 40, 47, 148, 185, 157, 192]
