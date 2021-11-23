@@ -56,7 +56,8 @@ def gmap_dt_equal(gmap_1, gmap_2) -> bool:
     """
     for dart_1, dart_2 in zip(gmap_1.darts, gmap_2.darts):
         if dart_1 != dart_2:
-            raise Exception(f"The identifiers don't match. id 1: {dart_1} - id 2: {dart_2}")
+            print(f"The identifiers don't match. id 1: {dart_1} - id 2: {dart_2}")
+            return False
 
         distance_1 = gmap_1.distances[dart_1]
         distance_2 = gmap_2.distances[dart_2]
