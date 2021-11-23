@@ -189,13 +189,13 @@ def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.Lis
                 # could not be the right one. All the values have to be checked. View example on joplin (01/11/2021)
                 if accumulation_directions[i]:
                     if gmap.distances[neighbour] == -1:
-                        next_queue.put(neighbour)
+                        next_queue.put(neighbour)  # only the first time I add the element to the queue
                     if gmap.distances[neighbour] == -1\
                             or gmap.distances[dart] + 1 < gmap.distances[neighbour]:
                         gmap.distances[neighbour] = gmap.distances[dart] + 1
                 else:
                     if gmap.distances[neighbour] == -1:
-                        curr_queue.put(neighbour)
+                        curr_queue.put(neighbour)  # only the first time I add the element to the queue
                     if gmap.distances[neighbour] == -1 \
                                 or gmap.distances[dart] < gmap.distances[neighbour]:
                         gmap.distances[neighbour] = gmap.distances[dart]

@@ -116,11 +116,56 @@ class TestDijkstra(TestCase):
 
         actual_gmap.plot()
         actual_gmap.plot(attribute_to_show="weight")
-        generalized_wave_propagation_gmap(actual_gmap, [0], [255], generate_accumulation_directions_vertex(2))
-        actual_gmap.plot_dt()
 
         expected_gmap.plot_dt()
 
         generalized_dijkstra_dt_gmap(actual_gmap, [0], [255], generate_accumulation_directions_vertex(2))
 
-        self.assertTrue(True)
+        actual_gmap.plot_dt()
+        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
+
+    def test_generalized_dijkstra_dt_gmap_unweighted_faces_propagation_bug(self):
+        image = cv2.imread('../data/5_5_boundary.png', 0)
+        actual_gmap = LabelMap.from_labels(image)
+        expected_gmap = LabelMap.from_labels(image)
+
+        # set distances on expected gmap
+        for i in range(56):
+            expected_gmap.set_dart_distance(i, -1)
+        for i in range(56, 80):
+            expected_gmap.set_dart_distance(i, 0)
+        for i in range(80, 88):
+            expected_gmap.set_dart_distance(i, -1)
+        for i in range(88, 96):
+            expected_gmap.set_dart_distance(i, 0)
+        for i in range(96, 112):
+            expected_gmap.set_dart_distance(i, 1)
+        for i in range(112, 120):
+            expected_gmap.set_dart_distance(i, 0)
+        for i in range(120, 128):
+            expected_gmap.set_dart_distance(i, -1)
+        for i in range(128, 136):
+            expected_gmap.set_dart_distance(i, 0)
+        for i in range(136, 144):
+            expected_gmap.set_dart_distance(i, 1)
+        for i in range(144, 152):
+            expected_gmap.set_dart_distance(i, 2)
+        for i in range(152, 160):
+            expected_gmap.set_dart_distance(i, 1)
+        for i in range(160, 168):
+            expected_gmap.set_dart_distance(i, -1)
+        for i in range(168, 176):
+            expected_gmap.set_dart_distance(i, 0)
+        for i in range(176, 184):
+            expected_gmap.set_dart_distance(i, 1)
+        for i in range(184, 200):
+            expected_gmap.set_dart_distance(i, 2)
+
+        generalized_dijkstra_dt_gmap(actual_gmap, [0], [195], generate_accumulation_directions_cell(2))
+
+        # plot
+        expected_gmap.plot()
+        expected_gmap.plot_dt(fill_cell='face')
+        actual_gmap.plot_dt(fill_cell='face')
+
+        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
