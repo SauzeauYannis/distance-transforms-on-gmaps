@@ -39,9 +39,6 @@ class TestPreprocessing(TestCase):
         for i in range(30, 32):
             gmap_2_2.set_dart_distance(i, 4)
 
-        gmap_2_2.plot()
-        gmap_2_2.plot_dt()
-
         expected = 2.4
         actual = compute_diffusion_distance(gmap_2_2, 0)
         self.assertEqual(expected, actual)
@@ -82,3 +79,19 @@ class TestPreprocessing(TestCase):
         diffusion_distance_with_weights = compute_diffusion_distance(gmap_with_weights, 50)
 
         self.assertNotEqual(diffusion_distance_without_weights, diffusion_distance_with_weights)
+
+
+    def test_compute_dt_for_diffusion_distance_without_stomata(self):
+        image_name = "DEHYDRATION_small_leaf_4_time_1_ax1cros_0100_Label_1152x1350_uint8.png"
+        image = cv2.imread("../data/time_1/cross/" + image_name, 0)
+        reduced_image = reduce_image_size(image, 11)
+        print(f"reduced_image shape: {reduced_image.shape}")
+        gmap, _, _ = compute_dt_for_diffusion_distance(reduced_image, None, True, False, 0.5, False)
+
+        """
+        If there are no stomata or there are no cells, the diffusion distance should be equal to -1
+        """
+        expected = -1
+        actual = compute_diffusion_distance(gmap, 50)
+
+        self.assertEqual(expected, actual)

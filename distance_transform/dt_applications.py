@@ -21,6 +21,9 @@ def compute_diffusion_distance(gmap, label: int) -> float:
 
     I consider only the darts with distance value >= 0.
     Read Joplin 25/11/2021 - Bug compute diffusion distance
+
+    It returns -1 if no values have been found.
+    It could happen if there are no stomata in the image.
     """
 
     sum = 0
@@ -30,6 +33,9 @@ def compute_diffusion_distance(gmap, label: int) -> float:
         if gmap.image_labels[dart] == label and gmap.distances[dart] >= 0:
             number_of_values += 1
             sum += gmap.distances[dart]
+
+    if number_of_values == 0:
+        return -1
 
     average = sum / number_of_values
     return average
