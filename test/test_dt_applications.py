@@ -23,6 +23,29 @@ class TestPreprocessing(TestCase):
         actual = compute_diffusion_distance(gmap_2_2, 0)
         self.assertEqual(expected, actual)
 
+    def test_compute_diffusion_distance_negative_weights(self):
+        """
+        Negative values do not have to be taken into consideration
+        in computing diffusion distance
+        """
+
+        image = cv2.imread('../data/2_2_labeled_image.png', 0)
+        gmap_2_2 = LabelMap.from_labels(image)
+
+        for i in range(8, 16):
+            gmap_2_2.set_dart_distance(i, 2)
+        for i in range(24, 30):
+            gmap_2_2.set_dart_distance(i, -1)
+        for i in range(30, 32):
+            gmap_2_2.set_dart_distance(i, 4)
+
+        gmap_2_2.plot()
+        gmap_2_2.plot_dt()
+
+        expected = 2.4
+        actual = compute_diffusion_distance(gmap_2_2, 0)
+        self.assertEqual(expected, actual)
+
     def test_compute_dt_for_diffusion_distance_with_without_weights(self):
         """
         If the gmap is not reduced, using or not using the weight should produce the same result.

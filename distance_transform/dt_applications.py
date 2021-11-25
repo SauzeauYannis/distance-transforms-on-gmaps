@@ -18,13 +18,16 @@ def compute_diffusion_distance(gmap, label: int) -> float:
 
     At the moment I am computing the average on darts
     Probably I should compute the average on faces. It is not so difficult to do that
+
+    I consider only the darts with distance value >= 0.
+    Read Joplin 25/11/2021 - Bug compute diffusion distance
     """
 
     sum = 0
     number_of_values = 0
 
     for dart in gmap.darts:
-        if gmap.image_labels[dart] == label:
+        if gmap.image_labels[dart] == label and gmap.distances[dart] >= 0:
             number_of_values += 1
             sum += gmap.distances[dart]
 
