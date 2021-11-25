@@ -33,6 +33,10 @@ def set_logging(result_dir_path: str = "results"):
                 "level": "DEBUG",
                 "handlers": ["console-named", "file-named"]
             },
+            "evaluate_performance_compute_diffusion_distance_logger": {
+                "level": "DEBUG",
+                "handlers": ["console-named", "file-named"]
+            },
             "gmap_logger": {
                 "level": "INFO",
                 "handlers": ["console-named"]

@@ -31,8 +31,8 @@ class TestPreprocessing(TestCase):
         image = cv2.imread("../data/time_1/cross/" + image_name, 0)
         reduced_image = reduce_image_size(image, 11)
         print(f"reduced_image shape: {reduced_image.shape}")
-        gmap_without_weights = compute_dt_for_diffusion_distance(reduced_image, None, True, False, 0, False)
-        gmap_with_weights = compute_dt_for_diffusion_distance(reduced_image, None, True, False, 0, True)
+        gmap_without_weights, _, _ = compute_dt_for_diffusion_distance(reduced_image, None, True, False, 0, False)
+        gmap_with_weights, _, _ = compute_dt_for_diffusion_distance(reduced_image, None, True, False, 0, True)
 
         self.assertTrue(gmap_dt_equal(gmap_without_weights, gmap_with_weights))
 
@@ -50,8 +50,8 @@ class TestPreprocessing(TestCase):
         image = cv2.imread("../data/time_1/cross/" + image_name, 0)
         reduced_image = reduce_image_size(image, 11)
         print(f"reduced_image shape: {reduced_image.shape}")
-        gmap_without_weights = compute_dt_for_diffusion_distance(reduced_image, None, True, False, 0.5, False)
-        gmap_with_weights = compute_dt_for_diffusion_distance(reduced_image, None, True, False, 0.5, True)
+        gmap_without_weights, _, _ = compute_dt_for_diffusion_distance(reduced_image, None, True, False, 0.5, False)
+        gmap_with_weights, _, _ = compute_dt_for_diffusion_distance(reduced_image, None, True, False, 0.5, True)
 
         self.assertFalse(gmap_dt_equal(gmap_without_weights, gmap_with_weights))
 

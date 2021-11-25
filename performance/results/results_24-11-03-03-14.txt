@@ -1,0 +1,68 @@
+INFO     Image name: ../data/time_1/cross/DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png
+INFO     Image shape: (1152, 1350)
+INFO     Image reduction factor: 11
+INFO     Image shape after reduction: (105, 123)
+INFO     
+INFO     Evaluate performance called
+INFO     Reduction_factor: 0
+INFO     Use weights: False
+INFO     Time to reduce gmap s: 0.0
+INFO     Time to compute dt s: 0.9160008430480957
+INFO     Time to compute diffusion s: 0.23599624633789062
+INFO     Diffusion distance: 32.43653100775194
+INFO     
+INFO     Evaluate performance called
+INFO     Reduction_factor: 0
+INFO     Use weights: True
+INFO     Time to reduce gmap s: 0.0
+INFO     Time to compute dt s: 0.7390015125274658
+INFO     Time to compute diffusion s: 0.2869985103607178
+INFO     Diffusion distance: 32.43653100775194
+INFO     
+INFO     Evaluate performance called
+INFO     Reduction_factor: 0.25
+INFO     Use weights: False
+INFO     Time to reduce gmap s: 2.5509979724884033
+INFO     Time to compute dt s: 0.7300002574920654
+INFO     Time to compute diffusion s: 0.17999601364135742
+INFO     Diffusion distance: 29.37266739846323
+INFO     
+INFO     Evaluate performance called
+INFO     Reduction_factor: 0.25
+INFO     Use weights: True
+INFO     Time to reduce gmap s: 2.5139999389648438
+INFO     Time to compute dt s: 0.5280039310455322
+INFO     Time to compute diffusion s: 0.20100164413452148
+INFO     Diffusion distance: 33.66813025978778
+INFO     
+INFO     Evaluate performance called
+INFO     Reduction_factor: 0.5
+INFO     Use weights: False
+INFO     Time to reduce gmap s: 3.8519999980926514
+INFO     Time to compute dt s: 0.4890022277832031
+INFO     Time to compute diffusion s: 0.13300013542175293
+INFO     Diffusion distance: 30.02428603552957
+INFO     
+INFO     Evaluate performance called
+INFO     Reduction_factor: 0.5
+INFO     Use weights: True
+INFO     Time to reduce gmap s: 3.9610040187835693
+INFO     Time to compute dt s: 0.34799933433532715
+INFO     Time to compute diffusion s: 0.13699889183044434
+INFO     Diffusion distance: 41.90398021137846
+INFO     
+INFO     Evaluate performance called
+INFO     Reduction_factor: 1
+INFO     Use weights: False
+INFO     Time to reduce gmap s: 3.958995819091797
+INFO     Time to compute dt s: 0.15700030326843262
+INFO     Time to compute diffusion s: 0.057997941970825195
+INFO     Diffusion distance: 32.53993344425957
+INFO     
+INFO     Evaluate performance called
+INFO     Reduction_factor: 1
+INFO     Use weights: True
+INFO     Time to reduce gmap s: 3.9999983310699463
+INFO     Time to compute dt s: 0.13300204277038574
+INFO     Time to compute diffusion s: 0.05899620056152344
+INFO     Diffusion distance: 129.05906821963396

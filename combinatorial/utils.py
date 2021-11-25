@@ -124,6 +124,10 @@ def build_dt_grey_image(gmap, interpolate_missing_values: bool = True) -> np.arr
         if max_distance == 0:
             max_distance = 1
 
+        if max_distance < 255:
+            print(f"max distance: {max_distance} < 255. Using 255")
+            max_distance = 255
+
         for i in range(dt_grey_image.shape[0]):
             for j in range(dt_grey_image.shape[1]):
                 # I use the white color both for -1 and -2
