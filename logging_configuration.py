@@ -14,6 +14,9 @@ def set_logging(result_dir_path: str = "results"):
         "formatters": {
             "named": {
                 "format": "%(levelname)-8s %(message)s"
+            },
+            "unnamed": {
+                "format": "%(message)s"
             }
         },
         "handlers": {
@@ -25,7 +28,7 @@ def set_logging(result_dir_path: str = "results"):
             "file-named": {
                 "class": "logging.FileHandler",
                 "filename": results_dir / f"results_{datetime.datetime.now().strftime('%d-%m-%H-%M-%S')}.txt",
-                "formatter": "named"
+                "formatter": "unnamed"
             }
         },
         "loggers": {
