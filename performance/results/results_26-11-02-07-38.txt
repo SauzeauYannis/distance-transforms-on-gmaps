@@ -1,0 +1,60 @@
+***** DIFFUSION DISTANCE COMPUTATION EXPERIMENTATION *****
+
+Image reduction factor: 11
+
+***** LEGEND *****
+RF: Reduction factor
+UW: Use weights
+DD: Diffusion distance
+DD_E: Diffusion distance error (current - base)
+DD_RE: Diffusion distance relative error (current - base) / base
+TRG_S: Time reduce gmap s
+TCDT_S: Time compute dt s
+TCDT_S_D: Time compute dt s difference (current - base)
+TCDT_S_IF: Time compute dt s improvement factor (base / current)
+TCDD_S: Time compute distance s
+
+***** RESULTS FOR EACH IMAGE *****
+
+***** IMAGE 1 *****
+
+Image name: img.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+0          False      56.00      +0.00      +0.00      0.00       0.80       +0.00      1.00       0.23      
+0.25       False      46.96      -9.04      -0.16      2.49       0.61       -0.19      1.32       0.18      
+0.25       True       55.76      -0.24      -0.00      2.53       0.49       -0.32      1.65       0.17      
+0.5        False      50.01      -5.99      -0.11      3.81       0.40       -0.40      1.99       0.12      
+0.5        True       67.94      +11.94     +0.21      3.69       0.31       -0.49      2.59       0.12      
+1          False      23.60      -32.40     -0.58      3.73       0.14       -0.66      5.70       0.06      
+1          True       108.23     +52.23     +0.93      3.86       0.12       -0.68      6.43       0.05      
+
+***** IMAGE 2 *****
+
+Image name: img_1.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+0          False      38.41      +0.00      +0.00      0.00       0.53       +0.00      1.00       0.23      
+0.25       False      35.04      -3.36      -0.09      2.60       0.41       -0.12      1.29       0.18      
+0.25       True       39.71      +1.30      +0.03      2.48       0.32       -0.21      1.65       0.18      
+0.5        False      31.34      -7.06      -0.18      3.70       0.28       -0.25      1.91       0.12      
+0.5        True       44.13      +5.73      +0.15      3.57       0.24       -0.30      2.27       0.12      
+1          False      14.44      -23.97     -0.62      3.83       0.11       -0.42      4.64       0.05      
+1          True       78.04      +39.64     +1.03      5.27       0.28       -0.25      1.91       0.08      
+
+
+***** AGGREGATE REPORT *****
+
+Number of images     Number of images with stomata
+2                    2
+                  
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+0          False      47.20      +0.00      +0.00      0.00       0.67       +0.00      1.00       0.23      
+0.25       False      41.00      -6.20      -0.12      2.54       0.51       -0.16      1.30       0.18      
+0.25       True       47.73      +0.53      +0.01      2.51       0.41       -0.26      1.65       0.17      
+0.5        False      40.68      -6.53      -0.15      3.75       0.34       -0.33      1.95       0.12      
+0.5        True       56.04      +8.83      +0.18      3.63       0.27       -0.40      2.43       0.12      
+1          False      19.02      -28.18     -0.60      3.78       0.13       -0.54      5.17       0.05      
+1          True       93.14      +45.94     +0.98      4.56       0.20       -0.47      4.17       0.07      

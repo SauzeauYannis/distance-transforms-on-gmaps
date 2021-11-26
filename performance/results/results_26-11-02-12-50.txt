@@ -1,0 +1,74 @@
+***** DIFFUSION DISTANCE COMPUTATION EXPERIMENTATION *****
+
+Image reduction factor: 11
+
+***** LEGEND *****
+RF: Reduction factor
+UW: Use weights
+DD: Diffusion distance
+DD_E: Diffusion distance error (current - base)
+DD_RE: Diffusion distance relative error (current - base) / base
+TRG_S: Time reduce gmap s
+TCDT_S: Time compute dt s
+TCDT_S_D: Time compute dt s difference (current - base)
+TCDT_S_IF: Time compute dt s improvement factor (base / current)
+TCDD_S: Time compute distance s
+
+***** RESULTS FOR EACH IMAGE *****
+
+***** IMAGE 1 *****
+
+Image name: DEHYDRATION_small_leaf_4_time_1_ax1cros_0100_Label_1152x1350_uint8.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+0          False      -1.00      +0.00      -0.00      0.00       0.32       +0.00      1.00       0.23      
+0.25       False      -1.00      +0.00      -0.00      2.50       0.24       -0.08      1.32       0.20      
+0.25       True       -1.00      +0.00      -0.00      2.45       0.25       -0.07      1.29       0.18      
+0.5        False      -1.00      +0.00      -0.00      3.60       0.18       -0.14      1.75       0.12      
+0.5        True       -1.00      +0.00      -0.00      3.64       0.18       -0.14      1.76       0.13      
+1          False      -1.00      +0.00      -0.00      4.73       0.10       -0.22      3.22       0.06      
+1          True       -1.00      +0.00      -0.00      3.89       0.10       -0.22      3.19       0.06      
+
+***** IMAGE 2 *****
+
+Image name: img.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+0          False      56.00      +0.00      +0.00      0.00       0.79       +0.00      1.00       0.24      
+0.25       False      46.96      -9.04      -0.16      2.46       0.61       -0.19      1.31       0.19      
+0.25       True       55.76      -0.24      -0.00      2.51       0.46       -0.33      1.73       0.18      
+0.5        False      50.01      -5.99      -0.11      3.72       0.44       -0.35      1.81       0.12      
+0.5        True       67.94      +11.94     +0.21      3.68       0.58       -0.21      1.36       0.42      
+1          False      23.60      -32.40     -0.58      5.95       0.14       -0.65      5.72       0.07      
+1          True       108.23     +52.23     +0.93      5.24       0.26       -0.53      3.00       0.13      
+
+***** IMAGE 3 *****
+
+Image name: img_1.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+0          False      38.41      +0.00      +0.00      0.00       0.53       +0.00      1.00       0.23      
+0.25       False      35.04      -3.36      -0.09      2.62       0.40       -0.13      1.31       0.18      
+0.25       True       39.71      +1.30      +0.03      2.68       0.34       -0.18      1.54       0.19      
+0.5        False      31.34      -7.06      -0.18      3.79       0.30       -0.23      1.78       0.13      
+0.5        True       44.13      +5.73      +0.15      3.68       0.26       -0.27      2.05       0.12      
+1          False      14.44      -23.97     -0.62      4.06       0.12       -0.40      4.26       0.06      
+1          True       78.04      +39.64     +1.03      4.44       0.12       -0.41      4.44       0.09      
+
+
+***** AGGREGATE REPORT *****
+
+Number of images     Number of images with stomata
+3                    2
+                  
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+0          False      47.20      +0.00      +0.00      0.00       0.66       +0.00      1.00       0.23      
+0.25       False      41.00      -6.20      -0.12      2.54       0.50       -0.16      1.31       0.18      
+0.25       True       47.73      +0.53      +0.01      2.60       0.40       -0.26      1.64       0.18      
+0.5        False      40.68      -6.53      -0.15      3.76       0.37       -0.29      1.80       0.13      
+0.5        True       56.04      +8.83      +0.18      3.68       0.42       -0.24      1.71       0.27      
+1          False      19.02      -28.18     -0.60      5.01       0.13       -0.53      4.99       0.07      
+1          True       93.14      +45.94     +0.98      4.84       0.19       -0.47      3.72       0.11      
