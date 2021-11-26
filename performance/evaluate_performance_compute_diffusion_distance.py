@@ -193,7 +193,8 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
     aggregate_results = []
     for i in range(n_results_for_image):
         aggregate_results.append(deepcopy(aggregate_results_dict))
-    
+
+    total_start = time.time()
     for image_path in image_paths:
         image = cv2.imread(dataset_path + image_path, 0)
         reduced_image = reduce_image_size(image, image_reduction_factor)
@@ -250,11 +251,16 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
 
         image_count += 1
 
+    total_end = time.time()
+    total_execution_time = total_end - total_start
     compute_average_aggregate_results(aggregate_results, image_count_with_stomata)
 
     logger.info("\n***** AGGREGATE REPORT *****\n")
-    logger.info("{: <20} {: <20}".format("Number of images", "Number of images with stomata"))
-    logger.info("{: <20} {: <20}".format(f"{image_count}", f"{image_count_with_stomata}\n"))
+    logger.info("{: <20} {: <20} {: <20} {: <20}".format("N. images", "N. images stomata",
+                                                         "Tot. exec time s", "Avg exec time image s"))
+    logger.info("{: <20} {: <20} {: <20.2f} {: <20.2f}".format(f"{image_count}", f"{image_count_with_stomata}",
+                                                               total_execution_time, total_execution_time / image_count))
+    logger.info("")
 
     logger.info(RESULT_HEADER_STRING)
 
@@ -284,7 +290,7 @@ def main():
     evaluate_performance_one_image(image_path)
     """
 
-    evaluate_performance_all_dataset("../data/diffusion_distance_images/", image_reduction_factor=5)
+    evaluate_performance_all_dataset("../data/diffusion_distance_images/", image_reduction_factor=3)
 
 
 if __name__ == "__main__":
