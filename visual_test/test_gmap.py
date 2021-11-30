@@ -6,7 +6,7 @@ from combinatorial.pixelmap import PixelMap
 from distance_transform.dt_utils import *
 from combinatorial.pixelmap import LabelMap
 from distance_transform.preprocessing import *
-from combinatorial.utils import build_dt_grey_image
+from combinatorial.utils import build_dt_grey_image_from_gmap
 from test.test_utils import *
 from combinatorial.utils import *
 import cv2

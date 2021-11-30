@@ -3,6 +3,34 @@ from queue import Queue
 import numpy as np
 
 
+def generalized_wave_propagation_image(image: np.array, seed_labels: typing.List[int],
+                                       propagation_labels: typing.List[int]) -> np.array:
+    # int64 should be sufficient
+    output_image = np.zeros(image.shape, np.int64)
+    output_image.fill(-1)  # initialize output_image
+
+    queue = Queue()
+
+    # Find seeds and add to queue
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            if image[i][j] in seed_labels:
+                queue.put((i, j))
+                output_image[i][j] = 0
+
+    while not queue.empty():
+        pixel = queue.get()
+        # Visit all the neighbours
+        for i in range(4):
+            neighbour = get_next_neighbour_image(i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
+            if neighbour is not None and image[neighbour[0]][neighbour[1]] in propagation_labels and\
+                    output_image[neighbour[0], neighbour[1]] == -1:
+                output_image[neighbour[0], neighbour[1]] = output_image[pixel[0], pixel[1]] + 1
+                queue.put(neighbour)
+
+    return output_image
+    
+
 def wave_propagation_dt_image(image: np.array, seeds: typing.List[typing.Tuple[int, int]] = None) -> np.array:
     """
     4-neighborhood connection
@@ -11,39 +39,6 @@ def wave_propagation_dt_image(image: np.array, seeds: typing.List[typing.Tuple[i
     :param seeds: A list of seeds (x, y). If None, all values equal to 0 in the image will be used as seeds
     :return:
     """
-
-    def get_next_neighbour(index: int, x: int, y: int, max_x: int, max_y: int) -> (int, int):
-        """
-        Preconditions:
-            x and y are valid values, i.e. x, y >= 0 and x <= max_x and y <= max_y
-
-        :param index:
-        :param x:
-        :param y:
-        :return:
-        """
-        if index == 0:  # left
-            if y - 1 < 0:
-                return None
-            else:
-                return x, y - 1
-        elif index == 1:  # up
-            if x - 1 < 0:
-                return None
-            else:
-                return x - 1, y
-        elif index == 2:  # right
-            if y + 1 > max_y:
-                return None
-            else:
-                return x, y + 1
-        elif index == 3:  # down
-            if x + 1 > max_x:
-                return None
-            else:
-                return x + 1, y
-        else:
-            raise Exception(f"Unexpected index {index}")
 
     output_image = np.zeros(image.shape, image.dtype)
     # initialize output_image
@@ -68,12 +63,54 @@ def wave_propagation_dt_image(image: np.array, seeds: typing.List[typing.Tuple[i
         pixel = queue.get()
         # Visit all the neighbours
         for i in range(4):
-            neighbour = get_next_neighbour(i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
+            neighbour = get_next_neighbour_image(i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
             if neighbour is not None and output_image[neighbour[0], neighbour[1]] == -1:
                 output_image[neighbour[0], neighbour[1]] = output_image[pixel[0], pixel[1]] + 1
                 queue.put(neighbour)
 
     return output_image
+
+
+def get_next_neighbour_image(index: int, x: int, y: int, max_x: int, max_y: int) -> (int, int):
+    """
+    4 neighborhood connections
+
+    Preconditions:
+        x and y are valid values, i.e. x, y >= 0 and x <= max_x and y <= max_y
+
+    :param index:
+    :param x:
+    :param y:
+    :return:
+    """
+    if index == 0:  # left
+        if y - 1 < 0:
+            return None
+        else:
+            return x, y - 1
+    elif index == 1:  # up
+        if x - 1 < 0:
+            return None
+        else:
+            return x - 1, y
+    elif index == 2:  # right
+        if y + 1 > max_y:
+            return None
+        else:
+            return x, y + 1
+    elif index == 3:  # down
+        if x + 1 > max_x:
+            return None
+        else:
+            return x + 1, y
+    else:
+        raise Exception(f"Unexpected index {index}")
+
+
+def improved_wave_propagation_gmap_vertex(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int]) -> None:
+    # Initialization
+    for dart in gmap.darts:
+        gmap.distances[dart] = -1
 
 
 def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int],

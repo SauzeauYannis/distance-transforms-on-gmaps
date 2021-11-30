@@ -2,7 +2,7 @@ from unittest import TestCase
 from distance_transform.preprocessing import *
 from data.labels import labels
 import cv2
-from combinatorial.utils import build_dt_grey_image
+from combinatorial.utils import build_dt_grey_image_from_gmap
 
 from test.test_utils import matrix_compare
 

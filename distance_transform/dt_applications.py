@@ -6,7 +6,7 @@ from combinatorial.pixelmap import LabelMap
 from combinatorial.gmaps import nGmap
 from distance_transform.preprocessing import connected_component_labeling_one_pass
 import numpy as np
-from combinatorial.utils import build_dt_grey_image
+from combinatorial.utils import build_dt_grey_image_from_gmap
 from distance_transform.dt_utils import *
 from distance_transform.dijkstra import *
 import time
@@ -33,6 +33,33 @@ def compute_diffusion_distance(gmap, label: int) -> float:
         if gmap.image_labels[dart] == label and gmap.distances[dart] >= 0:
             number_of_values += 1
             sum += gmap.distances[dart]
+
+    if number_of_values == 0:
+        return -1
+
+    average = sum / number_of_values
+    return average
+
+
+def compute_diffusion_distance_image(image: np.array, dt_image: np.array, label: int) -> float:
+    """
+    It's the average of the distance of each point with label equal to the label passed as parameter.
+
+    I consider only the pixels with distance value >= 0.
+    Read Joplin 25/11/2021 - Bug compute diffusion distance
+
+    It returns -1 if no values have been found.
+    It could happen if there are no stomata in the image.
+    """
+
+    sum = 0
+    number_of_values = 0
+
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            if image[i][j] == label and dt_image[i][j] >= 0:
+                number_of_values += 1
+                sum += dt_image[i][j]
 
     if number_of_values == 0:
         return -1
@@ -94,7 +121,7 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
         print("Dt successfully computed")
 
     # Save dt image
-    dt_image = build_dt_grey_image(gmap, interpolate_missing_values=False)
+    dt_image = build_dt_grey_image_from_gmap(gmap, interpolate_missing_values=False)
     if verbose:
         print("dt image successfully computed")
 
@@ -102,4 +129,23 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
         cv2.imwrite(dt_image_path, dt_image)
 
     return gmap, time_to_reduce_gmap_s, time_to_compute_dt_s
+
+
+def compute_dt_for_diffusion_distance_image(image: np.array, border_label: int = 50) -> (np.array, float):
+    """
+    Computes the diffusion distance of the cell represented by the image in image_path.
+
+    It returns a tuple
+    The first element is the dt_image
+    The second element is the time, in seconds, required to compure dt
+    """
+
+    # Compute dt from stomata to the cells
+    propagation_labels = [labels["air"], border_label]
+    start = time.time()
+    dt_image = generalized_wave_propagation_image(image, [labels["stomata"]], propagation_labels)
+    end = time.time()
+    time_to_compute_dt_s = end - start
+
+    return dt_image, time_to_compute_dt_s
 

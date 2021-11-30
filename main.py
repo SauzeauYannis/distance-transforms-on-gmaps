@@ -8,7 +8,7 @@ from distance_transform.sample_data import *
 from distance_transform.dt_utils import *
 import imageio
 import matplotlib.pyplot as plt
-from combinatorial.utils import build_dt_grey_image
+from combinatorial.utils import build_dt_grey_image_from_gmap
 import cv2
 
 
@@ -148,7 +148,7 @@ def test_norm_image(path):
     accumulation_directions = generate_accumulation_directions_cell(2)
     wave_propagation_dt_gmap(gmap, None, accumulation_directions)
     # get image and show results
-    dt_image = build_dt_grey_image(gmap)
+    dt_image = build_dt_grey_image_from_gmap(gmap)
     plot_dt_image(dt_image, None)
 
 

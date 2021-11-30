@@ -16,9 +16,18 @@ class TestPreprocessing(TestCase):
 
         self.assertTrue(True)
 
+    def test_compute_dt_for_diffusion_distance_image(self):
+        image = cv2.imread("../data/cleaned_borders_cross_section_leaf.png", 0)
+        image_with_borders = generalized_find_borders(image, labels["cell"], 50)
+        dt_image, _ = compute_dt_for_diffusion_distance_image(image_with_borders, 50)
+        dt_plottable_image = build_dt_grey_image(dt_image)
+        plot_dt_image(dt_plottable_image)
+
+        self.assertTrue(True)
+
     def test_compute_diffusion_distance_big_image(self):
         # Read image
-        image = cv2.imread("../data/cleaned_borders_cross_section_leaf.png", 0)  # the second parameter with value 0 is needed to read the greyscale image
+        image = cv2.imread("../data/cleaned_borders_cross_section_leaf.png", 0)
         print("image successfully read")
         gmap, _, _ = compute_dt_for_diffusion_distance(image, "results/dt_diffusion_big_image.png", True)
         diffusion_distance = compute_diffusion_distance(gmap, 50)

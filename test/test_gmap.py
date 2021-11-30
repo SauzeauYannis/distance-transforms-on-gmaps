@@ -6,7 +6,7 @@ from combinatorial.pixelmap import PixelMap
 from distance_transform.dt_utils import *
 from combinatorial.pixelmap import LabelMap
 from distance_transform.preprocessing import *
-from combinatorial.utils import build_dt_grey_image
+from combinatorial.utils import build_dt_grey_image_from_gmap
 from test_utils import *
 from combinatorial.utils import *
 import cv2
@@ -154,7 +154,7 @@ class TestGmap(TestCase):
         gmap.remove_vertices()
         generalized_wave_propagation_gmap(gmap, [0], [0, 195],
                                           accumulation_directions=generate_accumulation_directions_cell(2))
-        dt_grey_image = build_dt_grey_image(gmap)
+        dt_grey_image = build_dt_grey_image_from_gmap(gmap)
 
         self.assertEqual(dt_grey_image.shape, image.shape)
         expected = np.zeros(image.shape, dtype=dt_grey_image.dtype)

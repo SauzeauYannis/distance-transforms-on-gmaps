@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import numpy as np
 
-from combinatorial.utils import build_dt_grey_image
+from combinatorial.utils import build_dt_grey_image_from_gmap
 from distance_transform.wave_propagation import *
 from combinatorial.pixelmap import PixelMap
 from distance_transform.dt_utils import *
@@ -294,7 +294,7 @@ class TestWavePropagation(TestCase):
         expected_gmap.plot_dt(fill_cell='face')
         actual_gmap.plot_dt(fill_cell='face')
 
-        dt_image = build_dt_grey_image(actual_gmap)
+        dt_image = build_dt_grey_image_from_gmap(actual_gmap)
         plot_dt_image(dt_image, None)
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
@@ -353,3 +353,21 @@ class TestWavePropagation(TestCase):
         # plot
         actual_gmap.plot_faces_dt()
         self.assertTrue(True)
+
+    def test_generalized_wave_propagation_image(self):
+        image = cv2.imread("../data/5_5_boundary.png", 0)
+        actual = generalized_wave_propagation_image(image, [0], [195])
+        expected = np.zeros(actual.shape, actual.dtype)
+
+        expected.fill(-1)
+        expected[1, 2:] = 0
+        expected[2:, 1] = 0
+        expected[2, 4] = 0
+        expected[2:, 2] = 1
+        expected[2, 3] = 1
+        expected[3, 4] = 1
+        expected[3:, 3] = 2
+        expected[4, 4] = 2
+
+        self.assertEqual(actual.tolist(), expected.tolist())
+

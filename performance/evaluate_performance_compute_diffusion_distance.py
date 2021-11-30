@@ -14,7 +14,7 @@ from combinatorial.pixelmap import LabelMap
 import tracemalloc
 from memory_profiler import profile
 from distance_transform.wave_propagation import *
-from combinatorial.utils import build_dt_grey_image
+from combinatorial.utils import build_dt_grey_image_from_gmap
 from distance_transform.preprocessing import *
 from distance_transform.dt_applications import *
 from copy import deepcopy
@@ -24,6 +24,25 @@ import os
 # get logger
 logger = logging.getLogger("evaluate_performance_compute_diffusion_distance_logger")
 logging_configuration.set_logging("results")
+
+
+def evaluate_performance_image(image: np.array) -> typing.Dict:
+    random.seed(42)
+
+    # Find borders
+    image_with_borders = generalized_find_borders(image, labels["cell"], 50)
+
+    dt_image, time_to_compute_dt_s = compute_dt_for_diffusion_distance_image(image_with_borders, 50)
+
+    start = time.time()
+    diffusion_distance = compute_diffusion_distance_image(image_with_borders, dt_image, 50)
+    end = time.time()
+    time_to_compute_diffusion_s = end - start
+
+    results_dict = {"reduction_factor": None, "use_weights": None, "diffusion_distance": diffusion_distance,
+                    "time_reduce_gmap_s": 0, "time_compute_dt_s": time_to_compute_dt_s, "time_to_compute_diffusion_s": time_to_compute_diffusion_s}
+
+    return results_dict
 
 
 def evaluate_performance(image: np.array, out_images_path: typing.Optional[str], verbose: bool,
@@ -189,7 +208,7 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
                               "time_to_compute_diffusion_s": 0}
     
     # Initialize aggregate results array
-    n_results_for_image = 7
+    n_results_for_image = 8
     aggregate_results = []
     for i in range(n_results_for_image):
         aggregate_results.append(deepcopy(aggregate_results_dict))
@@ -207,45 +226,51 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
 
         logger.info(RESULT_HEADER_STRING)
 
+        # The first row contains the results computed directed on the image, without using the gmap
+        image_results = evaluate_performance_image(image=reduced_image)
+        log_results(image_results, image_results)
+        if image_results["diffusion_distance"] != -1:
+            update_aggregate_results(aggregate_results[0], image_results, image_results)
+
         _, base_results = evaluate_performance(image=reduced_image, out_images_path=None, verbose=True,
-                                              compute_voronoi_diagram=False, reduction_factor=0, use_weights=False)
+                                               compute_voronoi_diagram=False, reduction_factor=0, use_weights=False)
 
         if base_results["diffusion_distance"] != -1:
             image_count_with_stomata += 1
 
         log_results(base_results, base_results)
         if base_results["diffusion_distance"] != -1:
-            update_aggregate_results(aggregate_results[0], base_results, base_results)
+            update_aggregate_results(aggregate_results[1], base_results, base_results)
         _, results = evaluate_performance(image=reduced_image, out_images_path=None, verbose=True,
                                           compute_voronoi_diagram=False, reduction_factor=0.25, use_weights=False)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
-            update_aggregate_results(aggregate_results[1], base_results, results)
+            update_aggregate_results(aggregate_results[2], base_results, results)
         _, results = evaluate_performance(image=reduced_image, out_images_path=None, verbose=True,
                                           compute_voronoi_diagram=False, reduction_factor=0.25, use_weights=True)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
-            update_aggregate_results(aggregate_results[2], base_results, results)
+            update_aggregate_results(aggregate_results[3], base_results, results)
         _, results = evaluate_performance(image=reduced_image, out_images_path=None, verbose=True,
                                           compute_voronoi_diagram=False, reduction_factor=0.5, use_weights=False)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
-            update_aggregate_results(aggregate_results[3], base_results, results)
+            update_aggregate_results(aggregate_results[4], base_results, results)
         _, results = evaluate_performance(image=reduced_image, out_images_path=None, verbose=True,
                                           compute_voronoi_diagram=False, reduction_factor=0.5, use_weights=True)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
-            update_aggregate_results(aggregate_results[4], base_results, results)
+            update_aggregate_results(aggregate_results[5], base_results, results)
         _, results = evaluate_performance(image=reduced_image, out_images_path=None, verbose=True,
                                           compute_voronoi_diagram=False, reduction_factor=1, use_weights=False)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
-            update_aggregate_results(aggregate_results[5], base_results, results)
+            update_aggregate_results(aggregate_results[6], base_results, results)
         _, results = evaluate_performance(image=reduced_image, out_images_path=None, verbose=True,
                                           compute_voronoi_diagram=False, reduction_factor=1, use_weights=True)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
-            update_aggregate_results(aggregate_results[6], base_results, results)
+            update_aggregate_results(aggregate_results[7], base_results, results)
 
         logger.info("")
 
@@ -290,7 +315,7 @@ def main():
     evaluate_performance_one_image(image_path)
     """
 
-    evaluate_performance_all_dataset("../data/diffusion_distance_images/", image_reduction_factor=3)
+    evaluate_performance_all_dataset("../data/diffusion_distance_images/", image_reduction_factor=5)
 
 
 if __name__ == "__main__":
