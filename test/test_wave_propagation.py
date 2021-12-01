@@ -428,3 +428,45 @@ class TestWavePropagation(TestCase):
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
+    def test_improved_wave_propagation_gmap_vertex_reduced_image(self):
+        image_name = "img.png"
+        image = cv2.imread("../data/diffusion_distance_images/" + image_name, 0)
+        reduced_image = reduce_image_size(image, 11)
+        expected_gmap = LabelMap.from_labels(reduced_image)
+        actual_gmap = LabelMap.from_labels(reduced_image)
+
+        actual_gmap.uniform_labels_for_vertices()
+        expected_gmap.uniform_labels_for_vertices()
+
+        random.seed(42)
+        actual_gmap.remove_edges(1)
+        actual_gmap.remove_vertices()
+        random.seed(42)
+        expected_gmap.remove_edges(1)
+        expected_gmap.remove_vertices()
+
+        accumulation_directions = generate_accumulation_directions_vertex(2)
+        start = time.time()
+        generalized_wave_propagation_gmap(expected_gmap, [labels["stomata"]], [labels["air"]], accumulation_directions)
+        end = time.time()
+        print(f"time s normal: {end - start}")
+        start = time.time()
+        improved_wave_propagation_gmap_vertex(actual_gmap, [labels["stomata"]], [labels["air"]])
+        end = time.time()
+        print(f"time s improved: {end - start}")
+
+        plt.imshow(reduced_image, cmap="gray", vmin=0, vmax=255)
+        plt.show()
+        grey_image = build_dt_grey_image_from_gmap(expected_gmap)
+        plot_dt_image(grey_image)
+        grey_image = build_dt_grey_image_from_gmap(actual_gmap)
+        plot_dt_image(grey_image)
+
+        # It's strange
+        # It seems correct, the dt should exist for that value
+        # Very strange
+        # Probably the bug is in the other algorithm
+        # I have to reduce the size of the image in order to find the bug
+
+        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
+

@@ -315,7 +315,7 @@ def main():
     evaluate_performance_one_image(image_path)
     """
 
-    evaluate_performance_all_dataset("../data/diffusion_distance_images/", image_reduction_factor=5)
+    evaluate_performance_all_dataset("../data/diffusion_distance_images/", image_reduction_factor=11)
 
 
 if __name__ == "__main__":

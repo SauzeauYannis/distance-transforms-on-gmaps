@@ -96,6 +96,7 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     gmap = LabelMap.from_labels(image_with_borders, connected_components_labels=connected_components_labels)
     if verbose:
         print("Gmap successfully builded")
+    gmap.uniform_labels_for_vertices()  #
 
     # Reduce gmap
     start = time.time()
@@ -114,7 +115,8 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     if use_weights:
         generalized_dijkstra_dt_gmap(gmap, [labels["stomata"]], propagation_labels, accumulation_directions)
     else:
-        generalized_wave_propagation_gmap(gmap, [labels["stomata"]], propagation_labels, accumulation_directions)
+        # generalized_wave_propagation_gmap(gmap, [labels["stomata"]], propagation_labels, accumulation_directions)
+        improved_wave_propagation_gmap_vertex(gmap, [labels["stomata"]], propagation_labels)
     end = time.time()
     time_to_compute_dt_s = end - start
     if verbose:

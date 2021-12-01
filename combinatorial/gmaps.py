@@ -139,6 +139,8 @@ class nGmap(DualArray, Marks):
         self.distances = np.zeros(number_of_darts, dtype=np.int32)
         logger.debug(f"distances array successfully initialized with shape {self.distances.shape}"
                      f" and dtype {self.distances.dtype}")
+        # Initialization
+        self.distances.fill(-1)
 
         # allocate weights array
         # It maints the wegiht associated to each dart.

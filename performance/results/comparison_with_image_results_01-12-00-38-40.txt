@@ -1,0 +1,63 @@
+***** DIFFUSION DISTANCE COMPUTATION EXPERIMENTATION *****
+
+Image reduction factor: 11
+
+***** LEGEND *****
+RF: Reduction factor
+UW: Use weights
+DD: Diffusion distance
+DD_E: Diffusion distance error (current - base)
+DD_RE: Diffusion distance relative error (current - base) / base
+TRG_S: Time reduce gmap s
+TCDT_S: Time compute dt s
+TCDT_S_D: Time compute dt s difference (current - base)
+TCDT_S_IF: Time compute dt s improvement factor (base / current)
+TCDD_S: Time compute distance s
+
+***** RESULTS FOR EACH IMAGE *****
+
+***** IMAGE 1 *****
+
+Image name: DEHYDRATION_small_leaf_4_time_1_ax1cros_0450_Label_1152x1350_uint8.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+None       None       47.60      +0.00      +0.00      0.00       0.02       +0.00      1.00       0.01      
+0          False      46.25      +0.00      +0.00      0.00       0.49       +0.00      1.00       0.25      
+0.25       False      40.98      -5.27      -0.11      2.72       0.38       -0.11      1.27       0.20      
+0.25       True       47.67      +1.42      +0.03      2.66       0.35       -0.14      1.41       0.20      
+0.5        False      38.31      -7.94      -0.17      3.95       0.26       -0.23      1.88       0.12      
+0.5        True       52.83      +6.58      +0.14      3.83       0.22       -0.27      2.23       0.14      
+1          False      24.36      -21.89     -0.47      4.42       0.18       -0.31      2.76       0.10      
+1          True       115.23     +68.97     +1.49      4.39       0.13       -0.36      3.73       0.06      
+
+***** IMAGE 2 *****
+
+Image name: img.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+None       None       57.36      +0.00      +0.00      0.00       0.06       +0.00      1.00       0.01      
+0          False      56.00      +0.00      +0.00      0.00       0.91       +0.00      1.00       0.27      
+0.25       False      46.96      -9.04      -0.16      2.65       0.64       -0.28      1.44       0.21      
+0.25       True       55.76      -0.24      -0.00      2.70       0.48       -0.44      1.92       0.19      
+0.5        False      50.01      -5.99      -0.11      4.02       0.47       -0.45      1.96       0.13      
+0.5        True       67.94      +11.94     +0.21      4.05       0.33       -0.58      2.73       0.13      
+1          False      23.60      -32.40     -0.58      4.09       0.14       -0.77      6.49       0.06      
+1          True       108.23     +52.23     +0.93      4.67       0.16       -0.75      5.65       0.08      
+
+
+***** AGGREGATE REPORT *****
+
+N. images            N. images stomata    Tot. exec time s     Avg exec time image s
+2                    2                    83.17                41.58               
+
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+None       None       52.48      +0.00      +0.00      0.00       0.04       +0.00      1.00       0.01      
+0          False      51.13      +0.00      +0.00      0.00       0.70       +0.00      1.00       0.26      
+0.25       False      43.97      -7.15      -0.14      2.69       0.51       -0.19      1.36       0.21      
+0.25       True       51.71      +0.59      +0.01      2.68       0.41       -0.29      1.67       0.20      
+0.5        False      44.16      -6.97      -0.14      3.98       0.36       -0.34      1.92       0.13      
+0.5        True       60.38      +9.26      +0.18      3.94       0.28       -0.42      2.48       0.14      
+1          False      23.98      -27.14     -0.53      4.25       0.16       -0.54      4.62       0.08      
+1          True       111.73     +60.60     +1.21      4.53       0.15       -0.55      4.69       0.07      

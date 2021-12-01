@@ -1,6 +1,7 @@
 import typing
 from queue import Queue
 import numpy as np
+import time
 
 
 def generalized_wave_propagation_image(image: np.array, seed_labels: typing.List[int],
@@ -114,52 +115,77 @@ def improved_wave_propagation_gmap_vertex(gmap, seed_labels: typing.List[int], p
     I add to the queue only one dart per vertex
     """
 
-    def set_distance_if_in_propagation_and_seed_label(gmap, dart, distance):
-        gmap.distances[dart] = distance
-        """
-        if gmap.image_labels[dart] in propagation_labels:
-            gmap.distances[dart] = distance
-        """
+    total_start = time.time()
+    # print(f"n_darts: {gmap.n_darts}")
 
-
-    def get_neighbours_vertices(gmap, dart):
+    def _get_neighbours_vertices(gmap, dart):
         yield gmap.a0(dart)
         yield gmap.a0(gmap.a1(dart))
         yield gmap.a0(gmap.a1(gmap.a2(dart)))
         yield gmap.a0(gmap.a1(gmap.a2(gmap.a1(dart))))
 
-    def set_distance_vertex(gmap, dart, distance):
+    def _set_distance_vertex(gmap, dart, distance):
         gmap.distances[dart] = distance
-        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a1(dart), distance)
-        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a2(dart), distance)
-        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a2(gmap.a1(dart)), distance)
-        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a1(gmap.a2(dart)), distance)
-        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a2(gmap.a1(gmap.a2(dart))), distance)
-        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a1(gmap.a2(gmap.a1(dart))), distance)
-        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a2(gmap.a1(gmap.a2(gmap.a1(dart)))), distance)
+        gmap.distances[gmap.a1(dart)] = distance
+        gmap.distances[gmap.a2(dart)] = distance
+        gmap.distances[gmap.a2(gmap.a1(dart))] = distance
+        gmap.distances[gmap.a1(gmap.a2(dart))] = distance
+        gmap.distances[gmap.a2(gmap.a1(gmap.a2(dart)))] = distance
+        gmap.distances[gmap.a1(gmap.a2(gmap.a1(dart)))] = distance
+        gmap.distances[gmap.a2(gmap.a1(gmap.a2(gmap.a1(dart))))] = distance
+
+    def _init_seed_darts(gmap, wave_propagation_queue):
+        """
+        Return a dart for each vertex
+        """
+        queue = Queue()
+
+        dart = next(gmap.darts)
+        _set_distance_vertex(gmap, dart, -1)  # I am using -1 to indicate that has been visited
+        queue.put(dart)
+
+        while not queue.empty():
+            dart = queue.get()
+
+            if gmap.image_labels[dart] in seed_labels and gmap.distances[neighbour] != 0:
+                wave_propagation_queue.put(dart)
+                _set_distance_vertex(gmap, dart, 0)
+
+            # Visit all the neighbouring vertices
+            for neighbour in _get_neighbours_vertices(gmap, dart):
+                if gmap.distances[neighbour] == -2:
+                    queue.put(neighbour)
+                    _set_distance_vertex(gmap, neighbour, -1)
 
     # Initialization
-    for dart in gmap.darts:
-        gmap.distances[dart] = -1
+    start = time.time()
+    gmap.distances.fill(-2)
+    end = time.time()
+    print(f"time required init to -1: {end - start}")
 
+    start = time.time()
     queue = Queue()
-    for dart in gmap.darts:
-        if gmap.image_labels[dart] in seed_labels:
-            queue.put(dart)
-            set_distance_vertex(gmap, dart, 0)
+    _init_seed_darts(gmap, queue)
+    end = time.time()
+    print(f"time required init seed darts: {end - start}")
 
+    start = time.time()
     while not queue.empty():
         dart = queue.get()
         # Visit all the neighbouring vertices
-        for neighbour in get_neighbours_vertices(gmap, dart):
+        for neighbour in _get_neighbours_vertices(gmap, dart):
             # Check if I can propagate to that dart
             if gmap.image_labels[neighbour] not in propagation_labels:
                 continue
 
             if gmap.distances[neighbour] == -1:
                 # put to the same distance to all the darts of the vertex
-                set_distance_vertex(gmap, neighbour, gmap.distances[dart] + 1)
+                _set_distance_vertex(gmap, neighbour, gmap.distances[dart] + 1)
                 queue.put(neighbour)
+    end = time.time()
+    print(f"Time required queue: {end - start}")
+    total_end = time.time()
+    print(f"Total time: {total_end - total_start}")
 
 
 def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int],
@@ -179,6 +205,7 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
         for i in range(gmap.n + 1):
             accumulation_directions.append(True)
 
+    start = time.time()
     # Initialize distance to 0 for seeds and add the seeds to the queue
     curr_queue = Queue()
     next_queue = Queue()
@@ -187,7 +214,10 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
             curr_queue.put(dart)
             gmap.distances[dart] = 0
             gmap.dt_connected_components_labels[dart] = gmap.connected_components_labels[dart]
+    end = time.time()
+    print(f"naive algorithm init time: {end - start}")
 
+    start = time.time()
     while not curr_queue.empty():
         while not curr_queue.empty():
             dart = curr_queue.get()
@@ -217,6 +247,8 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
                         gmap.dt_connected_components_labels[neighbour] = gmap.dt_connected_components_labels[dart]
         curr_queue = next_queue
         next_queue = Queue()
+    end = time.time()
+    print(f"naive algorithm loop time: {end - start}")
 
 
 def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.List[int]], accumulation_directions: typing.List[bool] = None) -> None:
