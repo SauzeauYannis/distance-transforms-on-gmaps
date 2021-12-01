@@ -108,9 +108,58 @@ def get_next_neighbour_image(index: int, x: int, y: int, max_x: int, max_y: int)
 
 
 def improved_wave_propagation_gmap_vertex(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int]) -> None:
+    """
+    It computes only dt, without saving information for the generation of voronoi diagram
+
+    I add to the queue only one dart per vertex
+    """
+
+    def set_distance_if_in_propagation_and_seed_label(gmap, dart, distance):
+        gmap.distances[dart] = distance
+        """
+        if gmap.image_labels[dart] in propagation_labels:
+            gmap.distances[dart] = distance
+        """
+
+
+    def get_neighbours_vertices(gmap, dart):
+        yield gmap.a0(dart)
+        yield gmap.a0(gmap.a1(dart))
+        yield gmap.a0(gmap.a1(gmap.a2(dart)))
+        yield gmap.a0(gmap.a1(gmap.a2(gmap.a1(dart))))
+
+    def set_distance_vertex(gmap, dart, distance):
+        gmap.distances[dart] = distance
+        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a1(dart), distance)
+        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a2(dart), distance)
+        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a2(gmap.a1(dart)), distance)
+        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a1(gmap.a2(dart)), distance)
+        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a2(gmap.a1(gmap.a2(dart))), distance)
+        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a1(gmap.a2(gmap.a1(dart))), distance)
+        set_distance_if_in_propagation_and_seed_label(gmap, gmap.a2(gmap.a1(gmap.a2(gmap.a1(dart)))), distance)
+
     # Initialization
     for dart in gmap.darts:
         gmap.distances[dart] = -1
+
+    queue = Queue()
+    for dart in gmap.darts:
+        if gmap.image_labels[dart] in seed_labels:
+            queue.put(dart)
+            set_distance_vertex(gmap, dart, 0)
+
+    while not queue.empty():
+        dart = queue.get()
+        # Visit all the neighbouring vertices
+        for neighbour in get_neighbours_vertices(gmap, dart):
+            # Check if I can propagate to that dart
+            if gmap.image_labels[neighbour] not in propagation_labels:
+                continue
+
+            if gmap.distances[neighbour] == -1:
+                # put to the same distance to all the darts of the vertex
+                set_distance_vertex(gmap, neighbour, gmap.distances[dart] + 1)
+                queue.put(neighbour)
 
 
 def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int],

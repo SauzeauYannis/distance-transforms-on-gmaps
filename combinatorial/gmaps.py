@@ -177,6 +177,36 @@ class nGmap(DualArray, Marks):
         logger.debug(f"face_identifiers array successfully initialized with shape {self.face_identifiers.shape}"
                      f" and dtype {self.face_identifiers.dtype}")
 
+    def uniform_labels_for_vertices(self):
+        """
+        Assign a common label for each vertex. The most common label is chosen for each vertex
+        """
+
+        def _get_most_common_value(representative_dart, values):
+            most_common_values = {}
+            for dart in self.cell_i(0, representative_dart):
+                value = values[dart]
+                if value in most_common_values:
+                    most_common_values[value] += 1
+                else:
+                    most_common_values[value] = 1
+
+            max_count = 0
+            max_value = None
+            for value, count in most_common_values.items():
+                if count > max_count:
+                    max_count = count
+                    max_value = value
+
+            return max_value
+
+        for representative_dart in self.darts_of_i_cells(0):
+            image_label = _get_most_common_value(representative_dart, self.image_labels)
+            connected_components_label = _get_most_common_value(representative_dart, self.connected_components_labels)
+            for dart in self.cell_i(0, representative_dart):
+                self.image_labels[dart] = image_label
+                self.connected_components_labels[dart] = connected_components_label
+
     @classmethod
     def n_by_d (cls, n, n_darts):
         """Initializes n-dimensional Gmap with n_darts isolated darts."""

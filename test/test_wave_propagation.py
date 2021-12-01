@@ -1,3 +1,4 @@
+import random
 from unittest import TestCase
 
 import numpy as np
@@ -9,7 +10,9 @@ from distance_transform.dt_utils import *
 from combinatorial.pixelmap import LabelMap
 from distance_transform.preprocessing import *
 from combinatorial.utils import *
+from data.labels import labels
 import cv2
+import time
 
 
 class TestWavePropagation(TestCase):
@@ -370,4 +373,58 @@ class TestWavePropagation(TestCase):
         expected[4, 4] = 2
 
         self.assertEqual(actual.tolist(), expected.tolist())
+
+    def test_improved_wave_propagation_gmap_vertex_small_image(self):
+        image_name = "bug_image_improved.png"
+        image = cv2.imread("../data/" + image_name, 0)
+        expected_gmap = LabelMap.from_labels(image)
+        actual_gmap = LabelMap.from_labels(image)
+
+        actual_gmap.uniform_labels_for_vertices()
+        expected_gmap.uniform_labels_for_vertices()
+
+        accumulation_directions = generate_accumulation_directions_vertex(2)
+        generalized_wave_propagation_gmap(expected_gmap, [0], [255], accumulation_directions)
+        improved_wave_propagation_gmap_vertex(actual_gmap, [0], [255])
+
+        actual_gmap.plot()
+        expected_gmap.plot_dt()
+        actual_gmap.plot_dt()
+
+        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
+
+    def test_improved_wave_propagation_gmap_vertex_big_image(self):
+        image_name = "img.png"
+        image = cv2.imread("../data/diffusion_distance_images/" + image_name, 0)
+        reduced_image = reduce_image_size(image, 11)
+        expected_gmap = LabelMap.from_labels(reduced_image)
+        actual_gmap = LabelMap.from_labels(reduced_image)
+
+        actual_gmap.uniform_labels_for_vertices()
+        expected_gmap.uniform_labels_for_vertices()
+
+        accumulation_directions = generate_accumulation_directions_vertex(2)
+        start = time.time()
+        generalized_wave_propagation_gmap(expected_gmap, [labels["stomata"]], [labels["air"]], accumulation_directions)
+        end = time.time()
+        print(f"time s normal: {end - start}")
+        start = time.time()
+        improved_wave_propagation_gmap_vertex(actual_gmap, [labels["stomata"]], [labels["air"]])
+        end = time.time()
+        print(f"time s improved: {end - start}")
+
+        plt.imshow(reduced_image, cmap="gray", vmin=0, vmax=255)
+        plt.show()
+        grey_image = build_dt_grey_image_from_gmap(expected_gmap)
+        plot_dt_image(grey_image)
+        grey_image = build_dt_grey_image_from_gmap(actual_gmap)
+        plot_dt_image(grey_image)
+
+        # It's strange
+        # It seems correct, the dt should exist for that value
+        # Very strange
+        # Probably the bug is in the other algorithm
+        # I have to reduce the size of the image in order to find the bug
+
+        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
