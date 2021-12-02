@@ -144,6 +144,37 @@ def build_dt_grey_image_from_gmap(gmap, interpolate_missing_values: bool = True)
     return build_dt_grey_image(dt_image)
 
 
+def contour_plot_from_dt_image(dt_image: np.array, number_of_levels, max_value) -> None:
+    """
+    Plot the contour plot using matplotlib
+    """
+
+    x = list(range(dt_image.shape[1]))
+    y = list(range(dt_image.shape[0]))
+
+    X, Y = np.meshgrid(x, y)
+
+    Z = dt_image
+    Z = np.flipud(Z)
+
+    # preprocessing
+    # set to 1.000.000 the value of Z for -1 values (i.e. no value for distance)
+    for i in range(Z.shape[0]):
+        for j in range(Z.shape[1]):
+            if Z[i][j] == -1:
+                Z[i][j] = max_value
+
+    levels = list(range(-1, int(max_value), int(max_value / number_of_levels)))
+
+    fig, ax = plt.subplots(1, 1)
+    cp = ax.contourf(X, Y, Z, levels)
+    fig.colorbar(cp)  # Add a colorbar to a plot
+    ax.set_title('Filled Contours Plot')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    plt.show()
+
+
 def are_weights_consistent(gmap) -> bool:
     """
     It returns True if all the darts of the same edge have the same weights

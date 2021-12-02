@@ -9,6 +9,7 @@ from distance_transform.preprocessing import *
 from combinatorial.utils import build_dt_grey_image_from_gmap
 from test.test_utils import *
 from combinatorial.utils import *
+from distance_transform.dt_applications import *
 import cv2
 import random
 
@@ -24,6 +25,7 @@ class TestGmap(TestCase):
         random.seed(42)
         image = cv2.imread('../data/dt_test_image.png', 0)
         actual_gmap = LabelMap.from_labels(image)
+        actual_gmap.plot(attribute_to_show="weight")
 
         actual_gmap.remove_edges(0.5)
         actual_gmap.plot()
@@ -41,4 +43,16 @@ class TestGmap(TestCase):
         generalized_wave_propagation_gmap(actual_gmap, [0], [255], generate_accumulation_directions_vertex(2))
         actual_gmap.plot_dt()
 
+        actual_gmap.plot(attribute_to_show="weight")
+
+        self.assertTrue(True)
+
+    def test_contour_plot_from_dt_image(self):
+        image_name = "DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png"
+        image = cv2.imread("../data/time_1/cross/" + image_name, 0)
+        reduced_image = reduce_image_size(image, 5)
+        gmap, _, _ = compute_dt_for_diffusion_distance(reduced_image, "results/dt_diffusion_reduced_image_" + image_name,
+                                                       True, compute_voronoi_diagram=True)
+        dt_image = gmap.build_dt_image()
+        contour_plot_from_dt_image(dt_image, 20, 300)
         self.assertTrue(True)
