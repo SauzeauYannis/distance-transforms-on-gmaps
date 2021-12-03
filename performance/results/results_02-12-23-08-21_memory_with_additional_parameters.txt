@@ -1,0 +1,9 @@
+Reading image from ../data/100_100_portion_leaf.png
+Image shape: (100, 100)
+gmap with 80000 darts successfully builded in 0.8039989471435547 seconds
+wave propagation successfully executed in 0.23000311851501465 seconds
+edges successfully removed in 2.207972288131714 seconds. Reduction factor: 1
+vertices successfully removed in 0.06399750709533691 seconds.
+image successfully created in 0.37433433532714844 seconds.
+Memory: current: 3.362098 MB peak: 3.365198 MB
+Memory required for each dart is: 42.026225 B

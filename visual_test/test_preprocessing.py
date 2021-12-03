@@ -21,9 +21,6 @@ class TestPreprocessing(TestCase):
 
     def test_connected_component_labeling_one_pass(self):
         """
-        It seems that the algorithm is super slow for some reason.
-        Moreover it occupies a lot of memory.
-        It reached 1 GB.
         """
 
         image_name = "cleaned_borders_cross_section_leaf.png"

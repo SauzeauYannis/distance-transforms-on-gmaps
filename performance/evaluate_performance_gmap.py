@@ -112,8 +112,8 @@ def main():
     # 5.6 GB estimate for 1000x1000 image
 
     evaluate_performance('../data/100_100_portion_leaf.png', reduction_fraction=1)
-    evaluate_performance('../data/200_200_portion_leaf.png', reduction_fraction=1)
-    evaluate_performance('../data/300_300_portion_leaf.png', reduction_fraction=1)
+    # evaluate_performance('../data/200_200_portion_leaf.png', reduction_fraction=1)
+    # evaluate_performance('../data/300_300_portion_leaf.png', reduction_fraction=1)
     # evaluate_performance('../data/1000_1000_portion_leaf.png', reduction_fraction=1)
 
 

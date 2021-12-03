@@ -51,8 +51,22 @@ class TestGmap(TestCase):
         image_name = "DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png"
         image = cv2.imread("../data/time_1/cross/" + image_name, 0)
         reduced_image = reduce_image_size(image, 5)
-        gmap, _, _ = compute_dt_for_diffusion_distance(reduced_image, "results/dt_diffusion_reduced_image_" + image_name,
-                                                       True, compute_voronoi_diagram=True)
+        gmap, _, _ = compute_dt_for_diffusion_distance(reduced_image, None,
+                                                       True, compute_voronoi_diagram=True, use_weights=True)
         dt_image = gmap.build_dt_image()
+        dt_grey_image = build_dt_grey_image_from_gmap(gmap)
+        plot_dt_image(dt_grey_image)
         contour_plot_from_dt_image(dt_image, 20, 300)
+        self.assertTrue(True)
+
+    def test_remove_only_vertices(self):
+        image = cv2.imread("../data/2_2_labeled_image.png", 0)
+        gmap = LabelMap.from_labels(image)
+        gmap.plot()
+        gmap.remove_edge(5)
+        gmap.remove_edge(13)
+        gmap.remove_vertex(3)
+        gmap.plot()
+        # print(list(gmap.all_i_cells(0)))
+
         self.assertTrue(True)

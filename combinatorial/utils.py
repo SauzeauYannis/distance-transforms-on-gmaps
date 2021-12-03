@@ -169,7 +169,6 @@ def contour_plot_from_dt_image(dt_image: np.array, number_of_levels, max_value) 
     fig, ax = plt.subplots(1, 1)
     cp = ax.contourf(X, Y, Z, levels)
     fig.colorbar(cp)  # Add a colorbar to a plot
-    ax.set_title('Filled Contours Plot')
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     plt.show()

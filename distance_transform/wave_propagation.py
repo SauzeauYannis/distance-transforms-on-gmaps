@@ -112,7 +112,10 @@ def improved_wave_propagation_gmap_vertex(gmap, seed_labels: typing.List[int], p
     """
     It computes only dt, without saving information for the generation of voronoi diagram
 
-    I add to the queue only one dart per vertex
+    I add to the queue only one dart per vertex.
+
+    It does not work with voronoi diagram righ now.
+    gmap.dt_connected_components_labels[dart] = gmap.connected_components_labels[dart]
     """
 
     total_start = time.time()
@@ -196,8 +199,7 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
     """
 
     # Initialization
-    for dart in gmap.darts:
-        gmap.distances[dart] = -1
+    gmap.distances.fill(-1)
 
     # Initialize accumulation directions if None
     if accumulation_directions is None:

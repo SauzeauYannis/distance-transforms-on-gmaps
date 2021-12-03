@@ -90,13 +90,14 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     connected_components_labels = None
     if compute_voronoi_diagram:
         # Find connected components labels
-        connected_components_labels = connected_component_labeling_one_pass(image_with_borders)
+        connected_components_labels = connected_component_labeling_one_pass(image)
 
     # Build gmap
     gmap = LabelMap.from_labels(image_with_borders, connected_components_labels=connected_components_labels)
     if verbose:
         print("Gmap successfully builded")
-    gmap.uniform_labels_for_vertices()  #
+    # gmap.uniform_labels_for_vertices()  # used if the improvement algorithm is used. Does not work good
+                                          # I can't do that.
 
     # Reduce gmap
     start = time.time()
@@ -115,8 +116,8 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     if use_weights:
         generalized_dijkstra_dt_gmap(gmap, [labels["stomata"]], propagation_labels, accumulation_directions)
     else:
-        # generalized_wave_propagation_gmap(gmap, [labels["stomata"]], propagation_labels, accumulation_directions)
-        improved_wave_propagation_gmap_vertex(gmap, [labels["stomata"]], propagation_labels)
+        generalized_wave_propagation_gmap(gmap, [labels["stomata"]], propagation_labels, accumulation_directions)
+        # improved_wave_propagation_gmap_vertex(gmap, [labels["stomata"]], propagation_labels)
     end = time.time()
     time_to_compute_dt_s = end - start
     if verbose:

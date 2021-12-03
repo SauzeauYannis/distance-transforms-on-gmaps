@@ -8,6 +8,7 @@ from combinatorial.pixelmap import LabelMap
 from distance_transform.preprocessing import *
 import cv2
 from combinatorial.utils import build_dt_grey_image_from_gmap
+from distance_transform.dijkstra import *
 
 
 class TestWavePropagation(TestCase):
@@ -87,3 +88,48 @@ class TestWavePropagation(TestCase):
 
         self.assertTrue(True)
 
+    def test_wave_propagation_labeled_faces(self):
+        image = cv2.imread("../data/bug_image_improved.png", 0)
+        gmap = LabelMap.from_labels(image)
+
+        accumulation_directions = generate_accumulation_directions_cell(2)
+        generalized_wave_propagation_gmap(gmap, [0], [255], accumulation_directions)
+
+        gmap.plot(attribute_to_show=None)
+        gmap.plot_dt(fill_cell="face")
+
+        self.assertTrue(True)
+
+    def test_dijkstra_labeled_vertices(self):
+        image = cv2.imread("../data/bug_image_improved.png", 0)
+        gmap = LabelMap.from_labels(image)
+
+        gmap.plot(attribute_to_show="weight")
+
+        gmap.remove_edge(53)
+        gmap.remove_edge(90)
+        gmap.remove_edge(18)
+        gmap.remove_edge(29)
+        gmap.remove_edge(125)
+        gmap.remove_edge(122)
+        gmap.remove_edge(80)
+        gmap.remove_edge(40)
+        gmap.remove_edge(176)
+        gmap.remove_edge(191)
+        gmap.remove_edge(109)
+        gmap.remove_edge(118)
+        gmap.remove_edge(157)
+        gmap.remove_edge(37)
+
+        gmap.remove_edges()
+
+        gmap.remove_vertices()
+
+
+        generalized_dijkstra_dt_gmap(gmap, [0], [255], generate_accumulation_directions_vertex(2))
+
+        gmap.plot(attribute_to_show=None)
+        gmap.plot(attribute_to_show="weight")
+        gmap.plot_dt()
+
+        self.assertTrue(True)

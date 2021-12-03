@@ -287,12 +287,13 @@ class LabelMap (PixelMap):
             plt.plot([self._dart_polyline[d][-1,0],self._dart_polyline[e][-1,0]],[self._dart_polyline[d][-1,1],self._dart_polyline[e][-1,1]], 'k-')
             # f = self.a1(d)
             # plt.plot ([self._dart_polyline[d][ 0,0],self._dart_polyline[f][ 0,0]],[self._dart_polyline[d][ 0,1],self._dart_polyline[f][ 0,1]], 'b-')
-            if attribute_to_show == "dart_id":
-                self._plot_dart_no(d)
-            elif attribute_to_show == "weight":
-                self._plot_dart_attribute(d, self.weights[d])
-            else:
-                raise Exception("Unsupported attribute type")
+            if attribute_to_show is not None:
+                if attribute_to_show == "dart_id":
+                    self._plot_dart_no(d)
+                elif attribute_to_show == "weight":
+                    self._plot_dart_attribute(d, self.weights[d])
+                else:
+                    raise Exception("Unsupported attribute type")
             plt.scatter(self._dart_polyline[d][ 0,0], self._dart_polyline[d][ 0,1], c='k')
 #             plt.scatter(self._dart_polyline[d][-1,0], self._dart_polyline[d][-1,1], marker='+')
 

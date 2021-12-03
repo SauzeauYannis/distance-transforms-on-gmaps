@@ -1,3 +1,5 @@
+First performance test memory
+
 INFO     Reading image from ../data/100_100_portion_leaf.png
 INFO     Image shape: (100, 100)
 INFO     gmap suffessfully builded in 4.751996278762817 seconds

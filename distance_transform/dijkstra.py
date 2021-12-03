@@ -19,8 +19,7 @@ def generalized_dijkstra_dt_gmap(gmap, seed_labels: typing.List[int], propagatio
     """
 
     # Initialization
-    for dart in gmap.darts:
-        gmap.distances[dart] = -1
+    gmap.distances.fill(-1)
 
     # Initialize accumulation directions if None
     if accumulation_directions is None:
