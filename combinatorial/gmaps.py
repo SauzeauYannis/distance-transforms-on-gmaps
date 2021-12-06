@@ -126,7 +126,7 @@ class nGmap(DualArray, Marks):
     def __init__(self, array):
         super().__init__(8, self.shape[1])  # Create 8 marks for each (possible) dart
 
-        self._init_structures(number_of_darts=self.n_darts)
+        self._init_structures(number_of_darts=self.n_darts_init)
 
     def _init_structures(self, number_of_darts: int):
         logger.debug(f"The number of darts is: {number_of_darts}")
@@ -134,6 +134,12 @@ class nGmap(DualArray, Marks):
         # I use a signed dtype for using negative values as markers (example, None type)
         if number_of_darts > (np.iinfo(np.int32).max + 1):
             raise Exception(f"{dtype} is not sufficient to represent {number_of_darts} darts")
+
+        # Allocate darts array
+        # It is necessary to store only the alive darts and obtain better time performances
+        self.alive_darts = {}
+        for i in range(number_of_darts):
+            self.alive_darts[i] = i
 
         # allocate distances array
         self.distances = np.zeros(number_of_darts, dtype=np.int32)
@@ -251,17 +257,30 @@ class nGmap(DualArray, Marks):
     def n_darts(self):
         """Returns the number of darts"""
         ### return (self[0] >= 0).sum()  # this would first create another big array of booleans
-        return sum (1 for d in self.darts)
+        return sum(1 for d in self.darts)
 
     def set_dart_distance(self, identifier: np.uint32, distance: np.uint32) -> None:
         self.distances[identifier] = distance
 
     @property
+    def n_darts_init(self):
+        sum = 0
+        for index in range(self.shape[1]):
+            if self.a0(index) >= 0:
+                sum += 1
+        return sum
+
+    @property
     def darts(self):
         """Generator to iterate thru all valid (non-negative alphas) darts"""
+        alive_darts = self.alive_darts.keys()
+        for dart in alive_darts:
+            yield  dart
+        """
         for index in range (self.shape[1]):
             if self.a0(index) >= 0:
                 yield index
+        """
 
     def all_dimensions_but_i (self, i=None):
         """Return a sorted sequence [0,...,n], without i, if 0 <= i <= n"""
@@ -480,6 +499,7 @@ class nGmap(DualArray, Marks):
 
     def _remove_dart (self,d):
         # self [:,d] = -1    # this would be a direct access
+        self.alive_darts.pop(d)
         for i in self.all_dimensions:
             self.set_ai(i,d,-1)
 
