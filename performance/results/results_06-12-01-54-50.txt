@@ -1,0 +1,55 @@
+***** DIFFUSION DISTANCE COMPUTATION EXPERIMENTATION *****
+
+Image reduction factor: 11
+
+***** LEGEND *****
+RF: Reduction factor
+UW: Use weights
+DD: Diffusion distance
+DD_E: Diffusion distance error (current - base)
+DD_RE: Diffusion distance relative error (current - base) / base
+TRG_S: Time reduce gmap s
+TCDT_S: Time compute dt s
+TCDT_S_D: Time compute dt s difference (current - base)
+TCDT_S_IF: Time compute dt s improvement factor (base / current)
+TCDD_S: Time compute distance s
+
+***** RESULTS FOR EACH IMAGE *****
+
+***** IMAGE 1 *****
+
+Image name: DEHYDRATION_small_leaf_4_time_1_ax1cros_0350_Label_1152x1350_uint8.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+None       None       504.51     +0.00      +0.00      0.00       0.05       +0.00      1.00       0.01      
+0          False      471.70     +0.00      +0.00      0.00       1.18       +0.00      1.00       0.34      
+0.25       False      424.91     -46.79     -0.10      3.33       0.61       -0.57      1.94       0.21      
+0.25       True       495.86     +24.17     +0.05      2.62       0.37       -0.81      3.18       0.20      
+0.5        False      411.12     -60.58     -0.13      3.91       0.29       -0.89      4.04       0.11      
+0.5        True       602.20     +130.50    +0.28      3.92       0.22       -0.97      5.43       0.13      
+1          False      60.50      -411.20    -0.87      3.84       0.05       -1.13      23.20      0.05      
+1          True       1785.75    +1314.05   +2.79      4.47       0.05       -1.13      22.75      0.05      
+
+***** IMAGE 2 *****
+
+Image name: DEHYDRATION_small_leaf_4_time_1_ax1cros_0400_Label_1152x1350_uint8.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+None       None       530.73     +0.00      +0.00      0.00       0.02       +0.00      1.00       0.01      
+0          False      515.27     +0.00      +0.00      0.00       0.44       +0.00      1.00       0.25      
+0.25       False      435.18     -80.09     -0.16      2.62       0.30       -0.15      1.49       0.18      
+0.25       True       527.37     +12.10     +0.02      2.61       0.25       -0.19      1.76       0.18      
+0.5        False      438.72     -76.55     -0.15      4.01       0.18       -0.27      2.52       0.12      
+0.5        True       605.39     +90.12     +0.17      4.02       0.15       -0.29      2.93       0.12      
+1          False      46.00      -469.27    -0.91      4.06       0.05       -0.39      8.52       0.05      
+1          True       907.50     +392.23    +0.76      4.10       0.05       -0.40      9.23       0.05      
+
+***** IMAGE 3 *****
+
+Image name: DEHYDRATION_small_leaf_4_time_1_ax1cros_0450_Label_1152x1350_uint8.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+None       None       531.12     +0.00      +0.00      0.00       0.02       +0.00      1.00       0.01      

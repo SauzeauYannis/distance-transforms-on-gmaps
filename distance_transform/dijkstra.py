@@ -3,7 +3,7 @@ from heapq import heapify, heappush, heappop
 
 
 def generalized_dijkstra_dt_gmap(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int],
-                                 accumulation_directions: typing.List[bool] = None) -> None:
+                                 target_labels: typing.List[int], accumulation_directions: typing.List[bool] = None) -> None:
     """
     It also saves for each dart the connected_component_label of the closest seed.
     It is useful for the generation of voronoi diagrams.
@@ -17,6 +17,9 @@ def generalized_dijkstra_dt_gmap(gmap, seed_labels: typing.List[int], propagatio
     So I add values to the heap even if it is already present.
     In order to not consider the same dart multiple times, I need a visited structure.
     """
+
+    #
+    admissible_labels = propagation_labels + target_labels
 
     # Initialization
     gmap.distances.fill(-1)
@@ -51,7 +54,7 @@ def generalized_dijkstra_dt_gmap(gmap, seed_labels: typing.List[int], propagatio
                 continue
 
             # Check if I can propagate to that dart
-            if gmap.image_labels[neighbour] not in propagation_labels:
+            if gmap.image_labels[neighbour] not in admissible_labels:
                 continue
 
             if accumulation_directions[i]:
@@ -59,11 +62,13 @@ def generalized_dijkstra_dt_gmap(gmap, seed_labels: typing.List[int], propagatio
                         or gmap.distances[dart] + gmap.weights[dart] < gmap.distances[neighbour]:
                     gmap.distances[neighbour] = gmap.distances[dart] + gmap.weights[dart]
                     gmap.dt_connected_components_labels[neighbour] = gmap.dt_connected_components_labels[dart]
-                    heappush(heap, (gmap.distances[neighbour], neighbour))
+                    if gmap.image_labels[neighbour] in propagation_labels:
+                        heappush(heap, (gmap.distances[neighbour], neighbour))
             else:
                 if gmap.distances[neighbour] == -1 \
                         or gmap.distances[dart] < gmap.distances[neighbour]:
                     gmap.distances[neighbour] = gmap.distances[dart]
                     gmap.dt_connected_components_labels[neighbour] = gmap.dt_connected_components_labels[dart]
-                    heappush(heap, (gmap.distances[neighbour], neighbour))
+                    if gmap.image_labels[neighbour] in propagation_labels:
+                        heappush(heap, (gmap.distances[neighbour], neighbour))
 

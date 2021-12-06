@@ -5,12 +5,15 @@ import time
 
 
 def generalized_wave_propagation_image(image: np.array, seed_labels: typing.List[int],
-                                       propagation_labels: typing.List[int]) -> np.array:
+                                       propagation_labels: typing.List[int], target_labels: typing.List[int]) -> np.array:
     # int64 should be sufficient
     output_image = np.zeros(image.shape, np.int64)
     output_image.fill(-1)  # initialize output_image
 
     queue = Queue()
+
+    #
+    admissible_labels = propagation_labels + target_labels
 
     # Find seeds and add to queue
     for i in range(image.shape[0]):
@@ -24,10 +27,11 @@ def generalized_wave_propagation_image(image: np.array, seed_labels: typing.List
         # Visit all the neighbours
         for i in range(4):
             neighbour = get_next_neighbour_image(i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
-            if neighbour is not None and image[neighbour[0]][neighbour[1]] in propagation_labels and\
+            if neighbour is not None and image[neighbour[0]][neighbour[1]] in admissible_labels and\
                     output_image[neighbour[0], neighbour[1]] == -1:
                 output_image[neighbour[0], neighbour[1]] = output_image[pixel[0], pixel[1]] + 1
-                queue.put(neighbour)
+                if image[neighbour[0]][neighbour[1]] in propagation_labels:
+                    queue.put(neighbour)
 
     return output_image
     
@@ -192,14 +196,24 @@ def improved_wave_propagation_gmap_vertex(gmap, seed_labels: typing.List[int], p
 
 
 def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int],
-                                      accumulation_directions: typing.List[bool] = None) -> None:
+                                      target_labels: typing.List[int], accumulation_directions: typing.List[bool] = None) -> None:
     """
     It also saves for each dart the connected_component_label of the closest seed.
     It is useful for the generation of voronoi diagrams.
     """
 
     # Initialization
-    gmap.distances.fill(-1)
+    # gmap.distances.fill(-1)  Not super good, it iterates through the whole array even for deleted darts
+    start = time.time()
+    count = 0
+    for dart in gmap.darts:
+        gmap.distances[dart] = -1
+        count += 1
+    end = time.time()
+    print(f"time zio: {end - start} - count = {count}")
+
+    #
+    admissible_labels = propagation_labels + target_labels
 
     # Initialize accumulation directions if None
     if accumulation_directions is None:
@@ -227,7 +241,7 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
             for i in range(gmap.n + 1):
                 neighbour = gmap.ai(i, dart)
                 # Check if I can propagate to that dart
-                if gmap.image_labels[neighbour] not in propagation_labels:
+                if gmap.image_labels[neighbour] not in admissible_labels:
                     continue
 
                 # Due to the accumulation policies, it happens that the first distance value associated to a neighbour
@@ -235,14 +249,16 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
                 # I don't remember exactly what this part do. I have to check again.
                 if accumulation_directions[i]:
                     if gmap.distances[neighbour] == -1:
-                        next_queue.put(neighbour)
+                        if gmap.image_labels[neighbour] in propagation_labels:
+                            next_queue.put(neighbour)
                     if gmap.distances[neighbour] == -1 \
                             or gmap.distances[dart] + 1 < gmap.distances[neighbour]:
                         gmap.distances[neighbour] = gmap.distances[dart] + 1
                         gmap.dt_connected_components_labels[neighbour] = gmap.dt_connected_components_labels[dart]
                 else:
                     if gmap.distances[neighbour] == -1:
-                        curr_queue.put(neighbour)
+                        if gmap.image_labels[neighbour] in propagation_labels:
+                            curr_queue.put(neighbour)
                     if gmap.distances[neighbour] == -1 \
                             or gmap.distances[dart] < gmap.distances[neighbour]:
                         gmap.distances[neighbour] = gmap.distances[dart]

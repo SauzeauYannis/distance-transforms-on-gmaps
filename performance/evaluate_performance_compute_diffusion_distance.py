@@ -29,17 +29,14 @@ logging_configuration.set_logging("results")
 def evaluate_performance_image(image: np.array, image_reduction_factor: int) -> typing.Dict:
     random.seed(42)
 
-    # Find borders
-    image_with_borders = generalized_find_borders(image, labels["cell"], 50)
-
-    dt_image, time_to_compute_dt_s = compute_dt_for_diffusion_distance_image(image_with_borders, 50)
+    dt_image, time_to_compute_dt_s = compute_dt_for_diffusion_distance_image(image)
 
     start = time.time()
-    diffusion_distance = compute_diffusion_distance_image(image_with_borders, dt_image, 50) * image_reduction_factor
+    diffusion_distance = compute_diffusion_distance_image(image, dt_image, labels['cell']) * image_reduction_factor
     end = time.time()
     time_to_compute_diffusion_s = end - start
 
-    results_dict = {"reduction_factor": None, "use_weights": None, "diffusion_distance": diffusion_distance,
+    results_dict = {"reduction_factor": None, "n_darts": image.shape[0] * image.shape[1], "use_weights": None, "diffusion_distance": diffusion_distance,
                     "time_reduce_gmap_s": 0, "time_compute_dt_s": time_to_compute_dt_s, "time_to_compute_diffusion_s": time_to_compute_diffusion_s}
 
     return results_dict
@@ -57,10 +54,10 @@ def evaluate_performance(image: np.array, out_images_path: typing.Optional[str],
     gmap, time_to_reduce_gmap_s, time_to_compute_dt_s = compute_dt_for_diffusion_distance(image, dt_image_path, verbose,
                                                                                           compute_voronoi_diagram,
                                                                                           reduction_factor,
-                                                                                          use_weights, 50)
+                                                                                          use_weights)
 
     start = time.time()
-    diffusion_distance = compute_diffusion_distance(gmap, 50) * image_reduction_factor
+    diffusion_distance = compute_diffusion_distance(gmap, labels['cell']) * image_reduction_factor
     end = time.time()
     time_to_compute_diffusion_s = end - start
 
@@ -70,7 +67,8 @@ def evaluate_performance(image: np.array, out_images_path: typing.Optional[str],
         cv2.imwrite(voronoi_image_path, dt_voronoi_diagram)
 
     results_dict = {"reduction_factor": reduction_factor, "use_weights": use_weights, "diffusion_distance": diffusion_distance,
-                    "time_reduce_gmap_s": time_to_reduce_gmap_s, "time_compute_dt_s": time_to_compute_dt_s, "time_to_compute_diffusion_s": time_to_compute_diffusion_s}
+                    "time_reduce_gmap_s": time_to_reduce_gmap_s, "time_compute_dt_s": time_to_compute_dt_s,
+                    "time_to_compute_diffusion_s": time_to_compute_diffusion_s, "n_darts": gmap.n_darts}
 
     return gmap, results_dict
 
@@ -125,12 +123,13 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
     The results are aggregated for all the images.
     """
 
-    RESULT_HEADER_STRING = "{: <10} {: <10} {: <10} {: <10} {: <10}" \
-                           " {: <10} {: <10} {: <10} {: <10} {: <10}".format("RF", "UW", "DD", "DD_E", "DD_RE",
+    RESULT_HEADER_STRING = "{: <10} {: <10} {: <10} {: <10} {: <10} {: <10}" \
+                           " {: <10} {: <10} {: <10} {: <10} {: <10}".format("RF", "ND", "UW", "DD", "DD_E", "DD_RE",
                                                                              "TRG_S", "TCDT_S", "TCDT_S_D", "TCDT_S_IF", "TCDD_S")
 
     def log_results(base_results: typing.Dict, results: typing.Dict) -> None:
         reduction_factor = results["reduction_factor"]
+        n_darts = results["n_darts"]
         use_weights = results["use_weights"]
         diffusion_distance = results["diffusion_distance"]
         diffusion_distance_absolute_error = results["diffusion_distance"] - base_results["diffusion_distance"]
@@ -141,9 +140,9 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
         time_compute_dt_s_relative_difference = base_results["time_compute_dt_s"] / results["time_compute_dt_s"]
         time_to_compute_diffusion_s = results["time_to_compute_diffusion_s"]
 
-        logger.info("{: <10} {: <10} {: <10.2f} {: <+10.2f} {: <+10.2f}"
+        logger.info("{: <10} {: <10} {: <10} {: <10.2f} {: <+10.2f} {: <+10.2f}"
                     " {: <10.2f} {: <10.2f}"
-                    " {: <+10.2f} {: <10.2f} {: <10.2f}".format(f"{reduction_factor}", f"{use_weights}", diffusion_distance,
+                    " {: <+10.2f} {: <10.2f} {: <10.2f}".format(f"{reduction_factor}", n_darts, f"{use_weights}", diffusion_distance,
                                                                 diffusion_distance_absolute_error, diffusion_distance_relative_error,
                                                                 time_to_reduce_gmap_s, time_to_compute_dt_s,
                                                                 time_compute_dt_s_absolute_difference, time_compute_dt_s_relative_difference,
@@ -156,6 +155,7 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
         time_compute_dt_s_relative_difference = base_results["time_compute_dt_s"] / results["time_compute_dt_s"]
 
         aggregate_results_dict["reduction_factor"] = results["reduction_factor"]
+        aggregate_results_dict["n_darts"] += results["n_darts"]
         aggregate_results_dict["use_weights"] = results["use_weights"]
         aggregate_results_dict["diffusion_distance"] += results["diffusion_distance"]
         aggregate_results_dict["diffusion_distance_absolute_error"] += diffusion_distance_absolute_error
@@ -168,6 +168,7 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
 
     def compute_average_aggregate_results(aggregate_results_array: typing.List, num_images: int) -> None:
         for aggregate_results_dict in aggregate_results_array:
+            aggregate_results_dict["n_darts"] /= num_images
             aggregate_results_dict["diffusion_distance"] /= num_images
             aggregate_results_dict["diffusion_distance_absolute_error"] /= num_images
             aggregate_results_dict["diffusion_distance_relative_error"] /= num_images
@@ -184,6 +185,7 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
     logger.info(f"Image reduction factor: {image_reduction_factor}\n")
     logger.info("***** LEGEND *****")
     logger.info("RF: Reduction factor\n"
+                "ND: Number of darts\n"
                 "UW: Use weights\n"
                 "DD: Diffusion distance\n"
                 "DD_E: Diffusion distance error (current - base)\n"
@@ -201,7 +203,7 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
 
     # Initialize aggreagte results dict
     # I should use a class for the aggregate results dict
-    aggregate_results_dict = {"reduction_factor": -1, "use_weights": False, "diffusion_distance": 0,
+    aggregate_results_dict = {"reduction_factor": -1, "n_darts": 0, "use_weights": False, "diffusion_distance": 0,
                               "diffusion_distance_absolute_error": 0, "diffusion_distance_relative_error": 0,
                               "time_reduce_gmap_s": 0, "time_compute_dt_s": 0,
                               "time_compute_dt_s_absolute_difference": 0, "time_compute_dt_s_relative_difference": 0,

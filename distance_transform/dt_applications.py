@@ -70,7 +70,7 @@ def compute_diffusion_distance_image(image: np.array, dt_image: np.array, label:
 
 def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None, verbose: bool = False,
                                       compute_voronoi_diagram: bool = False, reduction_factor: float = 0,
-                                      use_weights: bool = False, border_label: int = 50) -> (nGmap, float, float):
+                                      use_weights: bool = False) -> (nGmap, float, float):
     """
     Computes the diffusion distance of the cell represented by the image in image_path.
 
@@ -82,18 +82,13 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     The second element is the time, in seconds, required to compure dt
     """
 
-    # Find borders
-    image_with_borders = generalized_find_borders(image, labels["cell"], border_label)
-    if verbose:
-        print("Image with borders successfully computed")
-
     connected_components_labels = None
     if compute_voronoi_diagram:
         # Find connected components labels
         connected_components_labels = connected_component_labeling_one_pass(image)
 
     # Build gmap
-    gmap = LabelMap.from_labels(image_with_borders, connected_components_labels=connected_components_labels)
+    gmap = LabelMap.from_labels(image, connected_components_labels=connected_components_labels)
     if verbose:
         print("Gmap successfully builded")
     # gmap.uniform_labels_for_vertices()  # used if the improvement algorithm is used. Does not work good
@@ -110,13 +105,12 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     time_to_reduce_gmap_s = end - start
 
     # Compute dt from stomata to the cells
-    propagation_labels = [labels["air"], border_label]
     accumulation_directions = generate_accumulation_directions_vertex(2)
     start = time.time()
     if use_weights:
-        generalized_dijkstra_dt_gmap(gmap, [labels["stomata"]], propagation_labels, accumulation_directions)
+        generalized_dijkstra_dt_gmap(gmap, [labels["stomata"]], [labels['air']], [labels['cell']], accumulation_directions)
     else:
-        generalized_wave_propagation_gmap(gmap, [labels["stomata"]], propagation_labels, accumulation_directions)
+        generalized_wave_propagation_gmap(gmap, [labels["stomata"]], [labels['air']], [labels['cell']], accumulation_directions)
         # improved_wave_propagation_gmap_vertex(gmap, [labels["stomata"]], propagation_labels)
     end = time.time()
     time_to_compute_dt_s = end - start
@@ -134,7 +128,7 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     return gmap, time_to_reduce_gmap_s, time_to_compute_dt_s
 
 
-def compute_dt_for_diffusion_distance_image(image: np.array, border_label: int = 50) -> (np.array, float):
+def compute_dt_for_diffusion_distance_image(image: np.array) -> (np.array, float):
     """
     Computes the diffusion distance of the cell represented by the image in image_path.
 
@@ -144,9 +138,8 @@ def compute_dt_for_diffusion_distance_image(image: np.array, border_label: int =
     """
 
     # Compute dt from stomata to the cells
-    propagation_labels = [labels["air"], border_label]
     start = time.time()
-    dt_image = generalized_wave_propagation_image(image, [labels["stomata"]], propagation_labels)
+    dt_image = generalized_wave_propagation_image(image, [labels["stomata"]], [labels['air']], [labels['cell']])
     end = time.time()
     time_to_compute_dt_s = end - start
 

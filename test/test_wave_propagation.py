@@ -359,7 +359,7 @@ class TestWavePropagation(TestCase):
 
     def test_generalized_wave_propagation_image(self):
         image = cv2.imread("../data/5_5_boundary.png", 0)
-        actual = generalized_wave_propagation_image(image, [0], [195])
+        actual = generalized_wave_propagation_image(image, [0], [195], [255])
         expected = np.zeros(actual.shape, actual.dtype)
 
         expected.fill(-1)
@@ -371,6 +371,8 @@ class TestWavePropagation(TestCase):
         expected[3, 4] = 1
         expected[3:, 3] = 2
         expected[4, 4] = 2
+
+        print(actual)
 
         self.assertEqual(actual.tolist(), expected.tolist())
 

@@ -93,7 +93,7 @@ class TestWavePropagation(TestCase):
         gmap = LabelMap.from_labels(image)
 
         accumulation_directions = generate_accumulation_directions_cell(2)
-        generalized_wave_propagation_gmap(gmap, [0], [255], accumulation_directions)
+        generalized_wave_propagation_gmap(gmap, [0], [255], [50], accumulation_directions)
 
         gmap.plot(attribute_to_show=None)
         gmap.plot_dt(fill_cell="face")
