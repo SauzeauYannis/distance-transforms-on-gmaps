@@ -31,10 +31,10 @@ def evaluate_performance_image(image: np.array, image_reduction_factor: int) -> 
 
     dt_image, time_to_compute_dt_s = compute_dt_for_diffusion_distance_image(image)
 
-    start = time.time()
+    start = time.time_ns()
     diffusion_distance = compute_diffusion_distance_image(image, dt_image, labels['cell']) * image_reduction_factor
-    end = time.time()
-    time_to_compute_diffusion_s = end - start
+    end = time.time_ns()
+    time_to_compute_diffusion_s = (end - start) / (10 ** 9)
 
     results_dict = {"reduction_factor": None, "n_darts": image.shape[0] * image.shape[1], "use_weights": None, "diffusion_distance": diffusion_distance,
                     "time_reduce_gmap_s": 0, "time_compute_dt_s": time_to_compute_dt_s, "time_to_compute_diffusion_s": time_to_compute_diffusion_s}
@@ -56,10 +56,10 @@ def evaluate_performance(image: np.array, out_images_path: typing.Optional[str],
                                                                                           reduction_factor,
                                                                                           use_weights)
 
-    start = time.time()
+    start = time.time_ns()
     diffusion_distance = compute_diffusion_distance(gmap, labels['cell']) * image_reduction_factor
-    end = time.time()
-    time_to_compute_diffusion_s = end - start
+    end = time.time_ns()
+    time_to_compute_diffusion_s = (end - start) / (10 ** 9)
 
     if compute_voronoi_diagram and out_images_path:
         voronoi_image_path = out_images_path + "_voronoi.png"
@@ -141,8 +141,8 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
         time_to_compute_diffusion_s = results["time_to_compute_diffusion_s"]
 
         logger.info("{: <10} {: <10} {: <10} {: <10.2f} {: <+10.2f} {: <+10.2f}"
-                    " {: <10.2f} {: <10.2f}"
-                    " {: <+10.2f} {: <10.2f} {: <10.2f}".format(f"{reduction_factor}", n_darts, f"{use_weights}", diffusion_distance,
+                    " {: <10.2f} {: <10.4f}"
+                    " {: <+10.4f} {: <10.4f} {: <10.4f}".format(f"{reduction_factor}", n_darts, f"{use_weights}", diffusion_distance,
                                                                 diffusion_distance_absolute_error, diffusion_distance_relative_error,
                                                                 time_to_reduce_gmap_s, time_to_compute_dt_s,
                                                                 time_compute_dt_s_absolute_difference, time_compute_dt_s_relative_difference,
@@ -312,8 +312,8 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
         time_to_compute_dt_s = aggregate_results_dict["time_compute_dt_s"]
         time_to_compute_diffusion_s = aggregate_results_dict["time_to_compute_diffusion_s"]
         logger.info("{: <10} {: <10} {: <10.2f} {: <+10.2f} {: <+10.2f}"
-                    " {: <10.2f} {: <10.2f}"
-                    " {: <+10.2f} {: <10.2f} {: <10.2f}".format(f"{reduction_factor}", f"{use_weights}", diffusion_distance,
+                    " {: <10.2f} {: <10.4f}"
+                    " {: <+10.4f} {: <10.4f} {: <10.4f}".format(f"{reduction_factor}", f"{use_weights}", diffusion_distance,
                                                                 diffusion_distance_absolute_error, diffusion_distance_relative_error,
                                                                 time_to_reduce_gmap_s, time_to_compute_dt_s,
                                                                 time_compute_dt_s_absolute_difference, time_compute_dt_s_relative_difference,
@@ -347,8 +347,8 @@ def evaluate_performance_all_dataset_images(dataset_path: str, image_reduction_f
         time_to_compute_diffusion_s = results["time_to_compute_diffusion_s"]
 
         logger.info("{: <10} {: <10} {: <10.2f} {: <+10.2f} {: <+10.2f}"
-                    " {: <10.2f} {: <10.2f}"
-                    " {: <+10.2f} {: <10.2f} {: <10.2f}".format(f"{reduction_factor}", f"{use_weights}", diffusion_distance,
+                    " {: <10.2f} {: <10.4f}"
+                    " {: <+10.4f} {: <10.4f} {: <10.4f}".format(f"{reduction_factor}", f"{use_weights}", diffusion_distance,
                                                                 diffusion_distance_absolute_error, diffusion_distance_relative_error,
                                                                 time_to_reduce_gmap_s, time_to_compute_dt_s,
                                                                 time_compute_dt_s_absolute_difference, time_compute_dt_s_relative_difference,
@@ -476,7 +476,7 @@ def evaluate_performance_all_dataset_images(dataset_path: str, image_reduction_f
 
 
 def evaluate_precision_images_different_resolutions(dir_path: str):
-    for i in range(1, 12, 2):
+    for i in range(39, 40, 2):
         evaluate_performance_all_dataset_images(dataset_path=dir_path, image_reduction_factor=i)
 
 

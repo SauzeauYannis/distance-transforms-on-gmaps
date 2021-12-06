@@ -95,25 +95,25 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
                                           # I can't do that.
 
     # Reduce gmap
-    start = time.time()
+    start = time.time_ns()
     if reduction_factor > 0:
         gmap.remove_edges(reduction_factor)
         gmap.remove_vertices()
         if verbose:
             print(f"Gmap successfully reduced with reduction factor: {reduction_factor}")
-    end = time.time()
-    time_to_reduce_gmap_s = end - start
+    end = time.time_ns()
+    time_to_reduce_gmap_s = (end - start) / (10 ** 9)
 
     # Compute dt from stomata to the cells
     accumulation_directions = generate_accumulation_directions_vertex(2)
-    start = time.time()
+    start = time.time_ns()
     if use_weights:
         generalized_dijkstra_dt_gmap(gmap, [labels["stomata"]], [labels['air']], [labels['cell']], accumulation_directions)
     else:
         generalized_wave_propagation_gmap(gmap, [labels["stomata"]], [labels['air']], [labels['cell']], accumulation_directions)
         # improved_wave_propagation_gmap_vertex(gmap, [labels["stomata"]], propagation_labels)
-    end = time.time()
-    time_to_compute_dt_s = end - start
+    end = time.time_ns()
+    time_to_compute_dt_s = (end - start) / (10 ** 9)
     if verbose:
         print("Dt successfully computed")
 
@@ -138,10 +138,10 @@ def compute_dt_for_diffusion_distance_image(image: np.array) -> (np.array, float
     """
 
     # Compute dt from stomata to the cells
-    start = time.time()
+    start = time.time_ns()
     dt_image = generalized_wave_propagation_image(image, [labels["stomata"]], [labels['air']], [labels['cell']])
-    end = time.time()
-    time_to_compute_dt_s = end - start
+    end = time.time_ns()
+    time_to_compute_dt_s = (end - start) / (10 ** 9)
 
     return dt_image, time_to_compute_dt_s
 
