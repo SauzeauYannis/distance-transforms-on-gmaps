@@ -1,0 +1,42 @@
+***** DIFFUSION DISTANCE COMPUTATION EXPERIMENTATION *****
+
+Image reduction factor: 11
+
+***** LEGEND *****
+RF: Reduction factor
+ND: Number of darts
+UW: Use weights
+DD: Diffusion distance
+DD_E: Diffusion distance error (current - base)
+DD_RE: Diffusion distance relative error (current - base) / base
+TRG_S: Time reduce gmap s
+TCDT_S: Time compute dt s
+TCDT_S_D: Time compute dt s difference (current - base)
+TCDT_S_IF: Time compute dt s improvement factor (base / current)
+TCDD_S: Time compute distance s
+
+***** RESULTS FOR EACH IMAGE *****
+
+***** IMAGE 1 *****
+
+Image name: DEHYDRATION_small_leaf_4_time_1_ax1cros_0350_Label_1152x1350_uint8.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         ND         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+None       12915      None       504.51     +0.00      +0.00      0.00       0.05       +0.00      1.00       0.01      
+0          103320     False      471.70     +0.00      +0.00      0.00       0.84       +0.00      1.00       0.24      
+0.25       69792      False      424.91     -46.79     -0.10      2.63       0.59       -0.25      1.43       0.19      
+0.25       69792      True       495.86     +24.17     +0.05      2.62       0.40       -0.44      2.09       0.18      
+0.5        34898      False      411.12     -60.58     -0.13      3.92       0.38       -0.46      2.20       0.11      
+0.5        34898      True       602.20     +130.50    +0.28      3.84       0.21       -0.63      4.00       0.11      
+1          648        False      60.50      -411.20    -0.87      3.94       0.10       -0.75      8.69       0.07      
+1          648        True       1785.75    +1314.05   +2.79      4.20       0.05       -0.79      16.21      0.05      
+
+***** IMAGE 2 *****
+
+Image name: DEHYDRATION_small_leaf_4_time_1_ax1cros_0400_Label_1152x1350_uint8.png
+Shape                Shape reduced       
+(1152, 1350)         (105, 123)          
+RF         ND         UW         DD         DD_E       DD_RE      TRG_S      TCDT_S     TCDT_S_D   TCDT_S_IF  TCDD_S    
+None       12915      None       536.86     +0.00      +0.00      0.00       0.02       +0.00      1.00       0.01      
+0          103320     False      515.27     +0.00      +0.00      0.00       0.52       +0.00      1.00       0.27      

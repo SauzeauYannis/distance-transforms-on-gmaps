@@ -127,6 +127,11 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
                            " {: <10} {: <10} {: <10} {: <10} {: <10}".format("RF", "ND", "UW", "DD", "DD_E", "DD_RE",
                                                                              "TRG_S", "TCDT_S", "TCDT_S_D", "TCDT_S_IF", "TCDD_S")
 
+    AGGREGATE_RESULT_HEADER_STRING = "{: <10} {: <10} {: <10} {: <10} {: <10} {: <10} {: <10} " \
+                                     "{: <10} {: <10} {: <10} {: <10} {: <10} {: <10} {: <10}".\
+                                     format("RF", "ND", "UW", "DD", "DD_M_E", "DD_SD_E", "DD_MIN_E", "DD_MAX_E",
+                                            "DD_RE", "TRG_S", "TCDT_S", "TCDT_S_D", "TCDT_S_IF", "TCDD_S")
+
     def log_results(base_results: typing.Dict, results: typing.Dict) -> None:
         reduction_factor = results["reduction_factor"]
         n_darts = results["n_darts"]
@@ -149,13 +154,15 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
                                                                 time_to_compute_diffusion_s))
 
     def update_aggregate_results(aggregate_results_dict: typing.Dict, base_results: typing.Dict, results: typing.Dict) -> None:
-        diffusion_distance_absolute_error = results["diffusion_distance"] - base_results["diffusion_distance"]
+        diffusion_distance_error = results["diffusion_distance"] - base_results["diffusion_distance"]
+        diffusion_distance_absolute_error = abs(diffusion_distance_error)
         diffusion_distance_relative_error = diffusion_distance_absolute_error / base_results["diffusion_distance"]
         time_compute_dt_s_absolute_difference = results["time_compute_dt_s"] - base_results["time_compute_dt_s"]
         time_compute_dt_s_relative_difference = base_results["time_compute_dt_s"] / results["time_compute_dt_s"]
 
+        aggregate_results_dict["diffusion_distance_errors"].append(diffusion_distance_error)
         aggregate_results_dict["reduction_factor"] = results["reduction_factor"]
-        aggregate_results_dict["n_darts"] += results["n_darts"]
+        aggregate_results_dict["n_darts"] = results["n_darts"]
         aggregate_results_dict["use_weights"] = results["use_weights"]
         aggregate_results_dict["diffusion_distance"] += results["diffusion_distance"]
         aggregate_results_dict["diffusion_distance_absolute_error"] += diffusion_distance_absolute_error
@@ -168,7 +175,6 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
 
     def compute_average_aggregate_results(aggregate_results_array: typing.List, num_images: int) -> None:
         for aggregate_results_dict in aggregate_results_array:
-            aggregate_results_dict["n_darts"] /= num_images
             aggregate_results_dict["diffusion_distance"] /= num_images
             aggregate_results_dict["diffusion_distance_absolute_error"] /= num_images
             aggregate_results_dict["diffusion_distance_relative_error"] /= num_images
@@ -194,7 +200,12 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
                 "TCDT_S: Time compute dt s\n"
                 "TCDT_S_D: Time compute dt s difference (current - base)\n"
                 "TCDT_S_IF: Time compute dt s improvement factor (base / current)\n"
-                "TCDD_S: Time compute distance s\n")
+                "TCDD_S: Time compute distance s\n"
+                "\n"
+                "DD_M_E: Diffusion distance mean error\n"
+                "DD_SD_E: Diffusion distance standard deviation of error\n"
+                "DD_MIN_E: Diffusion distance min error (signed, not absolute)\n"
+                "DD_MAX_E: Diffusion distance max error (signed, not absolute)\n")
 
     logger.info("***** RESULTS FOR EACH IMAGE *****\n")
 
@@ -207,7 +218,7 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
                               "diffusion_distance_absolute_error": 0, "diffusion_distance_relative_error": 0,
                               "time_reduce_gmap_s": 0, "time_compute_dt_s": 0,
                               "time_compute_dt_s_absolute_difference": 0, "time_compute_dt_s_relative_difference": 0,
-                              "time_to_compute_diffusion_s": 0}
+                              "time_to_compute_diffusion_s": 0, "diffusion_distance_errors": []}
     
     # Initialize aggregate results array
     n_results_for_image = 8
@@ -298,23 +309,28 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
                                                                total_execution_time, total_execution_time / image_count))
     logger.info("")
 
-    logger.info(RESULT_HEADER_STRING)
+    logger.info(AGGREGATE_RESULT_HEADER_STRING)
 
     for aggregate_results_dict in aggregate_results:
         reduction_factor = aggregate_results_dict["reduction_factor"]
         use_weights = aggregate_results_dict["use_weights"]
         diffusion_distance = aggregate_results_dict["diffusion_distance"]
-        diffusion_distance_absolute_error = aggregate_results_dict["diffusion_distance_absolute_error"]
+        diffusion_distance_mean_error = aggregate_results_dict["diffusion_distance_absolute_error"]
+        diffusion_distance_error_std = np.std(aggregate_results_dict["diffusion_distance_errors"])
+        diffusion_distance_min_err = np.min(aggregate_results_dict["diffusion_distance_errors"])
+        diffusion_distance_max_err = np.max(aggregate_results_dict["diffusion_distance_errors"])
         diffusion_distance_relative_error = aggregate_results_dict["diffusion_distance_relative_error"]
         time_compute_dt_s_absolute_difference = aggregate_results_dict["time_compute_dt_s_absolute_difference"]
         time_compute_dt_s_relative_difference = aggregate_results_dict["time_compute_dt_s_relative_difference"]
         time_to_reduce_gmap_s = aggregate_results_dict["time_reduce_gmap_s"]
         time_to_compute_dt_s = aggregate_results_dict["time_compute_dt_s"]
         time_to_compute_diffusion_s = aggregate_results_dict["time_to_compute_diffusion_s"]
-        logger.info("{: <10} {: <10} {: <10.2f} {: <+10.2f} {: <+10.2f}"
-                    " {: <10.2f} {: <10.4f}"
-                    " {: <+10.4f} {: <10.4f} {: <10.4f}".format(f"{reduction_factor}", f"{use_weights}", diffusion_distance,
-                                                                diffusion_distance_absolute_error, diffusion_distance_relative_error,
+        n_darts = aggregate_results_dict["n_darts"]
+        logger.info("{: <10} {: <10} {: <10} {: <10.2f} {: <10.2f} {: <10.2f} {: <+10.2f}"
+                    " {: <+10.2f} {: <10.2f} {: <10.2f} {: <10.4f}"
+                    " {: <+10.4f} {: <10.4f} {: <10.4f}".format(f"{reduction_factor}", n_darts, f"{use_weights}", diffusion_distance,
+                                                                diffusion_distance_mean_error, diffusion_distance_error_std,
+                                                                diffusion_distance_min_err, diffusion_distance_max_err, diffusion_distance_relative_error,
                                                                 time_to_reduce_gmap_s, time_to_compute_dt_s,
                                                                 time_compute_dt_s_absolute_difference, time_compute_dt_s_relative_difference,
                                                                 time_to_compute_diffusion_s))
@@ -355,7 +371,7 @@ def evaluate_performance_all_dataset_images(dataset_path: str, image_reduction_f
                                                                 time_to_compute_diffusion_s))
 
     def update_aggregate_results(aggregate_results_dict: typing.Dict, base_results: typing.Dict, results: typing.Dict) -> None:
-        diffusion_distance_absolute_error = results["diffusion_distance"] - base_results["diffusion_distance"]
+        diffusion_distance_absolute_error = abs(results["diffusion_distance"] - base_results["diffusion_distance"])
         diffusion_distance_relative_error = diffusion_distance_absolute_error / base_results["diffusion_distance"]
         time_compute_dt_s_absolute_difference = results["time_compute_dt_s"] - base_results["time_compute_dt_s"]
         time_compute_dt_s_relative_difference = base_results["time_compute_dt_s"] / results["time_compute_dt_s"]
@@ -466,7 +482,7 @@ def evaluate_performance_all_dataset_images(dataset_path: str, image_reduction_f
         time_to_reduce_gmap_s = aggregate_results_dict["time_reduce_gmap_s"]
         time_to_compute_dt_s = aggregate_results_dict["time_compute_dt_s"]
         time_to_compute_diffusion_s = aggregate_results_dict["time_to_compute_diffusion_s"]
-        logger.info("{: <10} {: <10} {: <10.2f} {: <+10.2f} {: <+10.2f}"
+        logger.info("{: <10} {: <10} {: <10.2f} {: <10.2f} {: <10.2f}"
                     " {: <10.2f} {: <10.2f}"
                     " {: <+10.2f} {: <10.2f} {: <10.2f}".format(f"{reduction_factor}", f"{use_weights}", diffusion_distance,
                                                                 diffusion_distance_absolute_error, diffusion_distance_relative_error,
