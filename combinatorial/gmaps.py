@@ -15,55 +15,6 @@ logger = logging.getLogger("gmap_logger")
 logging_configuration.set_logging()
 
 
-"""
-# I can improve this class
-# Using only one byte for all the marks.
-class Marks:
-    @property
-    def m (self):
-        return self._marks.shape[0]
-
-    @property
-    def free_marks(self):
-        return self._free_marks
-
-    def __init__ (self, m, d):
-        if m != 8:
-            raise Exception(f"The number of marks is {f} but it have to be equal to 8")
-        self._marks = np.zeros(d, dtype=np.uint8)
-        self._free_marks = {i for i in range (m)}
-
-    def reserve_mark (self):
-        return self._free_marks.pop()
-
-    def free_mark (self,m):
-        self._free_marks |= {m}  # why. Just use add() function
-
-    def marked (self,m,d):
-        mask = np.uint8(1 << m)
-        return bool(self._marks[d] & mask)
-
-    def mark (self,m,d):
-        mask = np.uint8(1 << m)
-        self._marks[d] = self._marks[d] | mask
-
-    def unmark (self,m,d):
-        mask = np.uint8(~(1 << m))
-        self._marks[d] = self._marks[d] & mask
-
-    def mark_all(self, m):
-        mask = np.uint8(1 << m)
-        self._marks = np.bitwise_or(self._marks, mask)
-        for i in range(self._marks.shape[0]):
-            self._marks[i] = self._marks[i] | mask
-
-    def unmark_all(self, m):
-        mask = np.uint8(~(1 << m))
-        for i in range(self._marks.shape[0]):
-            self._marks[i] = self._marks[i] & mask
-"""
-
-
 class Marks:
     @property
     def m (self):
@@ -133,10 +84,14 @@ class nGmap(DualArray, Marks):
         # int32 is sufficient for 1000x1000 images.
         # I use a signed dtype for using negative values as markers (example, None type)
         if number_of_darts > (np.iinfo(np.int32).max + 1):
-            raise Exception(f"{dtype} is not sufficient to represent {number_of_darts} darts")
+            raise Exception(f"int32 is not sufficient to represent {number_of_darts} darts")
 
-        # Allocate darts array
+        # Allocate darts dict
         # It is necessary to store only the alive darts and obtain better time performances
+        # Using a dict I can remove darts in constant amortized time, otherwise using an array
+        # I need linear time. Right now, for the experiments, my priority is time, so I will
+        # also use a dict
+        # I can use something similar to canonical encoding.
         self.alive_darts = {}
         for i in range(number_of_darts):
             self.alive_darts[i] = i
@@ -149,11 +104,9 @@ class nGmap(DualArray, Marks):
         self.distances.fill(-1)
 
         # allocate weights array
-        # It maints the wegiht associated to each dart.
+        # It keeps the weights associated to each dart.
         # Each dart keeps the weight associated to the corresponding edge
         # So if alfa0(d) = d1 then weight(d) = weight(d1)
-        # And it's the same for alfa1
-        # I can make a security check based on that consideration
         self.weights = np.ones(number_of_darts, dtype=np.uint32)
         logger.debug(f"weights array successfully initialized with shape {self.weights.shape}"
                      f" and dtype {self.weights.dtype}")
@@ -275,7 +228,7 @@ class nGmap(DualArray, Marks):
         """Generator to iterate thru all valid (non-negative alphas) darts"""
         alive_darts = self.alive_darts.keys()
         for dart in alive_darts:
-            yield  dart
+            yield dart
         """
         for index in range (self.shape[1]):
             if self.a0(index) >= 0:
@@ -547,7 +500,6 @@ class nGmap(DualArray, Marks):
         Complexity
 
         """
-
         logging.debug (f'{"Remove" if rc == 1 else "Contract"} {i}-Cell of dart {dart}')
 
         if not skip_check:
