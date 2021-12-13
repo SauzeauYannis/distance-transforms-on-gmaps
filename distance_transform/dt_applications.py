@@ -10,6 +10,7 @@ from combinatorial.utils import build_dt_grey_image_from_gmap
 from distance_transform.dt_utils import *
 from distance_transform.dijkstra import *
 import time
+import os
 
 
 def compute_diffusion_distance(gmap, label: int) -> float:
@@ -119,11 +120,14 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
 
     # Save dt image
     dt_image = build_dt_grey_image_from_gmap(gmap, interpolate_missing_values=False)
+    dt_image_interpolated = build_dt_grey_image_from_gmap(gmap, interpolate_missing_values=True)
     if verbose:
         print("dt image successfully computed")
 
     if dt_image_path:
         cv2.imwrite(dt_image_path, dt_image)
+        interpolated_image_name = os.path.splitext(dt_image_path)[0] + "_interpolated.png"
+        cv2.imwrite(interpolated_image_name, dt_image_interpolated)
 
     return gmap, time_to_reduce_gmap_s, time_to_compute_dt_s
 

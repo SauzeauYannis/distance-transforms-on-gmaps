@@ -247,8 +247,13 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
             update_aggregate_results(aggregate_results[0], image_results, image_results)
 
         out_dir = "images/"
-        _, base_results = evaluate_performance(image=reduced_image, out_images_path=out_dir + image_path + "_0", verbose=True,
-                                               compute_voronoi_diagram=False, reduction_factor=0, use_weights=False,
+        # create image dir
+        image_name = os.path.splitext(image_path)[0]
+        image_out_dir = out_dir + image_name
+        if not os.path.exists(image_out_dir):
+            os.mkdir(image_out_dir)
+        _, base_results = evaluate_performance(image=reduced_image, out_images_path=image_out_dir + "/_0", verbose=True,
+                                               compute_voronoi_diagram=True, reduction_factor=0, use_weights=False,
                                                image_reduction_factor=image_reduction_factor)
 
         if base_results["diffusion_distance"] != -1:
@@ -257,38 +262,38 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
         log_results(base_results, base_results)
         if base_results["diffusion_distance"] != -1:
             update_aggregate_results(aggregate_results[1], base_results, base_results)
-        _, results = evaluate_performance(image=reduced_image, out_images_path=out_dir + image_path + "_0.25", verbose=True,
-                                          compute_voronoi_diagram=False, reduction_factor=0.25, use_weights=False,
+        _, results = evaluate_performance(image=reduced_image, out_images_path=image_out_dir + "/_0.25UW", verbose=True,
+                                          compute_voronoi_diagram=True, reduction_factor=0.25, use_weights=False,
                                           image_reduction_factor=image_reduction_factor)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
             update_aggregate_results(aggregate_results[2], base_results, results)
-        _, results = evaluate_performance(image=reduced_image, out_images_path=None, verbose=True,
-                                          compute_voronoi_diagram=False, reduction_factor=0.25, use_weights=True,
+        _, results = evaluate_performance(image=reduced_image, out_images_path=image_out_dir + "/_0.25W", verbose=True,
+                                          compute_voronoi_diagram=True, reduction_factor=0.25, use_weights=True,
                                           image_reduction_factor=image_reduction_factor)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
             update_aggregate_results(aggregate_results[3], base_results, results)
-        _, results = evaluate_performance(image=reduced_image, out_images_path=out_dir + image_path + "_0.5", verbose=True,
-                                          compute_voronoi_diagram=False, reduction_factor=0.5, use_weights=False,
+        _, results = evaluate_performance(image=reduced_image, out_images_path=image_out_dir + "/_0.5UW", verbose=True,
+                                          compute_voronoi_diagram=True, reduction_factor=0.5, use_weights=False,
                                           image_reduction_factor=image_reduction_factor)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
             update_aggregate_results(aggregate_results[4], base_results, results)
-        _, results = evaluate_performance(image=reduced_image, out_images_path=None, verbose=True,
-                                          compute_voronoi_diagram=False, reduction_factor=0.5, use_weights=True,
+        _, results = evaluate_performance(image=reduced_image, out_images_path=image_out_dir + "/_0.5W", verbose=True,
+                                          compute_voronoi_diagram=True, reduction_factor=0.5, use_weights=True,
                                           image_reduction_factor=image_reduction_factor)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
             update_aggregate_results(aggregate_results[5], base_results, results)
-        _, results = evaluate_performance(image=reduced_image, out_images_path=out_dir + image_path + "_1", verbose=True,
-                                          compute_voronoi_diagram=False, reduction_factor=1, use_weights=False,
+        _, results = evaluate_performance(image=reduced_image, out_images_path=image_out_dir + "/_1UW", verbose=True,
+                                          compute_voronoi_diagram=True, reduction_factor=1, use_weights=False,
                                           image_reduction_factor=image_reduction_factor)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
             update_aggregate_results(aggregate_results[6], base_results, results)
-        _, results = evaluate_performance(image=reduced_image, out_images_path=None, verbose=True,
-                                          compute_voronoi_diagram=False, reduction_factor=1, use_weights=True,
+        _, results = evaluate_performance(image=reduced_image, out_images_path=image_out_dir + "/_1W", verbose=True,
+                                          compute_voronoi_diagram=True, reduction_factor=1, use_weights=True,
                                           image_reduction_factor=image_reduction_factor)
         log_results(base_results, results)
         if results["diffusion_distance"] != -1:
@@ -503,7 +508,7 @@ def main():
     """
 
     # evaluate_precision_images_different_resolutions("../data/labels_with_stomata/time_1/cross/")
-    evaluate_performance_all_dataset("../data/labels_with_stomata/time_1/cross/", image_reduction_factor=11)
+    evaluate_performance_all_dataset("../data/labels_with_stomata/long/", image_reduction_factor=11)
     # evaluate_performance_all_dataset("../data/diffusion_distance_images/", image_reduction_factor=11)
 
 
