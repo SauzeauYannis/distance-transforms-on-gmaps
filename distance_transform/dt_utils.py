@@ -35,6 +35,11 @@ def plot_dt_image(image: np.array, max_value=None) -> None:
     plt.show()
 
 
+def plot_color_image(image: np.array) -> None:
+    plt.imshow(image)
+    plt.show()
+
+
 def generate_random_binary_image(image_size: int, background_pixel_probability: float) -> np.array:
     image = np.ones((image_size, image_size), dtype=int)
 

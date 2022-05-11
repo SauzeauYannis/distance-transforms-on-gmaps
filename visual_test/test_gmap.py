@@ -63,10 +63,68 @@ class TestGmap(TestCase):
         image = cv2.imread("../data/2_2_labeled_image.png", 0)
         gmap = LabelMap.from_labels(image)
         gmap.plot()
+        gmap.remove_edges()
+        gmap.plot()
+        """
+        for dart in gmap.darts:
+            print(dart)
+        gmap.plot()
         gmap.remove_edge(5)
         gmap.remove_edge(13)
         gmap.remove_vertex(3)
         gmap.plot()
         # print(list(gmap.all_i_cells(0)))
 
+        self.assertTrue(True)
+        """
+
+    def test_white_image(self):
+        """
+        image = cv2.imread("../data/2_2_white.png", 0)
+        gmap = LabelMap.from_labels(image)
+        gmap.plot()
+        gmap.remove_edges()
+        gmap.plot()
+
+        self.assertTrue(True)
+        """
+        """
+        for dart in gmap.darts:
+            print(dart)
+        gmap.plot()
+        gmap.remove_edge(5)
+        gmap.remove_edge(13)
+        gmap.remove_vertex(3)
+        gmap.plot()
+        # print(list(gmap.all_i_cells(0)))
+
+        self.assertTrue(True)
+        """
+
+        image = cv2.imread("../data/3_3_boundary_reduced.png", 0)
+        gmap = LabelMap.from_labels(image)
+
+        accumulation_directions = generate_accumulation_directions_cell(2)
+        generalized_wave_propagation_gmap(gmap, [0], [255], [50], accumulation_directions)
+
+        gmap.plot(attribute_to_show="weight")
+        gmap.remove_vertex(0)
+        gmap.plot(attribute_to_show="weight")
+        gmap.plot_dt(fill_cell="face")
+
+        self.assertTrue(True)
+
+    def test_image_generation_after_removal_operations(self):
+        image = cv2.imread("../data/time_1/cross/DEHYDRATION_small_leaf_4_time_1_ax1cros_0100_Label_1152x1350_uint8.png", 0)
+        reduced_image = reduce_image_size(image, 17)
+        gmap = LabelMap.from_labels(reduced_image)
+        print("The gmap has been successfully built")
+        label_image = gmap.get_label_image()
+        plot_color_image(label_image)
+        gmap.remove_edges(1.0)
+        gmap.remove_vertices()
+        print("The edges have been successfully removed")
+        label_image = gmap.get_label_image(interpolate_missing_values=True)
+        plot_color_image(label_image)
+        print("The gmap has been successfully plotted")
         self.assertTrue(True)

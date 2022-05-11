@@ -63,7 +63,7 @@ def evaluate_performance(image: np.array, out_images_path: typing.Optional[str],
 
     if compute_voronoi_diagram and out_images_path:
         voronoi_image_path = out_images_path + "_voronoi.png"
-        dt_voronoi_diagram = gmap.generate_dt_voronoi_diagram([labels["stomata"]])
+        dt_voronoi_diagram = gmap.generate_dt_voronoi_diagram(propagation_labels=[labels["stomata"], labels['air']], seed_labels=[labels["stomata"]])
         cv2.imwrite(voronoi_image_path, dt_voronoi_diagram)
 
     results_dict = {"reduction_factor": reduction_factor, "use_weights": use_weights, "diffusion_distance": diffusion_distance,
@@ -159,6 +159,7 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
         diffusion_distance_relative_error = diffusion_distance_absolute_error / base_results["diffusion_distance"]
         time_compute_dt_s_absolute_difference = results["time_compute_dt_s"] - base_results["time_compute_dt_s"]
         time_compute_dt_s_relative_difference = base_results["time_compute_dt_s"] / results["time_compute_dt_s"]
+        aggregate_results_dict["diffusion_distance_relative_errors"].append(diffusion_distance_relative_error)
 
         aggregate_results_dict["diffusion_distance_errors"].append(diffusion_distance_error)
         aggregate_results_dict["reduction_factor"] = results["reduction_factor"]
@@ -218,7 +219,7 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
                               "diffusion_distance_absolute_error": 0, "diffusion_distance_relative_error": 0,
                               "time_reduce_gmap_s": 0, "time_compute_dt_s": 0,
                               "time_compute_dt_s_absolute_difference": 0, "time_compute_dt_s_relative_difference": 0,
-                              "time_to_compute_diffusion_s": 0, "diffusion_distance_errors": []}
+                              "time_to_compute_diffusion_s": 0, "diffusion_distance_errors": [], "diffusion_distance_relative_errors": []}
     
     # Initialize aggregate results array
     n_results_for_image = 8
@@ -321,7 +322,7 @@ def evaluate_performance_all_dataset(dataset_path: str, image_reduction_factor: 
         use_weights = aggregate_results_dict["use_weights"]
         diffusion_distance = aggregate_results_dict["diffusion_distance"]
         diffusion_distance_mean_error = aggregate_results_dict["diffusion_distance_absolute_error"]
-        diffusion_distance_error_std = np.std(aggregate_results_dict["diffusion_distance_errors"])
+        diffusion_distance_error_std = np.std(aggregate_results_dict["diffusion_distance_relative_errors"])
         diffusion_distance_min_err = np.min(aggregate_results_dict["diffusion_distance_errors"])
         diffusion_distance_max_err = np.max(aggregate_results_dict["diffusion_distance_errors"])
         diffusion_distance_relative_error = aggregate_results_dict["diffusion_distance_relative_error"]
@@ -500,7 +501,6 @@ def evaluate_precision_images_different_resolutions(dir_path: str):
     for i in range(39, 40, 2):
         evaluate_performance_all_dataset_images(dataset_path=dir_path, image_reduction_factor=i)
 
-
 def main():
     """
     image_path = "../data/time_1/cross/DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png"
@@ -508,8 +508,8 @@ def main():
     """
 
     # evaluate_precision_images_different_resolutions("../data/labels_with_stomata/time_1/cross/")
-    evaluate_performance_all_dataset("../data/labels_with_stomata/long/", image_reduction_factor=11)
-    # evaluate_performance_all_dataset("../data/diffusion_distance_images/", image_reduction_factor=11)
+    # evaluate_performance_all_dataset("../data/labels_with_stomata/long/", image_reduction_factor=11)
+    evaluate_performance_all_dataset("../data/diffusion_distance_images/", image_reduction_factor=11)
 
 
 if __name__ == "__main__":

@@ -204,14 +204,8 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
 
     # Initialization
     # gmap.distances.fill(-1)  Not super good, it iterates through the whole array even for deleted darts
-    start = time.time()
-    count = 0
     for dart in gmap.darts:
         gmap.distances[dart] = -1
-        count += 1
-    end = time.time()
-    print(f"time zio: {end - start} - count = {count}")
-
     #
     admissible_labels = propagation_labels + target_labels
 
@@ -221,7 +215,6 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
         for i in range(gmap.n + 1):
             accumulation_directions.append(True)
 
-    start = time.time()
     # Initialize distance to 0 for seeds and add the seeds to the queue
     curr_queue = Queue()
     next_queue = Queue()
@@ -230,10 +223,7 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
             curr_queue.put(dart)
             gmap.distances[dart] = 0
             gmap.dt_connected_components_labels[dart] = gmap.connected_components_labels[dart]
-    end = time.time()
-    print(f"naive algorithm init time: {end - start}")
 
-    start = time.time()
     while not curr_queue.empty():
         while not curr_queue.empty():
             dart = curr_queue.get()
@@ -265,8 +255,6 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
                         gmap.dt_connected_components_labels[neighbour] = gmap.dt_connected_components_labels[dart]
         curr_queue = next_queue
         next_queue = Queue()
-    end = time.time()
-    print(f"naive algorithm loop time: {end - start}")
 
 
 def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.List[int]], accumulation_directions: typing.List[bool] = None) -> None:

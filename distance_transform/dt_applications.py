@@ -119,12 +119,15 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
         print("Dt successfully computed")
 
     # Save dt image
-    dt_image = build_dt_grey_image_from_gmap(gmap, interpolate_missing_values=False)
-    dt_image_interpolated = build_dt_grey_image_from_gmap(gmap, interpolate_missing_values=True)
+    dt_image_real_distances = gmap.build_dt_image(propagation_labels=[labels["stomata"], labels['air']], interpolate_missing_values=True)
+    dt_image = build_dt_grey_image_from_gmap(gmap, propagation_labels=[labels["stomata"], labels['air']], interpolate_missing_values=False)
+    dt_image_interpolated = build_dt_grey_image_from_gmap(gmap, propagation_labels=[labels["stomata"], labels['air']], interpolate_missing_values=True)
     if verbose:
         print("dt image successfully computed")
 
     if dt_image_path:
+        real_distances_image_name = os.path.splitext(dt_image_path)[0] + "_real_distances.npy"
+        np.save(real_distances_image_name, dt_image_real_distances)
         cv2.imwrite(dt_image_path, dt_image)
         interpolated_image_name = os.path.splitext(dt_image_path)[0] + "_interpolated.png"
         cv2.imwrite(interpolated_image_name, dt_image_interpolated)

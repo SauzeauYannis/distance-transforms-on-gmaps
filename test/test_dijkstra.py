@@ -119,7 +119,8 @@ class TestDijkstra(TestCase):
 
         expected_gmap.plot_dt()
 
-        generalized_dijkstra_dt_gmap(actual_gmap, [0], [255], generate_accumulation_directions_vertex(2))
+        generalized_dijkstra_dt_gmap(actual_gmap, [0], [255], [], generate_accumulation_directions_vertex(2))
+        print(generate_accumulation_directions_vertex(2))
 
         actual_gmap.plot_dt()
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
@@ -161,7 +162,7 @@ class TestDijkstra(TestCase):
         for i in range(184, 200):
             expected_gmap.set_dart_distance(i, 2)
 
-        generalized_dijkstra_dt_gmap(actual_gmap, [0], [195], generate_accumulation_directions_cell(2))
+        generalized_dijkstra_dt_gmap(actual_gmap, [0], [195], [], generate_accumulation_directions_cell(2))
 
         # plot
         expected_gmap.plot()

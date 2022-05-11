@@ -34,4 +34,3 @@ class TestPreprocessing(TestCase):
         print("rgb image successfully computed")
         cv2.imwrite("results/labeled_" + image_name, rgb_labeled_image)
         print("rgb image successfully saved")
-

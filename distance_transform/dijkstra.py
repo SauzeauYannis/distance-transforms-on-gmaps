@@ -15,6 +15,7 @@ def generalized_dijkstra_dt_gmap(gmap, seed_labels: typing.List[int], propagatio
     """
     At the moment the heap implementation that I am using doesn't has a method to update a value
     So I add values to the heap even if it is already present.
+    This not affect the correctness but memory consumption and performance.
     In order to not consider the same dart multiple times, I need a visited structure.
     """
 
@@ -35,8 +36,8 @@ def generalized_dijkstra_dt_gmap(gmap, seed_labels: typing.List[int], propagatio
     heapify(heap)
     for dart in gmap.darts:
         if gmap.image_labels[dart] in seed_labels:
-            heappush(heap, (gmap.distances[dart], dart))
             gmap.distances[dart] = 0
+            heappush(heap, (gmap.distances[dart], dart))
             gmap.dt_connected_components_labels[dart] = gmap.connected_components_labels[dart]
 
     # visited

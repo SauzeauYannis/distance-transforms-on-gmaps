@@ -139,8 +139,8 @@ def build_dt_grey_image(dt_image) -> np.array:
     return dt_grey_image
 
 
-def build_dt_grey_image_from_gmap(gmap, interpolate_missing_values: bool = True) -> np.array:
-    dt_image = gmap.build_dt_image(interpolate_missing_values=interpolate_missing_values)
+def build_dt_grey_image_from_gmap(gmap, propagation_labels: typing.List, interpolate_missing_values: bool = True) -> np.array:
+    dt_image = gmap.build_dt_image(interpolate_missing_values=interpolate_missing_values, propagation_labels=propagation_labels)
     return build_dt_grey_image(dt_image)
 
 

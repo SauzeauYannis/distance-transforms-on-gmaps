@@ -5,6 +5,8 @@ __all__ = ['PixelMap', 'LabelMap']
 # Cell
 
 import logging
+import typing
+
 import numpy as np
 from combinatorial.utils import *
 from .gmaps import nGmap
@@ -373,7 +375,7 @@ class LabelMap (PixelMap):
         plt.title (self.__str__())
         plt.show()
 
-    def generate_dt_voronoi_diagram(self, seed_labels: typing.List[int] = None) -> np.array:
+    def generate_dt_voronoi_diagram(self, propagation_labels: typing.List, seed_labels: typing.List[int] = None) -> np.array:
         """
         It generates an rgb dt voronoi diagram.
 
@@ -391,6 +393,10 @@ class LabelMap (PixelMap):
             for j in range(voronoi_diagram.shape[1]):
                 # get dart associated to each cell
                 dart = (i * voronoi_diagram.shape[1] * 8) + j * 8
+
+                if self.image_labels[dart] not in propagation_labels:
+                    voronoi_diagram[i][j] = (255, 255, 255)
+                    continue
 
                 # If the darts has been removed, take the new corresponding dart
                 # to assign a color to the corresponding cell
@@ -413,16 +419,25 @@ class LabelMap (PixelMap):
 
         return voronoi_diagram
 
-    def build_dt_image(self, interpolate_missing_values: bool = True) -> np.array:
+    def build_dt_image(self, propagation_labels: typing.List, interpolate_missing_values: bool = True, ) -> np.array:
         """
         It builds an image that keeps for each pixel the distance value kept in the graph.
         A pixel can have 3 different values:
         - From 0 to +inf if the corresponding cell in the gmap has a valid distance value.
-        - -2 if the corresponding cell in the gmap has not been used to propagate distances.
+        - -2 if the corresponding cell in the gmap has not been used to propagate distances or it is not in propagation_labels
         - -1 if the corresponding cell in the gmap does not exist (due to reduction).
           and "interpolate_missing_values" is False.
 
         :param interpolate_missing_values:
+        :param propagation_labels: list of labels (stomata, air, ...). A dart is considered only if it is in allowed labels.
+                                  It is necessary since if the reduction factor is high (close or equal to 1) it happens that
+                                  each connected component is reduced to one point. If that connected component was a cell,
+                                  during the computation of the distance transform, if that point is on the border and if it is reacheable
+                                  by a stomata, a distance value will be associated to that point.
+                                  Using this function, an image where all points in that connected component will share that dt value.
+                                  This is not optimal for visualization since we want an image with distance value only for the propagation regions.
+                                  So usually we don't want to have a distance value to pixels inside a cell.
+                                  We can use propagation_labels to specify which darts should have a distance value in producing an image.
         :return:
         """
 
@@ -432,6 +447,10 @@ class LabelMap (PixelMap):
             for j in range(image.shape[1]):
                 # Get the dart associated to each pixel
                 dart = (i * image.shape[1] * 8) + j * 8
+
+                if self.image_labels[dart] not in propagation_labels:
+                    image[i][j] = -2
+                    continue
 
                 # Check if the current dart has been deleted during the reduction process of the gmap
                 if self.ai(0, dart) == -1:
@@ -451,6 +470,29 @@ class LabelMap (PixelMap):
                     image[i][j] = -2
                 else:
                     image[i][j] = distance
+
+        return image
+
+    def get_label_image(self, interpolate_missing_values: bool = True) -> np.array:
+        image = np.zeros((self.n_rows, self.n_cols))
+
+        for i in range(image.shape[0]):
+            for j in range(image.shape[1]):
+                # Get the dart associated to each pixel
+                dart = (i * image.shape[1] * 8) + j * 8
+
+                # Check if the current dart has been deleted during the reduction process of the gmap
+                if self.ai(0, dart) == -1:
+                    if interpolate_missing_values:
+                        # If the dart has been removed take the new corresponding dart
+                        # to assign a distance value to the pixel associated to the removed dart
+                        while self.ai(0, dart) == -1:
+                            dart = self.face_identifiers[dart]
+                    else:
+                        image[i][j] = 255
+                        continue
+
+                image[i][j] = self.image_labels[dart]
 
         return image
 
