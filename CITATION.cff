@@ -1,0 +1,11 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Distance transforms on gmaps
+message: 'If you use this software, please cite it as below.'
+type: software
+authors:
+  - given-names: Carmine
+    family-names: Carratù
+    email: carmine_carratu@libero.it
