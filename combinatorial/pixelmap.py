@@ -258,7 +258,7 @@ class LabelMap (PixelMap):
                 c._dart_polyline [d][..., 1] += (d // 8) // c.n_cols
 
         # save labels
-        cls._save_labels(c, labels, connected_components_labels)
+        # cls._save_labels(c, labels, connected_components_labels)
 
         return c
 

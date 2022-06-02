@@ -6,7 +6,9 @@ from combinatorial.pixelmap import LabelMap
 from combinatorial.zoo_labels import *
 from distance_transform.sample_data import *
 from distance_transform.dt_utils import *
-import imageio
+from distance_transform.dt_applications import *
+from visual_test.test_dt_applications import *
+import imageio.v2 as imageio
 import matplotlib.pyplot as plt
 from combinatorial.utils import build_dt_grey_image_from_gmap
 import cv2
@@ -87,8 +89,8 @@ def dt_on_label_map_example():
 
 def dt_cell_10():
     image = str2labels(CELL_5)
-    #plt.imshow(image)
-    #plt.show()
+    # plt.imshow(image)
+    # plt.show()
 
     # Now I need a function to set seeds on an image
     # Then I need a function to convert the image with the seeds
@@ -97,8 +99,8 @@ def dt_cell_10():
     # vertices
 
     gmap = LabelMap.from_labels(image)
-    gmap.plot(attribute_to_show=True)
-    gmap.plot_labels()
+    gmap.plot()
+    # gmap.plot_labels()
 
     seeds = [6, 5, 40, 47, 148, 185, 157, 192]
 
@@ -107,7 +109,7 @@ def dt_cell_10():
 
     gmap.remove_edges()
     gmap.remove_vertices()
-    #gmap.plot(number_darts=True)
+    # gmap.plot(number_darts=True)
     gmap.plot_dt()
 
 
@@ -128,12 +130,14 @@ def build_gmap_from_leaf_image(path):
     img = read_leaf_image(path)
     gmap = LabelMap.from_labels(img)
     print("gmap created successfully")
-    #gmap.plot()
+    # gmap.plot()
     return gmap
+
 
 def save_labels(path):
     gmap = build_gmap_from_leaf_image(path)
     gmap.plot_labels()
+
 
 def test_norm_image(path):
     # read gray level image
@@ -162,23 +166,59 @@ def print_different_values_image(image: np.array) -> None:
     values = set()
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
-                values.add(image[i][j])
+            values.add(tuple(image[i][j]))
 
     print(values)
 
-def main():
 
-    img = read_leaf_image('data/cross_section_leaf.png')
-    """
-    # new_img = find_borders(img, 152)
-    print(img.shape)  # the shape is inverted, it should be 1024 x 874, not 874 x 1024
-    print(img[746][272])
-    
-    # test_norm_image('data/100_100_portion_leaf.png')
-    """
-    print_different_values_image(img)
+g_test = """\
+w . . . .
+w . . . .
+. . . w .
+. . . . .
+"""
+
+i_test_1 = [
+    0, 1, 2, 3, 4, 5, 6, 7,
+    40, 41, 42, 43, 44, 45, 46, 47,
+    104, 105, 106, 107, 108, 109, 110, 111
+]
+
+i_test_2 = []
+
+
+def test_with_binary_gmap():
+    img = str2labels(g_test)
+    print(img.shape)
+
+    lm_test = LabelMap.from_labels(img)
+
+    wave_propagation_dt_gmap(lm_test, i_test_1,
+                             # accumulation_directions=[True, False, False]
+                             )
+    print(lm_test.distances)
+    lm_test.plot_dt()
+
+    np.save("seed_2d", lm_test.distances)
+
+
+def test_with_image():
+    img = imageio.imread(
+        "data\yannis\DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png")[::8, ::8]
+
+    print(img.shape)
+
+    gmap, _, _ = compute_dt_for_diffusion_distance(img, verbose=True)
+
+    print('min :', gmap.distances.min())
+    print('max :', gmap.distances.max())
+
+    np.save("img_2d", gmap.distances)
+
+
+def main():
+    test_with_image()
 
 
 if __name__ == "__main__":
     main()
-

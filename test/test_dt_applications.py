@@ -76,7 +76,7 @@ class TestPreprocessing(TestCase):
         If the gmap is not reduced, using or not using the weight should produce the same result.
         """
         image_name = "DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png"
-        image = cv2.imread("../data/time_1/cross/" + image_name, 0)
+        image = cv2.imread("../data/yannis/DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Color_1152x1350_uint8.png", 0)
         reduced_image = reduce_image_size(image, 11)
         print(f"reduced_image shape: {reduced_image.shape}")
         gmap_without_weights, _, _ = compute_dt_for_diffusion_distance(reduced_image, None, True, False, 0, False)
@@ -86,6 +86,9 @@ class TestPreprocessing(TestCase):
 
         diffusion_distance_without_weights = compute_diffusion_distance(gmap_without_weights, 50)
         diffusion_distance_with_weights = compute_diffusion_distance(gmap_with_weights, 50)
+
+        print(diffusion_distance_without_weights)
+        print(diffusion_distance_with_weights)
 
         self.assertEqual(diffusion_distance_without_weights, diffusion_distance_with_weights)
 
