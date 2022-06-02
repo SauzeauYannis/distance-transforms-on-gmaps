@@ -84,8 +84,8 @@ class TestPreprocessing(TestCase):
 
         self.assertTrue(gmap_dt_equal(gmap_without_weights, gmap_with_weights))
 
-        diffusion_distance_without_weights = compute_diffusion_distance(gmap_without_weights, 50)
-        diffusion_distance_with_weights = compute_diffusion_distance(gmap_with_weights, 50)
+        diffusion_distance_without_weights = compute_diffusion_distance(gmap_without_weights, labels["cell"])
+        diffusion_distance_with_weights = compute_diffusion_distance(gmap_with_weights, labels["cell"])
 
         self.assertEqual(diffusion_distance_without_weights, diffusion_distance_with_weights)
 
