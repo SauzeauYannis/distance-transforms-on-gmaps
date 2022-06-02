@@ -30,12 +30,21 @@ def generalized_find_borders(image: np.array, region_label_value: int, border_la
 
 
 def is_equal_to_neighbours(image: np.array, value_position: typing.Tuple[int, int]) -> True:
+    """
+    8-connectivity check
+    * * * * *
+    t t t * *
+    t x t * *
+    t t t * *
+
+    If x is the value to checks, all values equals to t will be checked
+    """
     value_x = value_position[0]
     value_y = value_position[1]
-    x_values = [value_x, value_x - 1, value_x, value_x + 1]
-    y_values = [value_y -1, value_y, value_y + 1, value_y]
+    x_values = [value_x - 1, value_x - 1, value_x - 1,      value_x,     value_x,           value_x + 1, value_x + 1, value_x + 1]
+    y_values = [value_y - 1, value_y,     value_y + 1,      value_y - 1, value_y + 1,       value_y - 1, value_y,     value_y + 1]
     for x, y in zip(x_values, y_values):
-            if 0 < x < image.shape[0] and 0 < y < image.shape[1] and image[x][y] != image[value_x][value_y]:
+            if not (0 <= x < image.shape[0]) or not (0 <= y < image.shape[1]) or image[x][y] != image[value_x][value_y]:
                 return False
     return True
 

@@ -132,6 +132,9 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
         interpolated_image_name = os.path.splitext(dt_image_path)[0] + "_interpolated.png"
         cv2.imwrite(interpolated_image_name, dt_image_interpolated)
 
+    # Decomment to generate contour plot
+    # contour_plot_from_dt_image(dt_image_real_distances, 20, 400)
+
     return gmap, time_to_reduce_gmap_s, time_to_compute_dt_s
 
 
@@ -152,3 +155,37 @@ def compute_dt_for_diffusion_distance_image(image: np.array) -> (np.array, float
 
     return dt_image, time_to_compute_dt_s
 
+####################
+
+
+def compute_dt_from_stomata_to_cells(image: np.array) -> np.array:
+    gmap = LabelMap.from_labels(image)
+    generalized_wave_propagation_gmap(gmap, [labels["stomata"]], [labels['air']], [labels['cell']])
+
+    return gmap.distances.reshape(image.shape[0], image.shape[1], 8)
+
+
+def compute_dt_inside_air(image: np.array) -> np.array:
+    # Identiy the air region reacheable by the stomata
+    dt_image = generalized_wave_propagation_image(image, [labels["stomata"]], [labels['air']], [labels['air']])
+    air_image = np.copy(dt_image)  # to modify, I have to remove stomata
+    for i in range(air_image.shape[0]):
+        for j in range(air_image.shape[1]):
+            if air_image[i][j] == -1 or image[i][j] != labels["air"]:
+                air_image[i][j] = 0
+            else:
+                air_image[i][j] = labels["air"]
+
+    image_with_borders = generalized_find_borders(air_image, labels["air"], 180)
+    gmap = LabelMap.from_labels(image_with_borders)
+    generalized_wave_propagation_gmap(gmap, [180], [labels['air']], [labels['air']])
+
+    return gmap.distances.reshape(image.shape[0], image.shape[1], 8)
+
+
+def compute_dt_from_stomata_to_cells_using_borders(image: np.array) -> np.array:
+    image_with_borders = generalized_find_borders(image, labels["air"], 180)
+    gmap = LabelMap.from_labels(image_with_borders)
+    generalized_wave_propagation_gmap(gmap, [labels["stomata"]], [180], [labels["cell"]])
+
+    return gmap.distances.reshape(image.shape[0], image.shape[1], 8)

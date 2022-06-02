@@ -6,6 +6,7 @@ from combinatorial.pixelmap import LabelMap
 from combinatorial.zoo_labels import *
 from distance_transform.sample_data import *
 from distance_transform.dt_utils import *
+from distance_transform.dt_applications import *
 import imageio
 import matplotlib.pyplot as plt
 from combinatorial.utils import build_dt_grey_image_from_gmap
@@ -162,21 +163,15 @@ def print_different_values_image(image: np.array) -> None:
     values = set()
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
-                values.add(image[i][j])
+            values.add(tuple(image[i][j]))
 
     print(values)
 
 def main():
-
-    img = read_leaf_image('data/cross_section_leaf.png')
-    """
-    # new_img = find_borders(img, 152)
-    print(img.shape)  # the shape is inverted, it should be 1024 x 874, not 874 x 1024
-    print(img[746][272])
-    
-    # test_norm_image('data/100_100_portion_leaf.png')
-    """
-    print_different_values_image(img)
+    image = cv2.imread("data/time_1/cross/DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png", 0)
+    # image = reduce_image_size(image, 11)
+    distances = compute_dt_inside_air(image)
+    np.save("inside_air.npy", distances)
 
 
 if __name__ == "__main__":

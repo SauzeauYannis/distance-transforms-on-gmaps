@@ -23,9 +23,9 @@ class TestPreprocessing(TestCase):
         self.assertListEqual(sorted(values), sorted(list(labels.values())))
 
     def test_generalized_find_borders(self):
-        image = cv2.imread("../data/5_5_boundary.png", 0)
-        expected = cv2.imread("../data/5_5_boundary_gray_region.png", 0)
-        actual = generalized_find_borders(image, 195, 255)
+        image = cv2.imread("../data/10_10_borders.png", 0)
+        expected = cv2.imread("../data/10_10_borders_expected.png", 0)
+        actual = generalized_find_borders(image, 255, 195)
 
         self.assertEqual(expected.shape, actual.shape)
 
