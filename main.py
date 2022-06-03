@@ -213,7 +213,11 @@ def test_with_image():
     print('min :', gmap.distances.min())
     print('max :', gmap.distances.max())
 
-    np.save("img_2d", gmap.distances)
+    diffusion_distance_without_weights = compute_diffusion_distance(gmap, labels["cell"])
+
+    print(diffusion_distance_without_weights)
+
+    # np.save("img_2d", gmap.distances)
 
 
 def main():
