@@ -26,15 +26,17 @@ def generalized_wave_propagation_image(image: np.array, seed_labels: typing.List
         pixel = queue.get()
         # Visit all the neighbours
         for i in range(4):
-            neighbour = get_next_neighbour_image(i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
+            neighbour = get_next_neighbour_image(
+                i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
             if neighbour is not None and image[neighbour[0]][neighbour[1]] in admissible_labels and\
                     output_image[neighbour[0], neighbour[1]] == -1:
-                output_image[neighbour[0], neighbour[1]] = output_image[pixel[0], pixel[1]] + 1
+                output_image[neighbour[0], neighbour[1]
+                             ] = output_image[pixel[0], pixel[1]] + 1
                 if image[neighbour[0]][neighbour[1]] in propagation_labels:
                     queue.put(neighbour)
 
     return output_image
-    
+
 
 def wave_propagation_dt_image(image: np.array, seeds: typing.List[typing.Tuple[int, int]] = None) -> np.array:
     """
@@ -68,9 +70,11 @@ def wave_propagation_dt_image(image: np.array, seeds: typing.List[typing.Tuple[i
         pixel = queue.get()
         # Visit all the neighbours
         for i in range(4):
-            neighbour = get_next_neighbour_image(i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
+            neighbour = get_next_neighbour_image(
+                i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
             if neighbour is not None and output_image[neighbour[0], neighbour[1]] == -1:
-                output_image[neighbour[0], neighbour[1]] = output_image[pixel[0], pixel[1]] + 1
+                output_image[neighbour[0], neighbour[1]
+                             ] = output_image[pixel[0], pixel[1]] + 1
                 queue.put(neighbour)
 
     return output_image
@@ -148,7 +152,8 @@ def improved_wave_propagation_gmap_vertex(gmap, seed_labels: typing.List[int], p
         queue = Queue()
 
         dart = next(gmap.darts)
-        _set_distance_vertex(gmap, dart, -1)  # I am using -1 to indicate that has been visited
+        # I am using -1 to indicate that has been visited
+        _set_distance_vertex(gmap, dart, -1)
         queue.put(dart)
 
         while not queue.empty():
@@ -195,11 +200,89 @@ def improved_wave_propagation_gmap_vertex(gmap, seed_labels: typing.List[int], p
     print(f"Total time: {total_end - total_start}")
 
 
+def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.List[int]], accumulation_directions: typing.List[bool] = None) -> None:
+    """It computes the distance transformation for the gmap passed as parameter.
+
+    Args:
+        > gmap: The gmap to compute the distance transform.
+        > seeds_identifiers (typing.Optional[typing.List[int]]): If None all the darts with label equal to 0 will be used 
+    and the distance propagates only in the non foreground darts (!= 255)
+        > accumulation_directions (typing.List[bool], optional): Has to be a list of n+1 elements, where n is the level of the gmap. 
+    Each element can be True, if the distance has to be increased, or False otherwise. 
+    Passing None as parameter has the same result of passing an array of True. 
+    The default behaviour is to increase the distance for all the directions, but a different combination can be used to increase 
+    distances in a different way. For example if the distance has to be increased only passing from a vertex to another, the 
+    combination of alfa0 = True and alfai = False for all the remaining i So the array should be: [True False False] for a 2-gmap can be used. 
+    Defaults to None.
+    """
+
+    # Initialization
+    for dart in gmap.darts:
+        gmap.distances[dart] = -1
+
+    # Initialize accumulation directions if None
+    if accumulation_directions is None:
+        accumulation_directions = []
+        for i in range(gmap.n + 1):
+            accumulation_directions.append(True)
+
+    curr_queue = Queue()
+    next_queue = Queue()
+
+    if seeds_identifiers is None:
+        for dart in gmap.darts:
+            if gmap.image_labels[dart] == 0:
+                curr_queue.put(dart)
+                gmap.distances[dart] = 0
+    else:
+        for seed_identifier in seeds_identifiers:
+            curr_queue.put(seed_identifier)
+            gmap.distances[seed_identifier] = 0
+
+    while not curr_queue.empty():
+        while not curr_queue.empty():
+            dart = curr_queue.get()
+            # Visit all the neighbours
+            for i in range(gmap.n + 1):
+                neighbour = gmap.ai(i, dart)
+                if seeds_identifiers is None and gmap.image_labels[neighbour] == 255:
+                    continue
+                # due to the accumulation policies, it happens that the first distance value associated to a neighbours
+                # could not be the right one. All the values have to be checked. View example on joplin (01/11/2021)
+                if accumulation_directions[i]:
+                    if gmap.distances[neighbour] == -1:
+                        # only the first time I add the element to the queue
+                        next_queue.put(neighbour)
+                    if gmap.distances[neighbour] == -1\
+                            or gmap.distances[dart] + 1 < gmap.distances[neighbour]:
+                        gmap.distances[neighbour] = gmap.distances[dart] + 1
+                else:
+                    if gmap.distances[neighbour] == -1:
+                        # only the first time I add the element to the queue
+                        curr_queue.put(neighbour)
+                    if gmap.distances[neighbour] == -1 \
+                            or gmap.distances[dart] < gmap.distances[neighbour]:
+                        gmap.distances[neighbour] = gmap.distances[dart]
+        curr_queue = next_queue
+        next_queue = Queue()
+
+
 def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int],
                                       target_labels: typing.List[int], accumulation_directions: typing.List[bool] = None) -> None:
-    """
-    It also saves for each dart the connected_component_label of the closest seed.
-    It is useful for the generation of voronoi diagrams.
+    """It computes the distance transformation for the gmap passed as parameter.
+
+    Args:
+        > gmap: The gmap to compute the distance transform.
+        > seed_labels (typing.List[int]): The labels of the seeds darts.
+        > propagation_labels (typing.List[int]): The labels of the darts that can be propagated.
+        > target_labels (typing.List[int]): The labels of the darts that have to be reached.
+        > accumulation_directions (typing.List[bool], optional): Has to be a list of n+1 elements, where n is the level of the gmap.
+    Each element can be True, if the distance has to be increased, or False otherwise.
+    Passing None as parameter has the same result of passing an array of True.
+    The default behaviour is to increase the distance for all the directions, but a different combination can be used to increase
+    distances in a different way. For example if the distance has to be increased only passing from a vertex to another, the
+    combination of alfa0 = True and alfai = False for all the remaining i So the array should be: [True False False] for a 2-gmap can be used.
+    Defaults to None.
     """
 
     # Initialization
@@ -257,76 +340,6 @@ def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propa
         next_queue = Queue()
 
 
-def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.List[int]], accumulation_directions: typing.List[bool] = None) -> None:
-    """
-    It computes the dt for the gmap passed as parameter.
-    The distance propagates through all the cells (using all the involutions).
-
-    Despite the fact that distance propagates through all the directions, a distance unit is not necessarily added
-    for all the directions.
-    The accumulation_directions parameter can be used to specify to which directions increase the distance.
-    accumulation_directions has to be a list of n+1 elements, where n is the level of the gmap.
-    Each element can be True, if the distance has to be increased, or False otherwise.
-    Passing None as parameter has the same result of passing an array of False.
-    The default behaviour is to increase the distance for all the directions, but a different combination can be used
-    to increase distances in a different way.
-    For example if the distance has to be increased only passing from a vertex to another, the combination of
-    alfa0 = True and alfai = False for all the remaining i
-    So the array should be: [True False False] for a 2-gmap
-    can be used.
-
-    seed_identifiers: if None all the darts with label equal to 0 will be used and the distance
-                      propagates only in the non foreground darts (!= 255)
-    """
-
-    # Initialization
-    for dart in gmap.darts:
-        gmap.distances[dart] = -1
-
-    # Initialize accumulation directions if None
-    if accumulation_directions is None:
-        accumulation_directions = []
-        for i in range(gmap.n + 1):
-            accumulation_directions.append(True)
-
-    curr_queue = Queue()
-    next_queue = Queue()
-    if seeds_identifiers is None:
-        for dart in gmap.darts:
-            if gmap.image_labels[dart] == 0:
-                curr_queue.put(dart)
-                gmap.distances[dart] = 0
-    else:
-        for seed_identifier in seeds_identifiers:
-            curr_queue.put(seed_identifier)
-            gmap.distances[seed_identifier] = 0
-
-    while not curr_queue.empty():
-        while not curr_queue.empty():
-            dart = curr_queue.get()
-            # Visit all the neighbours
-            for i in range(gmap.n + 1):
-                neighbour = gmap.ai(i, dart)
-                if seeds_identifiers is None and gmap.image_labels[neighbour] == 255:
-                    continue
-                # due to the accumulation policies, it happens that the first distance value associated to a neighbours
-                # could not be the right one. All the values have to be checked. View example on joplin (01/11/2021)
-                if accumulation_directions[i]:
-                    if gmap.distances[neighbour] == -1:
-                        next_queue.put(neighbour)  # only the first time I add the element to the queue
-                    if gmap.distances[neighbour] == -1\
-                            or gmap.distances[dart] + 1 < gmap.distances[neighbour]:
-                        gmap.distances[neighbour] = gmap.distances[dart] + 1
-                else:
-                    if gmap.distances[neighbour] == -1:
-                        curr_queue.put(neighbour)  # only the first time I add the element to the queue
-                    if gmap.distances[neighbour] == -1 \
-                                or gmap.distances[dart] < gmap.distances[neighbour]:
-                        gmap.distances[neighbour] = gmap.distances[dart]
-        curr_queue = next_queue
-        next_queue = Queue()
-
-
 def generate_accumulation_directions_vertex(gmap_size: int) -> typing.List[bool]:
     accumulation_directions = []
 
@@ -356,4 +369,3 @@ def generate_accumulation_directions_cell(gmap_size: int) -> typing.List[bool]:
     accumulation_directions.append(True)
 
     return accumulation_directions
-

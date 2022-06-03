@@ -8,7 +8,7 @@ from distance_transform.sample_data import *
 from distance_transform.dt_utils import *
 from distance_transform.dt_applications import *
 from visual_test.test_dt_applications import *
-import imageio.v2 as imageio
+import imageio
 import matplotlib.pyplot as plt
 from combinatorial.utils import build_dt_grey_image_from_gmap
 import cv2
@@ -171,55 +171,26 @@ def print_different_values_image(image: np.array) -> None:
     print(values)
 
 
-g_test = """\
-w . . . .
-w . . . .
-. . . w .
-. . . . .
-"""
-
-i_test_1 = [
-    0, 1, 2, 3, 4, 5, 6, 7,
-    40, 41, 42, 43, 44, 45, 46, 47,
-    104, 105, 106, 107, 108, 109, 110, 111
-]
-
-i_test_2 = []
-
-
-def test_with_binary_gmap():
-    img = str2labels(g_test)
-    print(img.shape)
-
-    lm_test = LabelMap.from_labels(img)
-
-    wave_propagation_dt_gmap(lm_test, i_test_1,
-                             # accumulation_directions=[True, False, False]
-                             )
-    print(lm_test.distances)
-    lm_test.plot_dt()
-
-    np.save("seed_2d", lm_test.distances)
-
-
-def test_with_image():
+def main():
     image = cv2.imread(
         "./data/image/DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png", 0)
 
-    # image = reduce_image_size(image, 11)
+    gmap = LabelMap.from_labels(image)
 
-    print(image.shape)
-    print_different_values_image(image)
+    generalized_wave_propagation_gmap(
+        gmap,
+        seed_labels=[labels["stomata"]],
+        propagation_labels=[labels['air']],
+        target_labels=[labels['cell']]
+    )
 
-    # distances = compute_dt_inside_air(image)
+    dt_image = build_dt_grey_image_from_gmap(
+        gmap, 
+        propagation_labels=[labels["stomata"], labels['air']], 
+        interpolate_missing_values=False
+    )
 
-    # print(distances.max())
-
-    # np.save("img_2d", gmap.distances)
-
-
-def main():
-    test_with_image()
+    plot_dt_image(dt_image)
 
 
 if __name__ == "__main__":

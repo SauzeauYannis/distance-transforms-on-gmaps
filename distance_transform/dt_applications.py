@@ -180,6 +180,9 @@ def compute_dt_inside_air(image: np.array) -> np.array:
     gmap = LabelMap.from_labels(image_with_borders)
     generalized_wave_propagation_gmap(gmap, [180], [labels['air']], [labels['air']])
 
+    # dt_image = build_dt_grey_image_from_gmap(gmap, propagation_labels=[labels["stomata"], labels['air']], interpolate_missing_values=False)
+    # plot_dt_image(dt_image)
+
     return gmap.distances.reshape(image.shape[0], image.shape[1], 8)
 
 
