@@ -39,25 +39,25 @@ def dt_gmap_example():
 
     """
     from combinatorial.zoo_labels import L2_SPIRAL_WB, str2labels
-    
+
     print (L2_SPIRAL_WB)
-    
+
     from combinatorial.pixelmap import LabelMap
-    
+
     image = str2labels (L2_SPIRAL_WB)
     print(image.shape)
-    
+
     lm_spiral = LabelMap.from_labels (image)
     print(lm_spiral)
-    
+
     lm_spiral.remove_edges()
     lm_spiral.remove_vertices()
     print(lm_spiral)
-    
+
     for dart in lm_spiral.darts:
         print(type(dart))
         print(dart)
-    
+
     lm_spiral.plot(number_darts=False)
     """
 
@@ -117,7 +117,7 @@ def read_leaf_image(path, show: bool = False):
     # Use 0 to read image in grayscale mode
     # I have for sure grayscale images because the image is labeled, so it is not useful to have more that 3 channels
     img = imageio.imread(path)
-    #img = cv2.imread(path, 0)
+    # img = cv2.imread(path, 0)
     if show:
         cv2.imshow('image', img)
         cv2.waitKey(0)
@@ -166,7 +166,7 @@ def print_different_values_image(image: np.array) -> None:
     values = set()
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
-            values.add(tuple(image[i][j]))
+            values.add(image[i][j])
 
     print(values)
 
@@ -203,19 +203,17 @@ def test_with_binary_gmap():
 
 
 def test_with_image():
-    img = imageio.imread(
-        "data\yannis\DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png")[::8, ::8]
+    image = cv2.imread(
+        "./data/image/DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png", 0)
 
-    print(img.shape)
+    # image = reduce_image_size(image, 11)
 
-    gmap, _, _ = compute_dt_for_diffusion_distance(img, verbose=True)
+    print(image.shape)
+    print_different_values_image(image)
 
-    print('min :', gmap.distances.min())
-    print('max :', gmap.distances.max())
+    # distances = compute_dt_inside_air(image)
 
-    diffusion_distance_without_weights = compute_diffusion_distance(gmap, labels["cell"])
-
-    print(diffusion_distance_without_weights)
+    # print(distances.max())
 
     # np.save("img_2d", gmap.distances)
 
