@@ -8,7 +8,8 @@ To compute the distance transform of a binary n-Gmaps, we can use the wave propa
 
 This algorithm is implemented with `wave_propagation_dt_gmap` function in the `wave_propagation` module in the `distance_transform` package.
 
-This function takes one mandatory argument `gmap` that is a binary n-Gmap, and two optional arguments `seeds_identifiers` and `accumulation_directions` that are the seeds and the directions (alphas of the n-Gmap) of the wave propagation. If `seeds_identifiers` is not provided, the algorithm will use the darts with label equal to 0 of the n-Gmaps as the seed. If `accumulation_directions` is not provided, the algorithm will use all the alphas of the n-Gmap as the directions.
+This function takes one mandatory argument `gmap` that is a binary n-Gmap, and two optional arguments `seeds_identifiers` and `accumulation_directions` that are the seeds and the directions (alphas of the n-Gmap) of the wave propagation. 
+If `seeds_identifiers` is not provided, the algorithm will use the darts with label equal to 0 of the n-Gmaps as the seed. If `accumulation_directions` is not provided, the algorithm will use all the alphas of the n-Gmap as the directions.
 
 5 by 4 n-Gmap distance transform example:
 
