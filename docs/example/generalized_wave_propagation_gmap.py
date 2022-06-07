@@ -5,7 +5,7 @@ from data.labels import labels
 from distance_transform.dt_utils import build_dt_grey_image_from_gmap, plot_dt_image
 
 image = imread(
-    "./../../data/image/DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png", 0)
+    "./../../data/images/DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png", 0)
 
 # Transform image with label to gmap
 gmap = LabelMap.from_labels(image)

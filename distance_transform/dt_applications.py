@@ -147,6 +147,25 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
 
     return gmap, time_to_reduce_gmap_s, time_to_compute_dt_s
 
+def compute_dt_for_diffusion_distance_image(image: np.array) -> typing.Tuple[np.array, float]:
+    """Computes the diffusion distance of the cell represented by the image in image_path.
+
+    Args:
+        image: the image of the cell.
+
+    Returns:
+        typing.Tuple[np.array, float]: The diffusion distance image and the time required to compute it.
+    """
+
+    # Compute dt from stomata to the cells
+    start = time.time_ns()
+    dt_image = generalized_wave_propagation_image(image, [labels["stomata"]], [labels['air']], [labels['cell']])
+    end = time.time_ns()
+    time_to_compute_dt_s = (end - start) / (10 ** 9)
+
+    return dt_image, time_to_compute_dt_s
+
+
 
 def compute_dt_from_stomata_to_cells(image: np.array) -> np.array:
     gmap = LabelMap.from_labels(image)
