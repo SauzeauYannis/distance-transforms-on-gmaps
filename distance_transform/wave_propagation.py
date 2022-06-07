@@ -132,11 +132,14 @@ def generalized_wave_propagation_gmap(
 
 
 def generate_accumulation_directions_vertex(gmap_size: int) -> typing.List[bool]:
-    """
-    Generates the accumulation directions array for the vertex of the max dimension.
+    """Generates the accumulation directions array for the vertex of the max dimension.
+
     For a 2gmap is the face (2vertex) for a 3gmap is the volume (3vertex).
     Note that the face in a 2gmap corresponds to a pixel in the corresponding image.
     and the volume in a 3gmap corresponds to a voxel in the corresponding 3d image.
+
+    Args:
+        > gmap_size (int): The size of the gmap.
 
     Note:
     The size of a n-gmap is n.
@@ -151,11 +154,14 @@ def generate_accumulation_directions_vertex(gmap_size: int) -> typing.List[bool]
 
 
 def generate_accumulation_directions_cell(gmap_size: int) -> typing.List[bool]:
-    """
-    Generates the accumulation directions array for the cell of the max dimension.
+    """Generates the accumulation directions array for the cell of the max dimension.
+
     For a 2gmap is the face (2cell) for a 3gmap is the volume (3cell).
     Note that the face in a 2gmap corresponds to a pixel in the corresponding image.
     and the volume in a 3gmap corresponds to a voxel in the corresponding 3d image.
+
+    Args:
+        > gmap_size (int): The size of the gmap.
 
     Note:
     The size of a n-gmap is n.
@@ -170,7 +176,17 @@ def generate_accumulation_directions_cell(gmap_size: int) -> typing.List[bool]:
     return accumulation_directions
 
 
-def _init_wave_propagation(gmap, accumulation_directions):
+def _init_wave_propagation(
+    gmap,
+    accumulation_directions: typing.List[bool] = None
+) -> typing.Tuple[typing.List[bool], Queue, Queue]:
+    """Initializes the wave propagation.
+
+    Args:
+        > gmap (Gmap): The gmap to compute the distance transform.
+        > accumulation_directions (typing.List[bool], optional): Has to be a list of n+1 elements, where n is the level of the gmap.
+    """
+
     # Initialization
     gmap.distances.fill(-1)
 
