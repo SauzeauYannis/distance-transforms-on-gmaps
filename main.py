@@ -1,3 +1,4 @@
+from cv2 import imread
 import numpy as np
 
 from distance_transform.wave_propagation import *
@@ -9,7 +10,6 @@ from distance_transform.dt_utils import *
 from distance_transform.dt_applications import *
 from visual_test.test_dt_applications import *
 import imageio
-import matplotlib.pyplot as plt
 from combinatorial.utils import build_dt_grey_image_from_gmap
 import cv2
 
@@ -22,6 +22,7 @@ def dt_gmap_example():
     # bounded pixel map example
     bpm = PixelMap.from_shape(2, 2)
     # bpm.plot_faces()
+    print(bpm.n_rows)
 
     for dart in bpm.darts:
         print(type(dart))
@@ -29,11 +30,11 @@ def dt_gmap_example():
 
     wave_propagation_dt_gmap(bpm, [2, 4, 7])
 
-    for dart in bpm.darts_with_attributes:
-        print(type(dart))
-        dart.identifier
-        print(dart.attributes["distance"])
-        break
+    # for dart in bpm.darts:
+    #     print(type(dart))
+    #     dart.identifier
+    #     print(dart.attributes["distance"])
+    #     break
 
     bpm.plot_faces_dt()
 
@@ -172,25 +173,15 @@ def print_different_values_image(image: np.array) -> None:
 
 
 def main():
-    image = cv2.imread(
-        "./data/image/DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png", 0)
-
-    gmap = LabelMap.from_labels(image)
-
-    generalized_wave_propagation_gmap(
-        gmap,
-        seed_labels=[labels["stomata"]],
+    image = imread(
+        "data\image\DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png")
+    result_img = generalized_wave_propagation_image(
+        image=image,
+        seed_labels=[labels['stomata']],
         propagation_labels=[labels['air']],
         target_labels=[labels['cell']]
     )
-
-    dt_image = build_dt_grey_image_from_gmap(
-        gmap, 
-        propagation_labels=[labels["stomata"], labels['air']], 
-        interpolate_missing_values=False
-    )
-
-    plot_dt_image(dt_image)
+    show_image(result_img)
 
 
 if __name__ == "__main__":

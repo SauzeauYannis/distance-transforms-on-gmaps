@@ -4,8 +4,13 @@ import numpy as np
 import time
 
 
-def generalized_wave_propagation_image(image: np.array, seed_labels: typing.List[int],
-                                       propagation_labels: typing.List[int], target_labels: typing.List[int]) -> np.array:
+def generalized_wave_propagation_image(
+    image: np.array,
+    seed_labels: typing.List[int],
+    propagation_labels: typing.List[int],
+    target_labels: typing.List[int]
+) -> np.array:
+
     # int64 should be sufficient
     output_image = np.zeros(image.shape, np.int64)
     output_image.fill(-1)  # initialize output_image
@@ -18,7 +23,7 @@ def generalized_wave_propagation_image(image: np.array, seed_labels: typing.List
     # Find seeds and add to queue
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
-            if image[i][j] in seed_labels:
+            if image[i][j].any() in seed_labels:
                 queue.put((i, j))
                 output_image[i][j] = 0
 
@@ -267,8 +272,13 @@ def wave_propagation_dt_gmap(gmap, seeds_identifiers: typing.Optional[typing.Lis
         next_queue = Queue()
 
 
-def generalized_wave_propagation_gmap(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int],
-                                      target_labels: typing.List[int], accumulation_directions: typing.List[bool] = None) -> None:
+def generalized_wave_propagation_gmap(
+    gmap,
+    seed_labels: typing.List[int],
+    propagation_labels: typing.List[int],
+    target_labels: typing.List[int],
+    accumulation_directions: typing.List[bool] = None
+) -> None:
     """It computes the distance transformation for the gmap passed as parameter.
 
     Args:

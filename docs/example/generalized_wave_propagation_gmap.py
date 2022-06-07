@@ -14,14 +14,14 @@ gmap = LabelMap.from_labels(image)
 # from stomata to the cells of the leaf propagated in the air
 generalized_wave_propagation_gmap(
     gmap,
-    seed_labels=[labels["stomata"]],
+    seed_labels=[labels['stomata']],
     propagation_labels=[labels['air']],
     target_labels=[labels['cell']]
 )
 
 dt_image = build_dt_grey_image_from_gmap(
     gmap,
-    propagation_labels=[labels["stomata"], labels['air']],
+    propagation_labels=[labels['stomata'], labels['air']],
     interpolate_missing_values=False
 )
 
