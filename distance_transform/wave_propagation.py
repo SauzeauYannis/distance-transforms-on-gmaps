@@ -4,45 +4,6 @@ import numpy as np
 import time
 
 
-def generalized_wave_propagation_image(
-    image: np.array,
-    seed_labels: typing.List[int],
-    propagation_labels: typing.List[int],
-    target_labels: typing.List[int]
-) -> np.array:
-
-    # int64 should be sufficient
-    output_image = np.zeros(image.shape, np.int64)
-    output_image.fill(-1)  # initialize output_image
-
-    queue = Queue()
-
-    #
-    admissible_labels = propagation_labels + target_labels
-
-    # Find seeds and add to queue
-    for i in range(image.shape[0]):
-        for j in range(image.shape[1]):
-            if image[i][j].any() in seed_labels:
-                queue.put((i, j))
-                output_image[i][j] = 0
-
-    while not queue.empty():
-        pixel = queue.get()
-        # Visit all the neighbours
-        for i in range(4):
-            neighbour = get_next_neighbour_image(
-                i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
-            if neighbour is not None and image[neighbour[0]][neighbour[1]] in admissible_labels and\
-                    output_image[neighbour[0], neighbour[1]] == -1:
-                output_image[neighbour[0], neighbour[1]
-                             ] = output_image[pixel[0], pixel[1]] + 1
-                if image[neighbour[0]][neighbour[1]] in propagation_labels:
-                    queue.put(neighbour)
-
-    return output_image
-
-
 def wave_propagation_dt_image(image: np.array, seeds: typing.List[typing.Tuple[int, int]] = None) -> np.array:
     """
     4-neighborhood connection
