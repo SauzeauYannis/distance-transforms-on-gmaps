@@ -174,6 +174,8 @@ def print_different_values_image(image: np.array) -> None:
 
 def main():
     print("main")
+    print(generate_random_binary_image(10, 0.5))
+    plot_binary_image(generate_random_binary_image(10, 0.5))
 
 if __name__ == "__main__":
     main()

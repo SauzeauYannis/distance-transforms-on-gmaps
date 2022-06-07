@@ -13,10 +13,10 @@ def wave_propagation_dt_gmap(
     """It computes the distance transformation for the gmap passed as parameter.
 
     Args:
-        > gmap: The gmap to compute the distance transform.
-        > seeds_identifiers (typing.Optional[typing.List[int]]): If None all the darts with label equal to 0 will be used
+        gmap: the gmap to compute the distance transform.
+        seeds_identifiers (typing.Optional[typing.List[int]]): if None all the darts with label equal to 0 will be used
     and the distance propagates only in the non foreground darts (!= 255)
-        > accumulation_directions (typing.List[bool], optional): Has to be a list of n+1 elements, where n is the level of the gmap.
+        accumulation_directions (typing.List[bool], optional): has to be a list of n+1 elements, where n is the level of the gmap.
     Each element can be True, if the distance has to be increased, or False otherwise.
     Passing None as parameter has the same result of passing an array of True.
     The default behaviour is to increase the distance for all the directions, but a different combination can be used to increase
@@ -76,11 +76,11 @@ def generalized_wave_propagation_gmap(
     """It computes the distance transformation for the gmap passed as parameter.
 
     Args:
-        > gmap: The gmap to compute the distance transform.
-        > seed_labels (typing.List[int]): The labels of the seeds darts.
-        > propagation_labels (typing.List[int]): The labels of the darts that can be propagated.
-        > target_labels (typing.List[int]): The labels of the darts that have to be reached.
-        > accumulation_directions (typing.List[bool], optional): Has to be a list of n+1 elements, where n is the level of the gmap.
+        gmap: the gmap to compute the distance transform.
+        seed_labels (typing.List[int]): the labels of the seeds darts.
+        propagation_labels (typing.List[int]): the labels of the darts that can be propagated.
+        target_labels (typing.List[int]): the labels of the darts that have to be reached.
+        accumulation_directions (typing.List[bool], optional): has to be a list of n+1 elements, where n is the level of the gmap.
     Each element can be True, if the distance has to be increased, or False otherwise.
     Passing None as parameter has the same result of passing an array of True.
     The default behaviour is to increase the distance for all the directions, but a different combination can be used to increase
@@ -142,10 +142,10 @@ def generalized_wave_propagation_image(
     """It computes the distance transformation for the image passed as parameter.
 
     Args:
-        > image: The image to compute the distance transform.
-        > seed_labels (typing.List[int]): The labels of the seeds darts.
-        > propagation_labels (typing.List[int]): The labels of the darts that can be propagated.
-        > target_labels (typing.List[int]): The labels of the darts that have to be reached.
+        image: the image to compute the distance transform.
+        seed_labels (typing.List[int]): the labels of the seeds darts.
+        propagation_labels (typing.List[int]): the labels of the darts that can be propagated.
+        target_labels (typing.List[int]): the labels of the darts that have to be reached.
 
     Returns:
         np.array: The distance transform of the image.
@@ -190,11 +190,11 @@ def wave_propagation_dt_image(
     """It computes the distance transform for the image passed as parameter.
 
     Args:
-        > image: The image to compute the distance transform.
-        > seeds (typing.List[typing.Tuple[int, int]]): The seeds of the distance transform.
+        image: the image to compute the distance transform.
+        seeds (typing.List[typing.Tuple[int, int]]): the seeds of the distance transform.
 
     Returns:
-        np.array: The distance transform of the image.
+        np.array: the distance transform of the image.
     """
 
     output_image = np.zeros(image.shape, image.dtype)
@@ -234,14 +234,14 @@ def get_next_neighbour_image(index: int, x: int, y: int, max_x: int, max_y: int)
     """It returns the next neighbour of the pixel passed as parameter.
 
     Args:
-        > index: The index of the neighbour.
-        > x: The x coordinate of the pixel.
-        > y: The y coordinate of the pixel.
-        > max_x: The maximum x coordinate of the image.
-        > max_y: The maximum y coordinate of the image.
+        index: the index of the neighbour.
+        x: the x coordinate of the pixel.
+        y: the y coordinate of the pixel.
+        max_x: the maximum x coordinate of the image.
+        max_y: the maximum y coordinate of the image.
 
     Returns:
-        typing.Tuple[int, int]: The coordinates of the next neighbour.
+        typing.Tuple[int, int]: the coordinates of the next neighbour.
     """
     if index == 0:  # left
         if y - 1 < 0:
@@ -275,14 +275,14 @@ def generate_accumulation_directions_vertex(gmap_size: int) -> typing.List[bool]
     and the volume in a 3gmap corresponds to a voxel in the corresponding 3d image.
 
     Args:
-        > gmap_size (int): The size of the gmap.
+        gmap_size: the size of the gmap.
 
     Returns:
-        typing.List[bool]: The accumulation directions array.
+        typing.List[bool]: the accumulation directions array.
 
     Note:
-    The size of a n-gmap is n.
-    So for a 2gmap the gmap size is equal to 2.
+        The size of a n-gmap is n.
+        So for a 2gmap the gmap size is equal to 2.
     """
     accumulation_directions = [True]
 
@@ -300,14 +300,14 @@ def generate_accumulation_directions_cell(gmap_size: int) -> typing.List[bool]:
     and the volume in a 3gmap corresponds to a voxel in the corresponding 3d image.
 
     Args:
-        > gmap_size (int): The size of the gmap.
+        gmap_size: the size of the gmap.
 
     Returns:
-        typing.List[bool]: The accumulation directions array.
+        typing.List[bool]: the accumulation directions array.
 
     Note:
-    The size of a n-gmap is n.
-    So for a 2gmap the gmap size is equal to 2.
+        The size of a n-gmap is n.
+        So for a 2gmap the gmap size is equal to 2.
     """
     accumulation_directions = []
 
@@ -325,11 +325,11 @@ def _init_wave_propagation(
     """Initializes the wave propagation.
 
     Args:
-        > gmap (Gmap): The gmap to compute the distance transform.
-        > accumulation_directions (typing.List[bool], optional): Has to be a list of n+1 elements, where n is the level of the gmap.
+        > gmap: the gmap to compute the distance transform.
+        > accumulation_directions (typing.List[bool], optional): has to be a list of n+1 elements, where n is the level of the gmap.
 
     Returns:
-        typing.Tuple[typing.List[bool], Queue, Queue]: The accumulation directions, the queue of the seeds and the queue of the pixels.
+        typing.Tuple[typing.List[bool], Queue, Queue]: the accumulation directions, the queue of the seeds and the queue of the pixels.
     """
 
     # Initialization
