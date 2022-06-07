@@ -1,7 +1,7 @@
 from cv2 import imread
 import numpy as np
 
-from distance_transform.wave_propagation import *
+from distance_transform.wave_propagation import _init_wave_propagation
 from distance_transform.preprocessing import *
 from combinatorial.pixelmap import LabelMap
 from combinatorial.zoo_labels import *
@@ -173,16 +173,7 @@ def print_different_values_image(image: np.array) -> None:
 
 
 def main():
-    image = imread(
-        "data\image\DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png")
-    result_img = generalized_wave_propagation_image(
-        image=image,
-        seed_labels=[labels['stomata']],
-        propagation_labels=[labels['air']],
-        target_labels=[labels['cell']]
-    )
-    show_image(result_img)
-
+    print("main")
 
 if __name__ == "__main__":
     main()
