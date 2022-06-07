@@ -1,6 +1,8 @@
-import typing
 from queue import Queue
+
 import time
+import typing
+import numpy as np
 
 
 def wave_propagation_dt_gmap(
@@ -131,6 +133,140 @@ def generalized_wave_propagation_gmap(
         next_queue = Queue()
 
 
+def generalized_wave_propagation_image(
+    image: np.array,
+    seed_labels: typing.List[int],
+    propagation_labels: typing.List[int],
+    target_labels: typing.List[int]
+) -> np.array:
+    """It computes the distance transformation for the image passed as parameter.
+
+    Args:
+        > image: The image to compute the distance transform.
+        > seed_labels (typing.List[int]): The labels of the seeds darts.
+        > propagation_labels (typing.List[int]): The labels of the darts that can be propagated.
+        > target_labels (typing.List[int]): The labels of the darts that have to be reached.
+
+    Returns:
+        np.array: The distance transform of the image.
+    """
+
+    # int64 should be sufficient
+    output_image = np.zeros(image.shape, np.int64)
+    output_image.fill(-1)  # initialize output_image
+
+    queue = Queue()
+
+    #
+    admissible_labels = propagation_labels + target_labels
+
+    # Find seeds and add to queue
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            if image[i][j].any() in seed_labels:
+                queue.put((i, j))
+                output_image[i][j] = 0
+
+    while not queue.empty():
+        pixel = queue.get()
+        # Visit all the neighbours
+        for i in range(4):
+            neighbour = get_next_neighbour_image(
+                i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
+            if neighbour is not None and image[neighbour[0]][neighbour[1]] in admissible_labels and\
+                    output_image[neighbour[0], neighbour[1]] == -1:
+                output_image[neighbour[0], neighbour[1]
+                             ] = output_image[pixel[0], pixel[1]] + 1
+                if image[neighbour[0]][neighbour[1]] in propagation_labels:
+                    queue.put(neighbour)
+
+    return output_image
+
+
+def wave_propagation_dt_image(
+    image: np.array,
+    seeds: typing.List[typing.Tuple[int, int]] = None
+) -> np.array:
+    """It computes the distance transform for the image passed as parameter.
+
+    Args:
+        > image: The image to compute the distance transform.
+        > seeds (typing.List[typing.Tuple[int, int]]): The seeds of the distance transform.
+
+    Returns:
+        np.array: The distance transform of the image.
+    """
+
+    output_image = np.zeros(image.shape, image.dtype)
+    # initialize output_image
+    for i in range(output_image.shape[0]):
+        for j in range(output_image.shape[1]):
+            output_image[i][j] = -1
+
+    queue = Queue()
+    if seeds is None:
+        # find seeds and add to queue
+        for i in range(image.shape[0]):
+            for j in range(image.shape[1]):
+                if image[i][j] == 0:
+                    queue.put((i, j))
+                    output_image[i][j] = 0
+    else:
+        for seed in seeds:
+            output_image[seed[0]][seed[1]] = image[seed[0]][seed[1]]
+            queue.put(seed)
+
+    while not queue.empty():
+        pixel = queue.get()
+        # Visit all the neighbours
+        for i in range(4):
+            neighbour = get_next_neighbour_image(
+                i, pixel[0], pixel[1], image.shape[0] - 1, image.shape[1] - 1)
+            if neighbour is not None and output_image[neighbour[0], neighbour[1]] == -1:
+                output_image[neighbour[0], neighbour[1]
+                             ] = output_image[pixel[0], pixel[1]] + 1
+                queue.put(neighbour)
+
+    return output_image
+
+
+def get_next_neighbour_image(index: int, x: int, y: int, max_x: int, max_y: int) -> typing.Tuple[int, int]:
+    """It returns the next neighbour of the pixel passed as parameter.
+
+    Args:
+        > index: The index of the neighbour.
+        > x: The x coordinate of the pixel.
+        > y: The y coordinate of the pixel.
+        > max_x: The maximum x coordinate of the image.
+        > max_y: The maximum y coordinate of the image.
+
+    Returns:
+        typing.Tuple[int, int]: The coordinates of the next neighbour.
+    """
+    if index == 0:  # left
+        if y - 1 < 0:
+            return None
+        else:
+            return x, y - 1
+    elif index == 1:  # up
+        if x - 1 < 0:
+            return None
+        else:
+            return x - 1, y
+    elif index == 2:  # right
+        if y + 1 > max_y:
+            return None
+        else:
+            return x, y + 1
+    elif index == 3:  # down
+        if x + 1 > max_x:
+            return None
+        else:
+            return x + 1, y
+    else:
+        raise Exception(f"Unexpected index {index}")
+
+
 def generate_accumulation_directions_vertex(gmap_size: int) -> typing.List[bool]:
     """Generates the accumulation directions array for the vertex of the max dimension.
 
@@ -140,6 +276,9 @@ def generate_accumulation_directions_vertex(gmap_size: int) -> typing.List[bool]
 
     Args:
         > gmap_size (int): The size of the gmap.
+
+    Returns:
+        typing.List[bool]: The accumulation directions array.
 
     Note:
     The size of a n-gmap is n.
@@ -163,6 +302,9 @@ def generate_accumulation_directions_cell(gmap_size: int) -> typing.List[bool]:
     Args:
         > gmap_size (int): The size of the gmap.
 
+    Returns:
+        typing.List[bool]: The accumulation directions array.
+
     Note:
     The size of a n-gmap is n.
     So for a 2gmap the gmap size is equal to 2.
@@ -185,6 +327,9 @@ def _init_wave_propagation(
     Args:
         > gmap (Gmap): The gmap to compute the distance transform.
         > accumulation_directions (typing.List[bool], optional): Has to be a list of n+1 elements, where n is the level of the gmap.
+
+    Returns:
+        typing.Tuple[typing.List[bool], Queue, Queue]: The accumulation directions, the queue of the seeds and the queue of the pixels.
     """
 
     # Initialization

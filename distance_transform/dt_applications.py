@@ -1,14 +1,15 @@
-import cv2
 from distance_transform.preprocessing import generalized_find_borders
 from data.labels import labels
 from distance_transform.wave_propagation import *
 from combinatorial.pixelmap import LabelMap
 from combinatorial.gmaps import nGmap
 from distance_transform.preprocessing import connected_component_labeling_one_pass
-import numpy as np
 from combinatorial.utils import build_dt_grey_image_from_gmap
 from distance_transform.dt_utils import *
 from distance_transform.dijkstra import *
+
+import cv2
+import numpy as np
 import time
 import os
 
@@ -71,7 +72,7 @@ def compute_diffusion_distance_image(image: np.array, dt_image: np.array, label:
 
 def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None, verbose: bool = False,
                                       compute_voronoi_diagram: bool = False, reduction_factor: float = 0,
-                                      use_weights: bool = False) -> (nGmap, float, float):
+                                      use_weights: bool = False) -> typing.Tuple[nGmap, float, float]:
     """
     Computes the diffusion distance of the cell represented by the image in image_path.
 
@@ -86,14 +87,16 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     connected_components_labels = None
     if compute_voronoi_diagram:
         # Find connected components labels
-        connected_components_labels = connected_component_labeling_one_pass(image)
+        connected_components_labels = connected_component_labeling_one_pass(
+            image)
 
     # Build gmap
-    gmap = LabelMap.from_labels(image, connected_components_labels=connected_components_labels)
+    gmap = LabelMap.from_labels(
+        image, connected_components_labels=connected_components_labels)
     if verbose:
         print("Gmap successfully builded")
     # gmap.uniform_labels_for_vertices()  # used if the improvement algorithm is used. Does not work good
-                                          # I can't do that.
+        # I can't do that.
 
     # Reduce gmap
     start = time.time_ns()
@@ -101,7 +104,8 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
         gmap.remove_edges(reduction_factor)
         gmap.remove_vertices()
         if verbose:
-            print(f"Gmap successfully reduced with reduction factor: {reduction_factor}")
+            print(
+                f"Gmap successfully reduced with reduction factor: {reduction_factor}")
     end = time.time_ns()
     time_to_reduce_gmap_s = (end - start) / (10 ** 9)
 
@@ -109,9 +113,11 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     accumulation_directions = generate_accumulation_directions_vertex(2)
     start = time.time_ns()
     if use_weights:
-        generalized_dijkstra_dt_gmap(gmap, [labels["stomata"]], [labels['air']], [labels['cell']], accumulation_directions)
+        generalized_dijkstra_dt_gmap(gmap, [labels["stomata"]], [labels['air']], [
+                                     labels['cell']], accumulation_directions)
     else:
-        generalized_wave_propagation_gmap(gmap, [labels["stomata"]], [labels['air']], [labels['cell']], accumulation_directions)
+        generalized_wave_propagation_gmap(gmap, [labels["stomata"]], [labels['air']], [
+                                          labels['cell']], accumulation_directions)
         # improved_wave_propagation_gmap_vertex(gmap, [labels["stomata"]], propagation_labels)
     end = time.time_ns()
     time_to_compute_dt_s = (end - start) / (10 ** 9)
@@ -119,17 +125,22 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
         print("Dt successfully computed")
 
     # Save dt image
-    dt_image_real_distances = gmap.build_dt_image(propagation_labels=[labels["stomata"], labels['air']], interpolate_missing_values=True)
-    dt_image = build_dt_grey_image_from_gmap(gmap, propagation_labels=[labels["stomata"], labels['air']], interpolate_missing_values=False)
-    dt_image_interpolated = build_dt_grey_image_from_gmap(gmap, propagation_labels=[labels["stomata"], labels['air']], interpolate_missing_values=True)
+    dt_image_real_distances = gmap.build_dt_image(propagation_labels=[
+                                                  labels["stomata"], labels['air']], interpolate_missing_values=True)
+    dt_image = build_dt_grey_image_from_gmap(gmap, propagation_labels=[
+                                             labels["stomata"], labels['air']], interpolate_missing_values=False)
+    dt_image_interpolated = build_dt_grey_image_from_gmap(gmap, propagation_labels=[
+                                                          labels["stomata"], labels['air']], interpolate_missing_values=True)
     if verbose:
         print("dt image successfully computed")
 
     if dt_image_path:
-        real_distances_image_name = os.path.splitext(dt_image_path)[0] + "_real_distances.npy"
+        real_distances_image_name = os.path.splitext(
+            dt_image_path)[0] + "_real_distances.npy"
         np.save(real_distances_image_name, dt_image_real_distances)
         cv2.imwrite(dt_image_path, dt_image)
-        interpolated_image_name = os.path.splitext(dt_image_path)[0] + "_interpolated.png"
+        interpolated_image_name = os.path.splitext(
+            dt_image_path)[0] + "_interpolated.png"
         cv2.imwrite(interpolated_image_name, dt_image_interpolated)
 
     # Decomment to generate contour plot
@@ -138,36 +149,18 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
     return gmap, time_to_reduce_gmap_s, time_to_compute_dt_s
 
 
-def compute_dt_for_diffusion_distance_image(image: np.array) -> (np.array, float):
-    """
-    Computes the diffusion distance of the cell represented by the image in image_path.
-
-    It returns a tuple
-    The first element is the dt_image
-    The second element is the time, in seconds, required to compure dt
-    """
-
-    # Compute dt from stomata to the cells
-    start = time.time_ns()
-    dt_image = generalized_wave_propagation_image(image, [labels["stomata"]], [labels['air']], [labels['cell']])
-    end = time.time_ns()
-    time_to_compute_dt_s = (end - start) / (10 ** 9)
-
-    return dt_image, time_to_compute_dt_s
-
-####################
-
-
 def compute_dt_from_stomata_to_cells(image: np.array) -> np.array:
     gmap = LabelMap.from_labels(image)
-    generalized_wave_propagation_gmap(gmap, [labels["stomata"]], [labels['air']], [labels['cell']])
+    generalized_wave_propagation_gmap(gmap, [labels["stomata"]], [
+                                      labels['air']], [labels['cell']])
 
     return gmap.distances.reshape(image.shape[0], image.shape[1], 8)
 
 
 def compute_dt_inside_air(image: np.array) -> np.array:
     # Identiy the air region reacheable by the stomata
-    dt_image = generalized_wave_propagation_image(image, [labels["stomata"]], [labels['air']], [labels['air']])
+    dt_image = generalized_wave_propagation_image(
+        image, [labels["stomata"]], [labels['air']], [labels['air']])
     air_image = np.copy(dt_image)  # to modify, I have to remove stomata
     for i in range(air_image.shape[0]):
         for j in range(air_image.shape[1]):
@@ -176,12 +169,11 @@ def compute_dt_inside_air(image: np.array) -> np.array:
             else:
                 air_image[i][j] = labels["air"]
 
-    image_with_borders = generalized_find_borders(air_image, labels["air"], 180)
+    image_with_borders = generalized_find_borders(
+        air_image, labels["air"], 180)
     gmap = LabelMap.from_labels(image_with_borders)
-    generalized_wave_propagation_gmap(gmap, [180], [labels['air']], [labels['air']])
-
-    # dt_image = build_dt_grey_image_from_gmap(gmap, propagation_labels=[labels["stomata"], labels['air']], interpolate_missing_values=False)
-    # plot_dt_image(dt_image)
+    generalized_wave_propagation_gmap(
+        gmap, [180], [labels['air']], [labels['air']])
 
     return gmap.distances.reshape(image.shape[0], image.shape[1], 8)
 
@@ -189,6 +181,7 @@ def compute_dt_inside_air(image: np.array) -> np.array:
 def compute_dt_from_stomata_to_cells_using_borders(image: np.array) -> np.array:
     image_with_borders = generalized_find_borders(image, labels["air"], 180)
     gmap = LabelMap.from_labels(image_with_borders)
-    generalized_wave_propagation_gmap(gmap, [labels["stomata"]], [180], [labels["cell"]])
+    generalized_wave_propagation_gmap(
+        gmap, [labels["stomata"]], [180], [labels["cell"]])
 
     return gmap.distances.reshape(image.shape[0], image.shape[1], 8)
