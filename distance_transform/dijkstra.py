@@ -1,25 +1,25 @@
-import typing
 from heapq import heapify, heappush, heappop
 
+import typing
 
-def generalized_dijkstra_dt_gmap(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int],
-                                 target_labels: typing.List[int], accumulation_directions: typing.List[bool] = None) -> None:
-    """
-    It also saves for each dart the connected_component_label of the closest seed.
-    It is useful for the generation of voronoi diagrams.
 
-    It does make no sense to use the algorithms also for faces.
-    I do that only for test purposes.
+def generalized_dijkstra_dt_gmap(
+    gmap,
+    seed_labels: typing.List[int],
+    propagation_labels: typing.List[int],
+    target_labels: typing.List[int],
+    accumulation_directions: typing.List[bool] = None
+) -> None:
+    """Compute the distance transform of a gmap using the Dijkstra algorithm
+
+    Args:
+        gmap: the gmap to compute the distance transform
+        seed_labels: the labels of the seed points
+        propagation_labels: the labels of the propagation points
+        target_labels: the labels of the target points
+        accumulation_directions: the accumulation directions of the propagation points
     """
 
-    """
-    At the moment the heap implementation that I am using doesn't has a method to update a value
-    So I add values to the heap even if it is already present.
-    This not affect the correctness but memory consumption and performance.
-    In order to not consider the same dart multiple times, I need a visited structure.
-    """
-
-    #
     admissible_labels = propagation_labels + target_labels
 
     # Initialization
@@ -32,19 +32,19 @@ def generalized_dijkstra_dt_gmap(gmap, seed_labels: typing.List[int], propagatio
             accumulation_directions.append(True)
 
     # Initialize distance to 0 for seeds and add the seeds to the heap
-    heap = []  # each element is a tuple -> (distance, dart)
+    heap = []
     heapify(heap)
     for dart in gmap.darts:
         if gmap.image_labels[dart] in seed_labels:
             gmap.distances[dart] = 0
-            heappush(heap, (gmap.distances[dart], dart))
+            heappush(heap, dart)
             gmap.dt_connected_components_labels[dart] = gmap.connected_components_labels[dart]
 
     # visited
     visited = set()
 
     while len(heap) > 0:
-        distance, dart = heappop(heap)
+        dart = heappop(heap)
         visited.add(dart)
         # Visit all the neighbours
         for i in range(gmap.n + 1):
@@ -61,15 +61,15 @@ def generalized_dijkstra_dt_gmap(gmap, seed_labels: typing.List[int], propagatio
             if accumulation_directions[i]:
                 if gmap.distances[neighbour] == -1 \
                         or gmap.distances[dart] + gmap.weights[dart] < gmap.distances[neighbour]:
-                    gmap.distances[neighbour] = gmap.distances[dart] + gmap.weights[dart]
+                    gmap.distances[neighbour] = gmap.distances[dart] + \
+                        gmap.weights[dart]
                     gmap.dt_connected_components_labels[neighbour] = gmap.dt_connected_components_labels[dart]
                     if gmap.image_labels[neighbour] in propagation_labels:
-                        heappush(heap, (gmap.distances[neighbour], neighbour))
+                        heappush(heap, neighbour)
             else:
                 if gmap.distances[neighbour] == -1 \
                         or gmap.distances[dart] < gmap.distances[neighbour]:
                     gmap.distances[neighbour] = gmap.distances[dart]
                     gmap.dt_connected_components_labels[neighbour] = gmap.dt_connected_components_labels[dart]
                     if gmap.image_labels[neighbour] in propagation_labels:
-                        heappush(heap, (gmap.distances[neighbour], neighbour))
-
+                        heappush(heap, neighbour)

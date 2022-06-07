@@ -1,13 +1,12 @@
+from combinatorial.pixelmap import LabelMap
+from distance_transform.dijkstra import generalized_dijkstra_dt_gmap
+from distance_transform.dt_utils import gmap_dt_equal
+from distance_transform.wave_propagation import generalized_wave_propagation_gmap, generate_accumulation_directions_cell, generate_accumulation_directions_vertex
+
 from unittest import TestCase
 
-import numpy as np
-from distance_transform.wave_propagation import *
-from combinatorial.pixelmap import PixelMap
-from distance_transform.dt_utils import *
-from combinatorial.pixelmap import LabelMap
-from distance_transform.preprocessing import *
-from distance_transform.dijkstra import *
 import cv2
+import random
 
 
 class TestDijkstra(TestCase):
@@ -15,28 +14,32 @@ class TestDijkstra(TestCase):
         pass
 
     def test_generalized_dijkstra_dt_gmap_unweighted_faces(self):
-        image = cv2.imread('../data/dt_test_image.png', 0)
+        image = cv2.imread('../data/image/dt_test_image.png', 0)
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 
-        generalized_dijkstra_dt_gmap(actual_gmap, [0], [255], generate_accumulation_directions_cell(2))
-        generalized_wave_propagation_gmap(expected_gmap, [0], [255], generate_accumulation_directions_cell(2))
+        generalized_dijkstra_dt_gmap(
+            actual_gmap, [0], [255], generate_accumulation_directions_cell(2))
+        generalized_wave_propagation_gmap(
+            expected_gmap, [0], [255], generate_accumulation_directions_cell(2))
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
     def test_generalized_dijkstra_dt_gmap_unweighted_vertices(self):
-        image = cv2.imread('../data/dt_test_image.png', 0)
+        image = cv2.imread('../data/image/dt_test_image.png', 0)
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 
-        generalized_dijkstra_dt_gmap(actual_gmap, [0], [255], generate_accumulation_directions_vertex(2))
-        generalized_wave_propagation_gmap(expected_gmap, [0], [255], generate_accumulation_directions_vertex(2))
+        generalized_dijkstra_dt_gmap(
+            actual_gmap, [0], [255], generate_accumulation_directions_vertex(2))
+        generalized_wave_propagation_gmap(
+            expected_gmap, [0], [255], generate_accumulation_directions_vertex(2))
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
     def test_generalized_dijkstra_dt_gmap_weighted_vertices(self):
         random.seed(42)
-        image = cv2.imread('../data/dt_test_image_2.png', 0)
+        image = cv2.imread('../data/image/dt_test_image_2.png', 0)
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 
@@ -119,14 +122,15 @@ class TestDijkstra(TestCase):
 
         expected_gmap.plot_dt()
 
-        generalized_dijkstra_dt_gmap(actual_gmap, [0], [255], [], generate_accumulation_directions_vertex(2))
+        generalized_dijkstra_dt_gmap(
+            actual_gmap, [0], [255], [], generate_accumulation_directions_vertex(2))
         print(generate_accumulation_directions_vertex(2))
 
         actual_gmap.plot_dt()
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
     def test_generalized_dijkstra_dt_gmap_unweighted_faces_propagation_bug(self):
-        image = cv2.imread('../data/5_5_boundary.png', 0)
+        image = cv2.imread('../data/image/5_5_boundary.png', 0)
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 
@@ -162,7 +166,8 @@ class TestDijkstra(TestCase):
         for i in range(184, 200):
             expected_gmap.set_dart_distance(i, 2)
 
-        generalized_dijkstra_dt_gmap(actual_gmap, [0], [195], [], generate_accumulation_directions_cell(2))
+        generalized_dijkstra_dt_gmap(
+            actual_gmap, [0], [195], [], generate_accumulation_directions_cell(2))
 
         # plot
         expected_gmap.plot()
