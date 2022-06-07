@@ -1,22 +1,25 @@
-import typing
+from queue import Queue
 
+import typing
 import numpy as np
 import math
 import random
-from queue import Queue
 
 random.seed(42)
 
+
 def generalized_find_borders(image: np.array, region_label_value: int, border_label_value: int) -> np.array:
-    """
-    It finds the borders of the regions with label_value and creates a new image identical with
+    """It finds the borders of the regions with label_value and creates a new image identical with
     the image passed parameters but with the borders of the interested regions modified with
     border_label_value
 
-    :param image:
-    :param label_value:
-    :param border_label_value:
-    :return:
+    Args:
+        image: the image to be modified
+        region_label_value: the label value of the regions of interest
+        border_label_value: the label value of the borders of the regions of interest
+
+    Returns:
+        np.array: the modified image
     """
 
     new_image = np.copy(image)
@@ -29,30 +32,44 @@ def generalized_find_borders(image: np.array, region_label_value: int, border_la
     return new_image
 
 
-def is_equal_to_neighbours(image: np.array, value_position: typing.Tuple[int, int]) -> True:
-    """
-    8-connectivity check
-    * * * * *
-    t t t * *
-    t x t * *
-    t t t * *
+def is_equal_to_neighbours(image: np.array, value_position: typing.Tuple[int, int]) -> bool:
+    """Check 8-connectedness of the pixel at the position passed as parameter
+
+    8-connectivity check\n
+    \* * * * *\n
+    t t t * *\n
+    t x t * *\n
+    t t t * *\n
 
     If x is the value to checks, all values equals to t will be checked
+
+    Args:
+        image: the image to be checked
+        value_position: the position of the pixel to be checked
+
+    Returns:
+        bool: True if the pixel at the position passed as parameter is equal to its neighbours
     """
     value_x = value_position[0]
     value_y = value_position[1]
-    x_values = [value_x - 1, value_x - 1, value_x - 1,      value_x,     value_x,           value_x + 1, value_x + 1, value_x + 1]
-    y_values = [value_y - 1, value_y,     value_y + 1,      value_y - 1, value_y + 1,       value_y - 1, value_y,     value_y + 1]
+
+    x_values = [value_x - 1, value_x - 1, value_x - 1, value_x,
+                value_x,     value_x + 1, value_x + 1, value_x + 1]
+    y_values = [value_y - 1, value_y,     value_y + 1, value_y - 1,
+                value_y + 1, value_y - 1, value_y,     value_y + 1]
+
     for x, y in zip(x_values, y_values):
-            if not (0 <= x < image.shape[0]) or not (0 <= y < image.shape[1]) or image[x][y] != image[value_x][value_y]:
-                return False
+        if not (0 <= x < image.shape[0]) \
+                or not (0 <= y < image.shape[1]) \
+                or image[x][y] != image[value_x][value_y]:
+            return False
+
     return True
 
 
-# Modify the function (maybe change also the name) in order to pass 2 array of labels
-# seeds_labels, propagation_labels
 def find_borders(labeled_image: np.array, label_value: int) -> np.array:
-    """
+    """Find the borders of the regions with label_value
+
     A pixel of a labeled component of interest is considered part of the border
     if the label of at least one of his neighbours is different from his label.
     4-neighbourhood is considered.
@@ -62,6 +79,13 @@ def find_borders(labeled_image: np.array, label_value: int) -> np.array:
     0: border
     255: foreground
     100: inside
+
+    Args:
+        labeled_image: the labeled image
+        label_value: the label value of the regions of interest
+
+    Returns:
+        np.array: the image with the borders of the regions of interest
     """
 
     image = np.copy(labeled_image)
@@ -70,17 +94,17 @@ def find_borders(labeled_image: np.array, label_value: int) -> np.array:
         for j in range(labeled_image.shape[1]):
             curr_pixel = labeled_image[i][j]
             if curr_pixel != label_value:
-                image[i][j] = 255 # foreground
+                image[i][j] = 255  # foreground
             elif is_equal_to_neighbours(labeled_image, (i, j)):
-                image[i][j] = 200 # inside
+                image[i][j] = 200  # inside
             else:
-                image[i][j] = 0 # border
+                image[i][j] = 0  # border
 
     return image
 
 
-def find_borders_on_gmap(gmap, label_value: int, face_value):
-    """
+def find_borders_on_gmap(gmap, label_value: int) -> None:
+    """Find the borders of the regions with label_value
 
     It modifies the gmap passed as parameter.
 
@@ -88,15 +112,29 @@ def find_borders_on_gmap(gmap, label_value: int, face_value):
     255: foreground
     100: inside
 
-    :param gmap:
-    :param label_value:
-    :return:
+    Args:
+        gmap: the gmap to be modified
+        label_value: the label value of the regions of interest
+
+    Returns:
+        None
     """
+
+    # TODO: code this function
 
     pass
 
 
 def clean_borders(image: np.array, kernel_size: int) -> np.array:
+    """Clean the borders of the image
+
+    Args:
+        image: the image to be cleaned
+        kernel_size: the size of the kernel used to clean the borders
+
+    Returns:
+        np.array: the cleaned image
+    """
 
     if kernel_size % 2 == 0:
         raise Exception("The size of the kernel must be odd")
@@ -105,47 +143,22 @@ def clean_borders(image: np.array, kernel_size: int) -> np.array:
 
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
-            cleaned_image[i][j] = get_most_common_value(image, i, j, kernel_size)
+            cleaned_image[i][j] = _get_most_common_value(
+                image, i, j, kernel_size)
 
     return cleaned_image
 
 
-def get_most_common_value(image: np.array, x: int, y: int, kernel_size: int, center_kernel: bool = True):
-    """
-    Center kernel specify if the kernel has to be centered in the pixel value or not.
-    If not the current pixel is positioned in the upper left position of the kernel
-    """
-
-    if center_kernel:
-        x_kernel_start = x - int(((kernel_size - 1) / 2))
-        y_kernel_start = y - int(((kernel_size - 1) / 2))
-    else:
-        x_kernel_start = x
-        y_kernel_start = y
-
-    values = {}
-
-    for i in range(kernel_size):
-        for j in range(kernel_size):
-            curr_x = x_kernel_start + i
-            curr_y = y_kernel_start + j
-            if 0 <= curr_x < image.shape[0] and 0 <= curr_y < image.shape[1]:
-                if image[curr_x][curr_y] not in values:
-                    values[image[curr_x][curr_y]] = 1
-                else:
-                    values[image[curr_x][curr_y]] = values[image[curr_x][curr_y]] + 1
-
-    max_value = -1
-    max_key = None
-    for key, value in values.items():
-        if value > max_value:
-            max_value = value
-            max_key = key
-
-    return max_key
-
-
 def remove_noise_from_labeled_image(image: np.array, labels: typing.Dict) -> np.array:
+    """Remove noise from the labeled image
+
+    Args:
+        image: the labeled image
+        labels: the labels of the regions of interest
+
+    Returns:
+        np.array: the image with the noise removed
+    """
 
     def find_closest_value(target, values):
         closest_value = None
@@ -168,7 +181,17 @@ def remove_noise_from_labeled_image(image: np.array, labels: typing.Dict) -> np.
 
 
 def get_different_values_image(image: np.array) -> typing.List:
+    """Get the different values of the image
+
+    Args:
+        image: the image
+
+    Returns:
+        typing.List: the different values of the image
+    """
+
     values = set()
+
     for i in range(image.shape[0]):
         for j in range(image.shape[1]):
             values.add(image[i][j])
@@ -177,8 +200,7 @@ def get_different_values_image(image: np.array) -> typing.List:
 
 
 def reduce_image_size(image: np.array, kernel_size: int) -> np.array:
-    """
-    It reduces the size of the image passed as parameter.
+    """It reduces the size of the image passed as parameter.
 
     The shape of the new image is equal to ceil(shape / kernel size)
     For each pixel a kernel of size "kernel_size" is considered.
@@ -186,21 +208,24 @@ def reduce_image_size(image: np.array, kernel_size: int) -> np.array:
     The value of the new pixel is the most common value in the image inside the kernel.
 
     Example:
-    kernel_size = 2
+        kernel_size = 2
 
-    1 1 3       1 3
-    0 1 3  ->   0 2
-    0 0 2
+        1 1 3 -> 1 3\n
+        0 1 3 -> 0 2\n
+        0 0 2
 
     Explanation:
-    1 1 -> 1   3 -> 3
-    0 1        3
+        1 1 -> 1 | 3 -> 3\n
+        0 1 -> . | 3 -> .\n
 
-    0 0 -> 0   2 -> 2
+        0 0 -> 0   2 -> 2
 
-    :param image:
-    :param kernel_size:
-    :return:
+    Args:
+        image: the image to be reduced
+        kernel_size: the size of the kernel used to reduce the image
+
+    Returns:
+        np.array: the reduced image
     """
 
     new_shape = [math.ceil(shape / kernel_size) for shape in image.shape]
@@ -208,21 +233,22 @@ def reduce_image_size(image: np.array, kernel_size: int) -> np.array:
 
     for i in range(reduced_image.shape[0]):
         for j in range(reduced_image.shape[1]):
-            reduced_image[i][j] = get_most_common_value(image, i * kernel_size, j * kernel_size, kernel_size)
+            reduced_image[i][j] = _get_most_common_value(
+                image, i * kernel_size, j * kernel_size, kernel_size)
 
     return reduced_image
 
 
 def connected_component_labeling_one_pass(image: np.array) -> np.array:
-    """
-    Pay attention to the number of connected components.
-    It influences the size of the resulting numpy array.
+    """Label the connected components of the image
+
+    Args:
+        image: the image to be labeled
+
+    Returns:
+        np.array: the labeled image
     """
 
-    """
-    The maximum number of connected components is equal to the number of pixels in the worst case
-    I assume that 4 bytes will be sufficient.
-    """
     labeled_image = np.zeros(image.shape, dtype=np.int32)
 
     # initialization
@@ -238,17 +264,28 @@ def connected_component_labeling_one_pass(image: np.array) -> np.array:
             if labeled_image[i][j] == -1:
                 # A new connected component has been found
                 # Assign the same label to the connected component using wave propagation algorithm
-                wave_propagation_labeling(image, labeled_image, (i, j), next_label)
+                _wave_propagation_labeling(
+                    image, labeled_image, (i, j), next_label)
                 next_label += 1
 
     return labeled_image
 
 
-def wave_propagation_labeling(image: np.array, labeled_image: np.array,
-                              position: typing.Tuple[int, int], label: int) -> None:
+def _wave_propagation_labeling(
+    image: np.array,
+    labeled_image: np.array,
+    position: typing.Tuple[int, int],
+    label: int
+) -> None:
+    """Label the connected component using wave propagation algorithm
+
+    Args:
+        image: the image
+        labeled_image: the labeled image
+        position: the position of the pixel to be labeled
+        label: the label to be assigned to the connected component    
     """
-    4 connected neighborhood
-    """
+
     def is_point_in_connected_component(image: np.array, labeled_image: np.array,
                                         position: typing.Tuple[int, int], label: int) -> bool:
         # check if point is in image
@@ -303,6 +340,12 @@ def wave_propagation_labeling(image: np.array, labeled_image: np.array,
 
 
 def generate_random_color() -> typing.Tuple[np.uint8, np.uint8, np.uint8]:
+    """Generate a random color
+
+    Returns:
+        typing.Tuple[np.uint8, np.uint8, np.uint8]: the random color in RGB
+    """
+
     r = math.floor(random.random() * 255)
     g = math.floor(random.random() * 255)
     b = math.floor(random.random() * 255)
@@ -311,6 +354,15 @@ def generate_random_color() -> typing.Tuple[np.uint8, np.uint8, np.uint8]:
 
 
 def build_rgb_image_from_labeled_image(labeled_image: np.array) -> np.array:
+    """Build an RGB image from a labeled image
+
+    Args:
+        labeled_image: the labeled image
+
+    Returns:
+        np.array: the RGB image
+    """
+    
     rgb_image_shape = (labeled_image.shape[0], labeled_image.shape[1], 3)
     rgb_image = np.zeros(rgb_image_shape, dtype=np.uint8)
 
@@ -324,3 +376,47 @@ def build_rgb_image_from_labeled_image(labeled_image: np.array) -> np.array:
             rgb_image[i][j] = colors[labeled_image[i][j]]
 
     return rgb_image
+
+
+def _get_most_common_value(
+    image: np.array,
+    x: int,
+    y: int,
+    kernel_size: int,
+    center_kernel: bool = True
+) -> typing.Any:
+    """Get the most common value in the kernel
+
+    Args:
+        image: The image to process
+        x: The x coordinate of the kernel
+        y: The y coordinate of the kernel
+        kernel_size: The size of the kernel
+        center_kernel: If True, the kernel will be centered on the point (x, y)
+
+    Returns:
+        The most common value in the kernel
+    """
+
+    x_kernel_start = x - int(((kernel_size - 1) / 2)) if center_kernel else x
+    y_kernel_start = y - int(((kernel_size - 1) / 2)) if center_kernel else y
+
+    values = {}
+
+    for i in range(kernel_size):
+        for j in range(kernel_size):
+            curr_x = x_kernel_start + i
+            curr_y = y_kernel_start + j
+            if 0 <= curr_x < image.shape[0] and 0 <= curr_y < image.shape[1]:
+                values[image[curr_x][curr_y]] = values.get(
+                    image[curr_x][curr_y], 0) + 1
+
+    max_value = -1
+    max_key = None
+
+    for key, value in values.items():
+        if value > max_value:
+            max_value = value
+            max_key = key
+
+    return max_key
