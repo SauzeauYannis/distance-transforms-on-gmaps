@@ -14,7 +14,7 @@ class TestDijkstra(TestCase):
         pass
 
     def test_generalized_dijkstra_dt_gmap_unweighted_faces(self):
-        image = cv2.imread('../data/image/dt_test_image.png', 0)
+        image = cv2.imread('../data/images/dt_test_image.png', 0)
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 
@@ -26,7 +26,7 @@ class TestDijkstra(TestCase):
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
     def test_generalized_dijkstra_dt_gmap_unweighted_vertices(self):
-        image = cv2.imread('../data/image/dt_test_image.png', 0)
+        image = cv2.imread('../data/images/dt_test_image.png', 0)
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 
@@ -39,7 +39,7 @@ class TestDijkstra(TestCase):
 
     def test_generalized_dijkstra_dt_gmap_weighted_vertices(self):
         random.seed(42)
-        image = cv2.imread('../data/image/dt_test_image_2.png', 0)
+        image = cv2.imread('../data/images/dt_test_image_2.png', 0)
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 
@@ -130,7 +130,7 @@ class TestDijkstra(TestCase):
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
     def test_generalized_dijkstra_dt_gmap_unweighted_faces_propagation_bug(self):
-        image = cv2.imread('../data/image/5_5_boundary.png', 0)
+        image = cv2.imread('../data/images/5_5_boundary.png', 0)
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 
