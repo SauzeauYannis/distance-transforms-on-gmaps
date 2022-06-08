@@ -1,4 +1,5 @@
 import random
+import typing
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -99,6 +100,7 @@ def gmap_dt_equal(gmap_1, gmap_2) -> bool:
 
 def compute_dt_reduction(
     image,
+    propagation_labels: typing.List,
     reduction_factor: float,
     show_gmap: bool = True,
     build_image_interpolate: bool = True
@@ -107,6 +109,7 @@ def compute_dt_reduction(
 
     Args:
         image: the image to compute the distance transform
+        propagation_labels: the labels to propagate
         reduction_factor: the reduction factor to apply
         show_gmap: if True, the gmap is plotted
         build_image_interpolate: if True, the image is interpolated to build the distance transform
@@ -130,6 +133,6 @@ def compute_dt_reduction(
         gmap.plot_dt(fill_cell='face')
 
     dt_image = build_dt_grey_image_from_gmap(
-        gmap, interpolate_missing_values=build_image_interpolate)
+        gmap, propagation_labels=propagation_labels, interpolate_missing_values=build_image_interpolate)
     print("image successfully retrieved")
     plot_dt_image(dt_image, None)

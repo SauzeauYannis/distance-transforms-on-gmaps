@@ -15,14 +15,14 @@ def wave_propagation_dt_gmap(
     Args:
         gmap: the gmap to compute the distance transform.
         seeds_identifiers (typing.Optional[typing.List[int]]): if None all the darts with label equal to 0 will be used
-    and the distance propagates only in the non foreground darts (!= 255)
-        accumulation_directions (typing.List[bool], optional): has to be a list of n+1 elements, where n is the level of the gmap.
-    Each element can be True, if the distance has to be increased, or False otherwise.
-    Passing None as parameter has the same result of passing an array of True.
-    The default behaviour is to increase the distance for all the directions, but a different combination can be used to increase
-    distances in a different way. For example if the distance has to be increased only passing from a vertex to another, the
-    combination of alfa0 = True and alfai = False for all the remaining i So the array should be: [True False False] for a 2-gmap can be used.
-    Defaults to None.
+            and the distance propagates only in the non foreground darts (!= 255)
+        accumulation_directions (typing.List[bool], optional): has to be a list of n+1 elements, where n is the level of
+            the gmap. Each element can be True, if the distance has to be increased, or False otherwise.
+            Passing None as parameter has the same result of passing an array of True.
+            The default behaviour is to increase the distance for all the directions, but a different combination can be
+            used to increase distances in a different way. For example if the distance has to be increased only passing
+            from a vertex to another, the combination of alfa_0 = True and alfa_i = False for all the remaining i So the
+            array should be: [True False False] for a 2-gmap can be used. Defaults to None.
     """
 
     accumulation_directions, curr_queue, next_queue = _init_wave_propagation(
@@ -80,13 +80,13 @@ def generalized_wave_propagation_gmap(
         seed_labels (typing.List[int]): the labels of the seeds darts.
         propagation_labels (typing.List[int]): the labels of the darts that can be propagated.
         target_labels (typing.List[int]): the labels of the darts that have to be reached.
-        accumulation_directions (typing.List[bool], optional): has to be a list of n+1 elements, where n is the level of the gmap.
-    Each element can be True, if the distance has to be increased, or False otherwise.
+        accumulation_directions (typing.List[bool], optional): has to be a list of n+1 elements, where n is the level of
+    the gmap. Each element can be True, if the distance has to be increased, or False otherwise.
     Passing None as parameter has the same result of passing an array of True.
-    The default behaviour is to increase the distance for all the directions, but a different combination can be used to increase
-    distances in a different way. For example if the distance has to be increased only passing from a vertex to another, the
-    combination of alfa0 = True and alfai = False for all the remaining i So the array should be: [True False False] for a 2-gmap can be used.
-    Defaults to None.
+    The default behaviour is to increase the distance for all the directions, but a different combination can be used
+    to increase distances in a different way. For example if the distance has to be increased only passing from a vertex
+    to another, the combination of alfa_0 = True and alfa_i = False for all the remaining i So the array should be:
+    [True False False] for a 2-gmap can be used. Defaults to None.
     """
 
     accumulation_directions, curr_queue, next_queue = _init_wave_propagation(
@@ -230,7 +230,8 @@ def wave_propagation_dt_image(
     return output_image
 
 
-def get_next_neighbour_image(index: int, x: int, y: int, max_x: int, max_y: int) -> typing.Tuple[int, int]:
+def get_next_neighbour_image(index: int, x: int, y: int, max_x: int, max_y: int)\
+        -> typing.Optional[typing.Tuple[int, int]]:
     """It returns the next neighbour of the pixel passed as parameter.
 
     Args:
@@ -325,11 +326,13 @@ def _init_wave_propagation(
     """Initializes the wave propagation.
 
     Args:
-        > gmap: the gmap to compute the distance transform.
-        > accumulation_directions (typing.List[bool], optional): has to be a list of n+1 elements, where n is the level of the gmap.
+        gmap: the gmap to compute the distance transform.
+        accumulation_directions (typing.List[bool], optional): has to be a list of n+1 elements,
+        where n is the level of the gmap.
 
     Returns:
-        typing.Tuple[typing.List[bool], Queue, Queue]: the accumulation directions, the queue of the seeds and the queue of the pixels.
+        typing.Tuple[typing.List[bool], Queue, Queue]: the accumulation directions, the queue of the seeds
+        and the queue of the pixels.
     """
 
     # Initialization
@@ -345,7 +348,8 @@ def _init_wave_propagation(
     return accumulation_directions, curr_queue, next_queue
 
 
-def _improved_wave_propagation_gmap_vertex(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int]) -> None:
+def _improved_wave_propagation_gmap_vertex(gmap, seed_labels: typing.List[int], propagation_labels: typing.List[int]) \
+        -> None:
     # TODO: Make this function work with voronoi diagram
     """
     It computes only dt, without saving information for the generation of voronoi diagram
@@ -359,45 +363,45 @@ def _improved_wave_propagation_gmap_vertex(gmap, seed_labels: typing.List[int], 
     total_start = time.time()
     # print(f"n_darts: {gmap.n_darts}")
 
-    def _get_neighbours_vertices(gmap, dart):
-        yield gmap.a0(dart)
-        yield gmap.a0(gmap.a1(dart))
-        yield gmap.a0(gmap.a1(gmap.a2(dart)))
-        yield gmap.a0(gmap.a1(gmap.a2(gmap.a1(dart))))
+    def _get_neighbours_vertices(_gmap, _dart):
+        yield _gmap.a0(_dart)
+        yield _gmap.a0(_gmap.a1(_dart))
+        yield _gmap.a0(_gmap.a1(_gmap.a2(_dart)))
+        yield _gmap.a0(_gmap.a1(_gmap.a2(_gmap.a1(_dart))))
 
-    def _set_distance_vertex(gmap, dart, distance):
-        gmap.distances[dart] = distance
-        gmap.distances[gmap.a1(dart)] = distance
-        gmap.distances[gmap.a2(dart)] = distance
-        gmap.distances[gmap.a2(gmap.a1(dart))] = distance
-        gmap.distances[gmap.a1(gmap.a2(dart))] = distance
-        gmap.distances[gmap.a2(gmap.a1(gmap.a2(dart)))] = distance
-        gmap.distances[gmap.a1(gmap.a2(gmap.a1(dart)))] = distance
-        gmap.distances[gmap.a2(gmap.a1(gmap.a2(gmap.a1(dart))))] = distance
+    def _set_distance_vertex(_gmap, _dart, distance):
+        _gmap.distances[_dart] = distance
+        _gmap.distances[_gmap.a1(_dart)] = distance
+        _gmap.distances[_gmap.a2(_dart)] = distance
+        _gmap.distances[_gmap.a2(_gmap.a1(_dart))] = distance
+        _gmap.distances[_gmap.a1(_gmap.a2(_dart))] = distance
+        _gmap.distances[_gmap.a2(_gmap.a1(_gmap.a2(_dart)))] = distance
+        _gmap.distances[_gmap.a1(_gmap.a2(_gmap.a1(_dart)))] = distance
+        _gmap.distances[_gmap.a2(_gmap.a1(_gmap.a2(_gmap.a1(_dart))))] = distance
 
-    def _init_seed_darts(gmap, wave_propagation_queue):
+    def _init_seed_darts(_gmap, wave_propagation_queue):
         """
         Return a dart for each vertex
         """
-        queue = Queue()
+        _queue = Queue()
 
-        dart = next(gmap.darts)
+        _dart = next(_gmap.darts)
         # I am using -1 to indicate that has been visited
-        _set_distance_vertex(gmap, dart, -1)
-        queue.put(dart)
+        _set_distance_vertex(_gmap, _dart, -1)
+        _queue.put(_dart)
 
-        while not queue.empty():
-            dart = queue.get()
-
-            if gmap.image_labels[dart] in seed_labels and gmap.distances[neighbour] != 0:
-                wave_propagation_queue.put(dart)
-                _set_distance_vertex(gmap, dart, 0)
+        while not _queue.empty():
+            _dart = _queue.get()
 
             # Visit all the neighbouring vertices
-            for neighbour in _get_neighbours_vertices(gmap, dart):
-                if gmap.distances[neighbour] == -2:
-                    queue.put(neighbour)
-                    _set_distance_vertex(gmap, neighbour, -1)
+            for _neighbour in _get_neighbours_vertices(_gmap, _dart):
+                if _gmap.image_labels[_dart] in seed_labels and _gmap.distances[_neighbour] != 0:
+                    wave_propagation_queue.put(_dart)
+                    _set_distance_vertex(_gmap, _dart, 0)
+
+                if _gmap.distances[_neighbour] == -2:
+                    _queue.put(_neighbour)
+                    _set_distance_vertex(_gmap, _neighbour, -1)
 
     # Initialization
     start = time.time()

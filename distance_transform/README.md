@@ -7,18 +7,18 @@ The gmap has to have the following interface:
 ```python
 def get_dart_by_indetifier(identifier: int) -> Dart:
     """
-        It returs the dart given the identifier
+        It returns the dart given the identifier
     """
 
 def ai(i: int, index: int) -> Dart:
     """
         It the returns, if it exist, the Dart associated with
-        "index" according to alfai
+        "index" according to alfa_i
     """
     
 def n() -> int:
     """
-        It returs the dimension of the gmap
+        It returns the dimension of the gmap
     """
     
 def darts_with_attributes() -> iterator<Dart>:

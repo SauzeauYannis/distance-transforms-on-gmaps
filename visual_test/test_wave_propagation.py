@@ -28,7 +28,7 @@ class TestWavePropagation(TestCase):
 
     def test_dt_after_reductio_big_image(self):
         image = cv2.imread('../data/100_100_portion_leaf.png', 0)
-        #image_borders = find_borders(image, 152)
+        # image_borders = find_borders(image, 152)
         gmap = LabelMap.from_labels(image)
         gmap.remove_edges()
         gmap.remove_vertices()
@@ -124,7 +124,6 @@ class TestWavePropagation(TestCase):
         gmap.remove_edges()
 
         gmap.remove_vertices()
-
 
         generalized_dijkstra_dt_gmap(gmap, [0], [255], generate_accumulation_directions_vertex(2))
 

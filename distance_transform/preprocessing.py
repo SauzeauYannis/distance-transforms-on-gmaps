@@ -272,7 +272,7 @@ def connected_component_labeling_one_pass(image: np.array) -> np.array:
     return labeled_image
 
 
-def generate_random_color() -> typing.Tuple[np.uint8, np.uint8, np.uint8]:
+def generate_random_color() -> typing.Tuple[float, float, float]:
     """Generate a random color
 
     Returns:
@@ -312,10 +312,10 @@ def build_rgb_image_from_labeled_image(labeled_image: np.array) -> np.array:
 
 
 def _wave_propagation_labeling(
-    image: np.array,
-    labeled_image: np.array,
-    position: typing.Tuple[int, int],
-    label: int
+        image: np.array,
+        labeled_image: np.array,
+        position: typing.Tuple[int, int],
+        label: int
 ) -> None:
     """Label the connected component using wave propagation algorithm
 
@@ -326,18 +326,18 @@ def _wave_propagation_labeling(
         label: the label to be assigned to the connected component    
     """
 
-    def is_point_in_connected_component(image: np.array, labeled_image: np.array,
-                                        position: typing.Tuple[int, int], label: int) -> bool:
+    def is_point_in_connected_component(_image: np.array, _labeled_image: np.array,
+                                        _position: typing.Tuple[int, int], _label: int) -> bool:
         # check if point is in image
-        if position[0] < 0 or position[0] >= image.shape[0] or position[1] < 0 or position[1] >= image.shape[1]:
+        if _position[0] < 0 or _position[0] >= _image.shape[0] or _position[1] < 0 or _position[1] >= _image.shape[1]:
             return False
 
         # check if the point has already got a label
-        if labeled_image[position[0]][position[1]] != -1:
+        if _labeled_image[_position[0]][_position[1]] != -1:
             return False
 
         # check if the point has the same label of the connected component in the image
-        if image[position[0]][position[1]] != label:
+        if _image[_position[0]][_position[1]] != _label:
             return False
 
         return True
@@ -380,11 +380,11 @@ def _wave_propagation_labeling(
 
 
 def _get_most_common_value(
-    image: np.array,
-    x: int,
-    y: int,
-    kernel_size: int,
-    center_kernel: bool = True
+        image: np.array,
+        x: int,
+        y: int,
+        kernel_size: int,
+        center_kernel: bool = True
 ) -> typing.Any:
     """Get the most common value in the kernel
 

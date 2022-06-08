@@ -90,17 +90,17 @@ def reduce_size_binary_image(image: np.array, stride: int) -> np.array:
         np.array: the reduced image
     """
 
-    def compute_reduced_value(image: np.array, reduced_image_x: int, reduced_image_y: int, stride: int) -> int:
-        start_x = reduced_image_x * stride
-        start_y = reduced_image_y * stride
-        end_x = start_x + stride
-        end_y = start_y + stride
+    def compute_reduced_value(_image: np.array, reduced_image_x: int, reduced_image_y: int, _stride: int) -> int:
+        start_x = reduced_image_x * _stride
+        start_y = reduced_image_y * _stride
+        end_x = start_x + _stride
+        end_y = start_y + _stride
 
-        for i in range(start_x, end_x):
-            for j in range(start_y, end_y):
-                if i > (image.shape[0] - 1) or j > (image.shape[1] - 1):
+        for _ in range(start_x, end_x):
+            for _ in range(start_y, end_y):
+                if i > (_image.shape[0] - 1) or j > (_image.shape[1] - 1):
                     continue
-                if image[i][j] == 0:
+                if _image[i][j] == 0:
                     return 0
 
         return 1
@@ -122,7 +122,7 @@ def reduce_size_binary_image(image: np.array, stride: int) -> np.array:
 def interpolate_dt_binary_image(dt_reduced_image: np.array, stride: int) -> np.array:
     """Interpolate the values of the distance transform image obtained from the reduced image
 
-    The algorithm is sequential but it can be parallelized to obtain (hopefully) O(1) time complexity.
+    The algorithm is sequential but it can be paralleled to obtain (hopefully) O(1) time complexity.
 
     Moreover the algorithm has been implemented giving priority to readability, sacrificing performance.
     If the results will be good a more efficient version of the algorithm will be implemented.
@@ -204,7 +204,7 @@ def improved_interpolate_dt_binary_image(original_image: np.array, dt_reduced_im
         All the pixels equal to 0 in the original image (background/seeds)
         will be equal to 0 also in the interpolated image.
         Wave propagation will be executed also from all of this seeds.
-        The algorithm should remain parallelizable as the naive one.
+        The algorithm should remain parallelize as the naive one.
 
     Changes:
         The stride parameter is no longer required because can be automatically computed from the shape
@@ -255,9 +255,9 @@ def _wave_propagation_interpolation(image: np.array, center_position: typing.Tup
     """Wave propagation on an interpolated image.
 
     Precondition:
-        The initial interpolated image (obtained before the interpolation starts), that is filled with the initial values
-        obtained by the dt reduced image and, optionally, by the zeros obtained by the original image, cannot have
-        a zero in a cell that has also a non-zero value.
+        The initial interpolated image (obtained before the interpolation starts), that is filled with the initial
+        values obtained by the dt reduced image and, optionally, by the zeros obtained by the original image, can not
+        have a zero in a cell that has also a non-zero value.
         This means that during the compression process the rule used tu compress the image is to always compress to a
         0 value if a the least a 0 value is present in the cell to compress.
 

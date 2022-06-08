@@ -1,7 +1,9 @@
+import typing
+
 import numpy as np
 
 
-def mae_image(dt_image: np.array, approximate_dt_image: np.array) -> float:
+def mae_image(dt_image: np.array, approximate_dt_image: np.array) -> typing.Any:
     """The average of the difference between the two images is computed
 
     Args:
