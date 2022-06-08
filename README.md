@@ -64,7 +64,7 @@ Let's consider the following example:
 
 Consider the following image:
 
-![png](data/image/DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png)
+![png](data/images/DEHYDRATION_small_leaf_4_time_1_ax1cros_0950_Label_1152x1350_uint8.png)
 
 ```python
 from cv2 import imread
