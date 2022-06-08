@@ -1,10 +1,11 @@
+import random
+
+import numpy as np
+import matplotlib.pyplot as plt
+
 from combinatorial.pixelmap import LabelMap
 from combinatorial.utils import build_dt_grey_image_from_gmap
 from distance_transform.wave_propagation import wave_propagation_dt_gmap, generate_accumulation_directions_cell
-
-import random
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 def plot_binary_image(image: np.array) -> None:

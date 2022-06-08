@@ -1,9 +1,9 @@
+import math
+import typing
+import random
 from queue import Queue
 
-import typing
 import numpy as np
-import math
-import random
 
 random.seed(42)
 
@@ -53,15 +53,19 @@ def is_equal_to_neighbours(image: np.array, value_position: typing.Tuple[int, in
     value_x = value_position[0]
     value_y = value_position[1]
 
-    x_values = [value_x - 1, value_x - 1, value_x - 1, value_x,
-                value_x,     value_x + 1, value_x + 1, value_x + 1]
-    y_values = [value_y - 1, value_y,     value_y + 1, value_y - 1,
-                value_y + 1, value_y - 1, value_y,     value_y + 1]
+    pixel = image[value_x][value_y]
+
+    x_values = [value_x - 1, value_x - 1, value_x - 1,
+                value_x, value_x,
+                value_x + 1, value_x + 1, value_x + 1]
+
+    y_values = [value_y - 1, value_y, value_y + 1,
+                value_y - 1, value_y + 1,
+                value_y - 1, value_y, value_y + 1]
 
     for x, y in zip(x_values, y_values):
-        if not (0 <= x < image.shape[0]) \
-                or not (0 <= y < image.shape[1]) \
-                or image[x][y] != image[value_x][value_y]:
+        if (0 <= x < image.shape[0]) and (0 <= y < image.shape[1]) \
+                and image[x][y] != pixel:
             return False
 
     return True
@@ -115,9 +119,6 @@ def find_borders_on_gmap(gmap, label_value: int) -> None:
     Args:
         gmap: the gmap to be modified
         label_value: the label value of the regions of interest
-
-    Returns:
-        None
     """
 
     # TODO: code this function
@@ -271,6 +272,45 @@ def connected_component_labeling_one_pass(image: np.array) -> np.array:
     return labeled_image
 
 
+def generate_random_color() -> typing.Tuple[np.uint8, np.uint8, np.uint8]:
+    """Generate a random color
+
+    Returns:
+        typing.Tuple[np.uint8, np.uint8, np.uint8]: the random color in RGB
+    """
+
+    r = math.floor(random.random() * 255)
+    g = math.floor(random.random() * 255)
+    b = math.floor(random.random() * 255)
+
+    return r, g, b
+
+
+def build_rgb_image_from_labeled_image(labeled_image: np.array) -> np.array:
+    """Build an RGB image from a labeled image
+
+    Args:
+        labeled_image: the labeled image
+
+    Returns:
+        np.array: the RGB image
+    """
+
+    rgb_image_shape = (labeled_image.shape[0], labeled_image.shape[1], 3)
+    rgb_image = np.zeros(rgb_image_shape, dtype=np.uint8)
+
+    colors = {}
+
+    for i in range(labeled_image.shape[0]):
+        for j in range(labeled_image.shape[1]):
+            if labeled_image[i][j] not in colors:
+                colors[labeled_image[i][j]] = generate_random_color()
+
+            rgb_image[i][j] = colors[labeled_image[i][j]]
+
+    return rgb_image
+
+
 def _wave_propagation_labeling(
     image: np.array,
     labeled_image: np.array,
@@ -337,45 +377,6 @@ def _wave_propagation_labeling(
                                            image[curr_position[0]][curr_position[1]]):
             labeled_image[next_position[0]][next_position[1]] = label
             queue.put(next_position)
-
-
-def generate_random_color() -> typing.Tuple[np.uint8, np.uint8, np.uint8]:
-    """Generate a random color
-
-    Returns:
-        typing.Tuple[np.uint8, np.uint8, np.uint8]: the random color in RGB
-    """
-
-    r = math.floor(random.random() * 255)
-    g = math.floor(random.random() * 255)
-    b = math.floor(random.random() * 255)
-
-    return r, g, b
-
-
-def build_rgb_image_from_labeled_image(labeled_image: np.array) -> np.array:
-    """Build an RGB image from a labeled image
-
-    Args:
-        labeled_image: the labeled image
-
-    Returns:
-        np.array: the RGB image
-    """
-    
-    rgb_image_shape = (labeled_image.shape[0], labeled_image.shape[1], 3)
-    rgb_image = np.zeros(rgb_image_shape, dtype=np.uint8)
-
-    colors = {}
-
-    for i in range(labeled_image.shape[0]):
-        for j in range(labeled_image.shape[1]):
-            if labeled_image[i][j] not in colors:
-                colors[labeled_image[i][j]] = generate_random_color()
-
-            rgb_image[i][j] = colors[labeled_image[i][j]]
-
-    return rgb_image
 
 
 def _get_most_common_value(

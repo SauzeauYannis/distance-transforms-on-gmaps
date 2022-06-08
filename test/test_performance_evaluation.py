@@ -1,8 +1,8 @@
 from unittest import TestCase
-import numpy as np
-from combinatorial.utils import build_dt_grey_image_from_gmap
 
-from distance_transform.performance_evaluation import *
+import numpy as np
+
+from distance_transform.performance_evaluation import mae_image
 
 
 class TestPerformanceEvaluation(TestCase):

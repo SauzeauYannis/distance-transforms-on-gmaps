@@ -1,38 +1,34 @@
 import random
 from unittest import TestCase
 
+import cv2
 import numpy as np
 
-from combinatorial.utils import build_dt_grey_image_from_gmap
-from distance_transform.wave_propagation import *
-from combinatorial.pixelmap import PixelMap
-from distance_transform.dt_utils import *
-from combinatorial.pixelmap import LabelMap
-from distance_transform.preprocessing import *
-from combinatorial.utils import *
-from data.labels import labels
-import cv2
-import time
+from combinatorial.pixelmap import LabelMap, PixelMap
+from distance_transform.dt_utils import gmap_dt_equal
+from distance_transform.wave_propagation import generate_accumulation_directions_cell, \
+    generate_accumulation_directions_vertex, wave_propagation_dt_gmap, wave_propagation_dt_image
 
 
 class TestWavePropagation(TestCase):
     def setUp(self) -> None:
         self.binary_image_1 = np.array(
             [[1, 1, 1, 1, 0],
-            [1, 1, 1, 0, 1],
-            [0, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1]])
+             [1, 1, 1, 0, 1],
+             [0, 1, 1, 1, 1],
+             [1, 1, 1, 1, 1],
+             [1, 1, 1, 1, 1]])
         self.expected_binary_image_1_dt = np.array(
             [[2, 3, 2, 1, 0],
-            [1, 2, 1, 0, 1],
-            [0, 1, 2, 1, 2],
-            [1, 2, 3, 2, 3],
-            [2, 3, 4, 3, 4]])
+             [1, 2, 1, 0, 1],
+             [0, 1, 2, 1, 2],
+             [1, 2, 3, 2, 3],
+             [2, 3, 4, 3, 4]])
 
     def test_wave_propagation_dt_binary_image(self):
         actual = wave_propagation_dt_image(self.binary_image_1)
-        self.assertEqual(self.expected_binary_image_1_dt.tolist(), actual.tolist())
+        self.assertEqual(
+            self.expected_binary_image_1_dt.tolist(), actual.tolist())
 
     def test_wave_propagation_dt_gmap(self):
         seeds = [2, 4, 7]
@@ -194,7 +190,7 @@ class TestWavePropagation(TestCase):
         Test if distance propagates correctly only through faces
         """
 
-        image = cv2.imread('../data/5_5_boundary.png', 0)
+        image = cv2.imread('../data/images/5_5_boundary_2.png', 0)
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 
@@ -240,101 +236,17 @@ class TestWavePropagation(TestCase):
 
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
-
-    def test_dt_after_reduction(self):
-        """
-        Test if distance propagates correctly only through faces
-        """
-        random.seed(42)
-
-        image = cv2.imread('../data/5_5_boundary.png', 0)
-        actual_gmap = LabelMap.from_labels(image)
-        expected_gmap = LabelMap.from_labels(image)
-
-        expected_gmap.plot()
-
-        # simplify gmap
-        actual_gmap.remove_edges()
-        actual_gmap.remove_vertices()
-        expected_gmap.remove_edges()
-        expected_gmap.remove_vertices()
-
-        expected_gmap.plot()
-
-        # set distances on expected gmap
-        expected_gmap.set_dart_distance(35, -1)
-        expected_gmap.set_dart_distance(36, -1)
-        expected_gmap.set_dart_distance(51, -1)
-        expected_gmap.set_dart_distance(52, -1)
-        expected_gmap.set_dart_distance(163, -1)
-        expected_gmap.set_dart_distance(164, -1)
-
-        expected_gmap.set_dart_distance(73, 0)
-        expected_gmap.set_dart_distance(74, 0)
-        expected_gmap.set_dart_distance(61, 0)
-        expected_gmap.set_dart_distance(62, 0)
-        expected_gmap.set_dart_distance(89, 0)
-        expected_gmap.set_dart_distance(90, 0)
-        expected_gmap.set_dart_distance(173, 0)
-        expected_gmap.set_dart_distance(174, 0)
-        expected_gmap.set_dart_distance(173, 0)
-        expected_gmap.set_dart_distance(171, 0)
-        expected_gmap.set_dart_distance(172, 0)
-        expected_gmap.set_dart_distance(115, 0)
-        expected_gmap.set_dart_distance(116, 0)
-
-        expected_gmap.set_dart_distance(96, 1)
-        expected_gmap.set_dart_distance(103, 1)
-        expected_gmap.set_dart_distance(181, 1)
-        expected_gmap.set_dart_distance(182, 1)
-        expected_gmap.set_dart_distance(153, 1)
-        expected_gmap.set_dart_distance(154, 1)
-
-        accumulation_directions = generate_accumulation_directions_cell(2)
-        wave_propagation_dt_gmap(actual_gmap, None, accumulation_directions)
-
-        # plot
-        expected_gmap.plot_dt(fill_cell='face')
-        actual_gmap.plot_dt(fill_cell='face')
-
-        dt_image = build_dt_grey_image_from_gmap(actual_gmap)
-        plot_dt_image(dt_image, None)
-
-        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
-
     def test_reduction_factor_0(self):
         random.seed(42)
-        image = cv2.imread('../data/5_5_boundary.png', 0)
+        image = cv2.imread('../data/images/5_5_boundary.png', 0)
         gmap = LabelMap.from_labels(image)
         gmap.remove_edges(0.0)
         gmap.plot()
         self.assertTrue(True)
 
-    def test_reduction_factor_05(self):
-        random.seed(42)
-        image = cv2.imread('../data/5_5_boundary.png', 0)
-        gmap = LabelMap.from_labels(image)
-        gmap.plot(attribute_to_show=True)
-        gmap.remove_edges(0.5)
-        gmap.remove_vertices()
-        gmap.plot(attribute_to_show=True)
-        self.assertTrue(True)
-
-    def test_dt_reduction_05(self):
-        random.seed(42)
-        image = cv2.imread('../data/5_5_boundary.png', 0)
-        compute_dt_reduction(image, 0.5)
-        self.assertTrue(True)
-
-    def test_dt_reduction_0(self):
-        random.seed(42)
-        image = cv2.imread('../data/5_5_boundary.png', 0)
-        compute_dt_reduction(image, 0)
-        self.assertTrue(True)
-
     def test_reduction_factor_pyramid(self):
         random.seed(42)
-        image = cv2.imread('../data/5_5_boundary.png', 0)
+        image = cv2.imread('../data/images/5_5_boundary.png', 0)
         gmap = LabelMap.from_labels(image)
         gmap.remove_edges(0.5)
         gmap.plot()
@@ -356,119 +268,3 @@ class TestWavePropagation(TestCase):
         # plot
         actual_gmap.plot_faces_dt()
         self.assertTrue(True)
-
-    def test_generalized_wave_propagation_image(self):
-        image = cv2.imread("../data/5_5_boundary.png", 0)
-        actual = generalized_wave_propagation_image(image, [0], [195], [255])
-        expected = np.zeros(actual.shape, actual.dtype)
-
-        expected.fill(-1)
-        expected[1, 2:] = 0
-        expected[2:, 1] = 0
-        expected[2, 4] = 0
-        expected[2:, 2] = 1
-        expected[2, 3] = 1
-        expected[3, 4] = 1
-        expected[3:, 3] = 2
-        expected[4, 4] = 2
-
-        print(actual)
-
-        self.assertEqual(actual.tolist(), expected.tolist())
-
-    def test_improved_wave_propagation_gmap_vertex_small_image(self):
-        image_name = "bug_image_improved.png"
-        image = cv2.imread("../data/" + image_name, 0)
-        expected_gmap = LabelMap.from_labels(image)
-        actual_gmap = LabelMap.from_labels(image)
-
-        actual_gmap.uniform_labels_for_vertices()
-        expected_gmap.uniform_labels_for_vertices()
-
-        accumulation_directions = generate_accumulation_directions_vertex(2)
-        generalized_wave_propagation_gmap(expected_gmap, [0], [255], accumulation_directions)
-        improved_wave_propagation_gmap_vertex(actual_gmap, [0], [255])
-
-        actual_gmap.plot()
-        expected_gmap.plot_dt()
-        actual_gmap.plot_dt()
-
-        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
-
-    def test_improved_wave_propagation_gmap_vertex_big_image(self):
-        image_name = "img.png"
-        image = cv2.imread("../data/diffusion_distance_images/" + image_name, 0)
-        reduced_image = reduce_image_size(image, 11)
-        expected_gmap = LabelMap.from_labels(reduced_image)
-        actual_gmap = LabelMap.from_labels(reduced_image)
-
-        actual_gmap.uniform_labels_for_vertices()
-        expected_gmap.uniform_labels_for_vertices()
-
-        accumulation_directions = generate_accumulation_directions_vertex(2)
-        start = time.time()
-        generalized_wave_propagation_gmap(expected_gmap, [labels["stomata"]], [labels["air"]], accumulation_directions)
-        end = time.time()
-        print(f"time s normal: {end - start}")
-        start = time.time()
-        improved_wave_propagation_gmap_vertex(actual_gmap, [labels["stomata"]], [labels["air"]])
-        end = time.time()
-        print(f"time s improved: {end - start}")
-
-        plt.imshow(reduced_image, cmap="gray", vmin=0, vmax=255)
-        plt.show()
-        grey_image = build_dt_grey_image_from_gmap(expected_gmap)
-        plot_dt_image(grey_image)
-        grey_image = build_dt_grey_image_from_gmap(actual_gmap)
-        plot_dt_image(grey_image)
-
-        # It's strange
-        # It seems correct, the dt should exist for that value
-        # Very strange
-        # Probably the bug is in the other algorithm
-        # I have to reduce the size of the image in order to find the bug
-
-        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
-
-    def test_improved_wave_propagation_gmap_vertex_reduced_image(self):
-        image_name = "img.png"
-        image = cv2.imread("../data/diffusion_distance_images/" + image_name, 0)
-        reduced_image = reduce_image_size(image, 11)
-        expected_gmap = LabelMap.from_labels(reduced_image)
-        actual_gmap = LabelMap.from_labels(reduced_image)
-
-        actual_gmap.uniform_labels_for_vertices()
-        expected_gmap.uniform_labels_for_vertices()
-
-        random.seed(42)
-        actual_gmap.remove_edges(1)
-        actual_gmap.remove_vertices()
-        random.seed(42)
-        expected_gmap.remove_edges(1)
-        expected_gmap.remove_vertices()
-
-        accumulation_directions = generate_accumulation_directions_vertex(2)
-        start = time.time()
-        generalized_wave_propagation_gmap(expected_gmap, [labels["stomata"]], [labels["air"]], accumulation_directions)
-        end = time.time()
-        print(f"time s normal: {end - start}")
-        start = time.time()
-        improved_wave_propagation_gmap_vertex(actual_gmap, [labels["stomata"]], [labels["air"]])
-        end = time.time()
-        print(f"time s improved: {end - start}")
-
-        plt.imshow(reduced_image, cmap="gray", vmin=0, vmax=255)
-        plt.show()
-        grey_image = build_dt_grey_image_from_gmap(expected_gmap)
-        plot_dt_image(grey_image)
-        grey_image = build_dt_grey_image_from_gmap(actual_gmap)
-        plot_dt_image(grey_image)
-
-        # It's strange
-        # It seems correct, the dt should exist for that value
-        # Very strange
-        # Probably the bug is in the other algorithm
-        # I have to reduce the size of the image in order to find the bug
-
-        self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
-

@@ -1,9 +1,11 @@
 from unittest import TestCase
 
-from distance_transform.pyramidal_dt import *
-from distance_transform.dt_utils import *
-from distance_transform.performance_evaluation import *
 import numpy as np
+
+from distance_transform.dt_utils import plot_binary_image, plot_dt_image
+from distance_transform.performance_evaluation import mae_image
+from distance_transform.pyramidal_dt import improved_interpolate_dt_binary_image, improved_pyramidal_dt_binary_image,\
+    interpolate_dt_binary_image, pyramidal_dt_binary_image, reduce_size_binary_image
 
 
 class TestPyramidalDt(TestCase):
@@ -78,17 +80,21 @@ class TestPyramidalDt(TestCase):
         plot_binary_image(self.binary_image_1)
         actual = reduce_size_binary_image(self.binary_image_1, stride=2)
         plot_binary_image(actual)
-        self.assertEqual(self.expected_reduced_binary_image_1.tolist(), actual.tolist())
+        self.assertEqual(
+            self.expected_reduced_binary_image_1.tolist(), actual.tolist())
 
     def test_interpolate_dt_binary_image(self):
-        actual = interpolate_dt_binary_image(self.expected_reduced_binary_image_1_dt, stride=2)
-        self.assertEqual(self.expected_interpolated_binary_image_1.tolist(), actual.tolist())
+        actual = interpolate_dt_binary_image(
+            self.expected_reduced_binary_image_1_dt, stride=2)
+        self.assertEqual(
+            self.expected_interpolated_binary_image_1.tolist(), actual.tolist())
 
     def test_pyramidal_dt_binary_image(self):
         plot_binary_image(self.binary_image_1)
         plot_dt_image(self.expected_binary_image_1_dt, max_value=10)
         actual = pyramidal_dt_binary_image(self.binary_image_1, stride=2)
-        self.assertEqual(self.expected_interpolated_binary_image_1.tolist(), actual.tolist())
+        self.assertEqual(
+            self.expected_interpolated_binary_image_1.tolist(), actual.tolist())
         plot_dt_image(actual, max_value=10)
 
         # Performance
@@ -108,14 +114,18 @@ class TestPyramidalDt(TestCase):
         self.assertTrue(True)
 
     def test_improved_interpolate_dt_binary_image(self):
-        actual = improved_interpolate_dt_binary_image(self.binary_image_1, self.expected_reduced_binary_image_1_dt)
-        self.assertEqual(self.improved_expected_interpolated_binary_image_1.tolist(), actual.tolist())
+        actual = improved_interpolate_dt_binary_image(
+            self.binary_image_1, self.expected_reduced_binary_image_1_dt)
+        self.assertEqual(
+            self.improved_expected_interpolated_binary_image_1.tolist(), actual.tolist())
 
     def test_improved_pyramidal_dt_binary_image(self):
         plot_binary_image(self.binary_image_1)
         plot_dt_image(self.expected_binary_image_1_dt, max_value=10)
-        actual = improved_pyramidal_dt_binary_image(self.binary_image_1, stride=2)
-        self.assertEqual(self.improved_expected_interpolated_binary_image_1.tolist(), actual.tolist())
+        actual = improved_pyramidal_dt_binary_image(
+            self.binary_image_1, stride=2)
+        self.assertEqual(
+            self.improved_expected_interpolated_binary_image_1.tolist(), actual.tolist())
         plot_dt_image(actual, max_value=10)
 
         # Performance
@@ -125,7 +135,7 @@ class TestPyramidalDt(TestCase):
 
 # MAYBE IN THIS SITUATION IS CONVENIENT TO IMPROVE THE RADIUS NEAR THE ZERO VALUE
 # IF I IMPROVE THE RADIUS I WILL OBTAIN A MORE PRECISE RESULT, BUT THE ALGORITHM BECAME MORE EXPENSIVE
-# BUT IS STILL PARALLELIZABLE.
+# BUT IS STILL PARALLELIZE.
 # IDEA:
 # THE RADIUS OF THE WAVE PROPAGATION IS AN HYPERPARAMETER, GREATER THE RADIUS, GREATER THE PRECISION.
 # IN FACT IF THE POSITION OF THE ZEROES IS PRECISE, APPLY A WAVE PROPAGATION ALGORITHM IN THAT POINT

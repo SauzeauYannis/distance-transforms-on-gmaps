@@ -4,7 +4,7 @@
 Each DT algorithm requires a gmap as input.
 The gmap has to have the following interface:
 
-``` 
+```python
 def get_dart_by_indetifier(identifier: int) -> Dart:
     """
         It returs the dart given the identifier

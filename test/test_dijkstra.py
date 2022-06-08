@@ -1,12 +1,13 @@
-from combinatorial.pixelmap import LabelMap
-from distance_transform.dijkstra import generalized_dijkstra_dt_gmap
-from distance_transform.dt_utils import gmap_dt_equal
-from distance_transform.wave_propagation import generalized_wave_propagation_gmap, generate_accumulation_directions_cell, generate_accumulation_directions_vertex
-
 from unittest import TestCase
 
 import cv2
 import random
+
+from combinatorial.pixelmap import LabelMap
+from distance_transform.dijkstra import generalized_dijkstra_dt_gmap
+from distance_transform.dt_utils import gmap_dt_equal
+from distance_transform.wave_propagation import generalized_wave_propagation_gmap,\
+    generate_accumulation_directions_cell, generate_accumulation_directions_vertex
 
 
 class TestDijkstra(TestCase):
@@ -39,7 +40,7 @@ class TestDijkstra(TestCase):
 
     def test_generalized_dijkstra_dt_gmap_weighted_vertices(self):
         random.seed(42)
-        image = cv2.imread('../data/images/dt_test_image_2.png', 0)
+        image = cv2.imread('../data/images/dt_test_image.png', 0)
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 
@@ -130,7 +131,7 @@ class TestDijkstra(TestCase):
         self.assertTrue(gmap_dt_equal(actual_gmap, expected_gmap))
 
     def test_generalized_dijkstra_dt_gmap_unweighted_faces_propagation_bug(self):
-        image = cv2.imread('../data/images/5_5_boundary.png', 0)
+        image = cv2.imread('../data/images/5_5_boundary_2.png', 0)
         actual_gmap = LabelMap.from_labels(image)
         expected_gmap = LabelMap.from_labels(image)
 

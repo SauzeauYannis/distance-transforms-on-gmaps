@@ -1,16 +1,17 @@
 from unittest import TestCase
 
-from combinatorial.pixelmap import LabelMap
-from distance_transform.dt_applications import compute_diffusion_distance, compute_diffusion_distance_image, compute_dt_for_diffusion_distance, compute_dt_for_diffusion_distance_image
-from distance_transform.dt_utils import gmap_dt_equal
-from distance_transform.preprocessing import generalized_find_borders, reduce_image_size
-from data.labels import labels
-
 import cv2
 import numpy as np
 
+from combinatorial.pixelmap import LabelMap
+from data.labels import labels
+from distance_transform.dt_applications import compute_diffusion_distance, compute_diffusion_distance_image, \
+    compute_dt_for_diffusion_distance, compute_dt_for_diffusion_distance_image
+from distance_transform.dt_utils import gmap_dt_equal
+from distance_transform.preprocessing import generalized_find_borders, reduce_image_size
 
-class TestPreprocessing(TestCase):
+
+class TestDtApplications(TestCase):
     def setUp(self) -> None:
         pass
 

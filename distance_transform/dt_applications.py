@@ -1,3 +1,10 @@
+import os
+import time
+import typing
+
+import cv2
+import numpy as np
+
 from combinatorial.pixelmap import LabelMap
 from combinatorial.gmaps import nGmap
 from combinatorial.utils import build_dt_grey_image_from_gmap
@@ -5,12 +12,6 @@ from data.labels import labels
 from distance_transform.dijkstra import generalized_dijkstra_dt_gmap
 from distance_transform.preprocessing import generalized_find_borders, connected_component_labeling_one_pass
 from distance_transform.wave_propagation import generalized_wave_propagation_gmap, generalized_wave_propagation_image, generate_accumulation_directions_vertex
-
-import typing
-import cv2
-import numpy as np
-import time
-import os
 
 
 def compute_diffusion_distance(gmap, label: int) -> float:
@@ -147,6 +148,7 @@ def compute_dt_for_diffusion_distance(image: np.array, dt_image_path: str = None
 
     return gmap, time_to_reduce_gmap_s, time_to_compute_dt_s
 
+
 def compute_dt_for_diffusion_distance_image(image: np.array) -> typing.Tuple[np.array, float]:
     """Computes the diffusion distance of the cell represented by the image in image_path.
 
@@ -159,12 +161,12 @@ def compute_dt_for_diffusion_distance_image(image: np.array) -> typing.Tuple[np.
 
     # Compute dt from stomata to the cells
     start = time.time_ns()
-    dt_image = generalized_wave_propagation_image(image, [labels["stomata"]], [labels['air']], [labels['cell']])
+    dt_image = generalized_wave_propagation_image(
+        image, [labels["stomata"]], [labels['air']], [labels['cell']])
     end = time.time_ns()
     time_to_compute_dt_s = (end - start) / (10 ** 9)
 
     return dt_image, time_to_compute_dt_s
-
 
 
 def compute_dt_from_stomata_to_cells(image: np.array) -> np.array:

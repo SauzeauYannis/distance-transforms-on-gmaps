@@ -1,6 +1,5 @@
-from heapq import heapify, heappush, heappop
-
 import typing
+from heapq import heapify, heappush, heappop
 
 
 def generalized_dijkstra_dt_gmap(
